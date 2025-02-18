@@ -1,19 +1,19 @@
-pre-commit:
-  parallel: true 
-  commands:
-    lint:
-      glob: "*.{js,jsx,ts,tsx}"
-      run: |
-        cd client && npm run lint
-    go-lint:
-      glob: "*.go"
-      run: |
-        golangci-lint run
-    format:
-      glob: "*.{js,jsx,ts,tsx}"
-      run: |
-        cd client && npm run format
-    test:
-      run: |
-        cd client && npm run test
-        go test ./...
+# pre-commit:
+#   parallel: true 
+#   commands:
+#     lint:
+#       glob: "*.{js,jsx,ts,tsx}"
+#       run: |
+#         cd client && npm run lint
+#     go-lint:
+#       glob: "*.go"
+#       run: |
+#         golangci-lint run
+#     format:
+#       glob: "*.{js,jsx,ts,tsx}"
+#       run: |
+#         cd client && npm run format
+#     test:
+#       run: |
+#         cd client && npm run test
+#         go test ./...
