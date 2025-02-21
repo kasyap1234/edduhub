@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "jotai": "^2.12.1",
     "next": "15.1.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "recoil": "^0.7.7"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
