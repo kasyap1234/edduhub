@@ -5,8 +5,16 @@ import (
 )
 type Config struct {
 	db *bun.DB 
+	//auth 
 
 }
+
+func NewConfig()(*Config){{
+	return &Config{
+
+	}
+}}
 func LoadConfig(){
+
 
 }
