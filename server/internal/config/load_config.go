@@ -4,17 +4,25 @@ import (
 	"github.com/uptrace/bun"
 )
 type Config struct {
-	db *bun.DB 
-	//auth 
+	DB *bun.DB 
+	DBConfig DBConfig
+	// Auth AuthConfig 
 
 }
 
-func NewConfig()(*Config){{
+func NewConfig()(*Config,error){{
+	dbConfig :=Start()
+	db:=LoadDatabase()
 	return &Config{
-
-	}
+DB: db, 
+DBConfig: dbConfig,
+	},nil 
 }}
-func LoadConfig(){
 
-
+func LoadConfig()(*Config,error){
+return NewConfig()
 }
+
+
+
+

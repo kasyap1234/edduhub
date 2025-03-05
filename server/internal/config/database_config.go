@@ -16,9 +16,9 @@ type DBConfig struct {
  SSLMode string 
 
 }
-func LoadDatabase()*bun.DB{
-	
-dbconfig:=DBConfig{
+
+func Start()DBConfig{
+	dbconfig:=DBConfig{
 	Host: "localhost",
 	Port : "5432",
 	User: "postgres",
@@ -26,6 +26,11 @@ dbconfig:=DBConfig{
 	DBName: "eduhub",
 	SSLMode: "disable",
 }
+return dbconfig
+}
+func LoadDatabase()*bun.DB{
+	dbconfig :=Start()
+
 dsn :=buildDSN(dbconfig)
 // dsn := "unix://user:pass@dbname/var/run/postgresql/.s.PGSQL.5432"
 sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
