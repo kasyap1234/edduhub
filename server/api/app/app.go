@@ -12,26 +12,22 @@ type App struct {
 	r      *chi.Mux
 	db     *bun.DB
 	config *config.Config
+	authConfig *config.AuthConfig
 }
+
 
 func (a *App) New() *App {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
+	authcfg,err :=config.LoadAuthConfig()
 	return &App{
 		r:      chi.NewRouter(),
 		db:     cfg.DB,
 		config: cfg,
+		authConfig: authcfg,
 	}
 
 }
 
-func (a *App) Start() (*config.Config, error) {
-	cfg, err := config.LoadConfig()
-
-	if err != nil {
-		return nil, err
-	}
-	return cfg, nil
-}
