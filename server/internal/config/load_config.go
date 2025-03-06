@@ -16,18 +16,19 @@ type Config struct {
 func NewConfig()(*Config,error){{
 	dbConfig :=Start()
 	db:=LoadDatabase()
-	authConfig:=AuthConfig{
-		Domain: os.Getenv("domain"),
-		Key: os.Getenv("key"),
-		ClientID: os.Getenv("clientid"),
-		RedirectURI: os.Getenv("redirecturi"),
-		Port: os.Getenv("port"),
+	// authConfig:=AuthConfig{
+	// 	Domain: os.Getenv("domain"),
+	// 	Key: os.Getenv("key"),
+	// 	ClientID: os.Getenv("clientid"),
+	// 	RedirectURI: os.Getenv("redirecturi"),
+	// 	Port: os.Getenv("port"),
 
-	}
+	// }
+	authConfig:=LoadAuthConfig()
 	return &Config{
 DB: db, 
 DBConfig: *dbConfig,
-Auth : authConfig,
+Auth : *authConfig,
 	},nil 
 }}
 
