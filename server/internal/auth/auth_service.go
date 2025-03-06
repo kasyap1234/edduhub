@@ -21,5 +21,5 @@ func NewAuthService(cfg *config.AuthConfig)*AuthService{
 }
 
 func(s *AuthService)GetLoginURL()string {
-	
+	return ""
 }
