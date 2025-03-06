@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zitadel/zitadel-go/pkg/client/zitadel"
+	"github.com/zitadel/zitadel-go/pkg/client"
 	"github.com/zitadel/zitadel-go/v3/pkg/zitadel"
 )
 
@@ -28,7 +28,7 @@ func LoadAuthConfig() (*AuthConfig, error) {
 	}
 
 	// Initialize Zitadel client
-	client, err := zitadel.New(
+	client, err := client.New(
 		context.Background(),
 		zitadel.WithCustomDomain(config.Domain),
 		zitadel.WithJWTProfileTokenSource(config.ClientID, []byte(config.Key)),
