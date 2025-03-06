@@ -15,7 +15,7 @@ func NewConfig()(*Config,error){{
 	db:=LoadDatabase()
 	return &Config{
 DB: db, 
-DBConfig: dbConfig,
+DBConfig: *dbConfig,
 	},nil 
 }}
 

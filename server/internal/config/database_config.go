@@ -17,7 +17,7 @@ type DBConfig struct {
 
 }
 
-func Start()DBConfig{
+func Start()*DBConfig{
 	dbconfig:=DBConfig{
 	Host: "localhost",
 	Port : "5432",
@@ -26,12 +26,12 @@ func Start()DBConfig{
 	DBName: "eduhub",
 	SSLMode: "disable",
 }
-return dbconfig
+return &dbconfig
 }
 func LoadDatabase()*bun.DB{
 	dbconfig :=Start()
 
-dsn :=buildDSN(dbconfig)
+dsn :=buildDSN(*dbconfig)
 // dsn := "unix://user:pass@dbname/var/run/postgresql/.s.PGSQL.5432"
 sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 
