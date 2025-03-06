@@ -5,37 +5,44 @@ import (
 
 	"github.com/uptrace/bun"
 )
+
 type Config struct {
-	DB *bun.DB 
+	DB       *bun.DB
 	DBConfig DBConfig
-	Auth AuthConfig
-
-
+	Auth     struct {
+		Domain      string
+		Key         string
+		ClientID    string
+		RedirectURI string
+		Port        string
+	}
 }
 
-func NewConfig()(*Config,error){{
-	dbConfig :=Start()
-	db:=LoadDatabase()
-	// authConfig:=AuthConfig{
-	// 	Domain: os.Getenv("domain"),
-	// 	Key: os.Getenv("key"),
-	// 	ClientID: os.Getenv("clientid"),
-	// 	RedirectURI: os.Getenv("redirecturi"),
-	// 	Port: os.Getenv("port"),
+func NewConfig() (*Config, error) {
+	dbConfig := Start()
+	db := LoadDatabase()
 
-	// }
-	authConfig:=LoadAuthConfig()
-	return &Config{
-DB: db, 
-DBConfig: *dbConfig,
-Auth : *authConfig,
-	},nil 
-}}
+	cfg := &Config{
+		DB:       db,
+		DBConfig: *dbConfig,
+		Auth: struct {
+			Domain      string
+			Key         string
+			ClientID    string
+			RedirectURI string
+			Port        string
+		}{
+			Domain:      os.Getenv("domain"),
+			Key:         os.Getenv("key"),
+			ClientID:    os.Getenv("clientid"),
+			RedirectURI: os.Getenv("redirecturi"),
+			Port:        os.Getenv("port"),
+		},
+	}
 
-func LoadConfig()(*Config,error){
-return NewConfig()
+	return cfg, nil
 }
 
-
-
-
+func LoadConfig() (*Config, error) {
+	return NewConfig()
+}
