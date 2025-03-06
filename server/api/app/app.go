@@ -27,11 +27,10 @@ func(a*App)New()*App{
 
 }
 
-func (a*App)Start(){
-	cfg :=config.LoadConfig()
-	auth :=config.LoadAuth()
-	db := config.LoadDatabase()
-	
-	
-
+func (a*App)Start()(*config.Config,error){
+	cfg,err:=config.LoadConfig()
+	if err !=nil {
+		return  nil,err
+	}
+	return cfg,nil 
 }
