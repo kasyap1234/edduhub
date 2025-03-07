@@ -9,13 +9,7 @@ import (
 type Config struct {
 	DB       *bun.DB
 	DBConfig DBConfig
-	Auth     struct {
-		Domain      string
-		Key         string
-		ClientID    string
-		RedirectURI string
-		Port        string
-	}
+	AuthConfig *AuthConfig
 }
 
 func NewConfig() (*Config, error) {
@@ -25,19 +19,7 @@ func NewConfig() (*Config, error) {
 	cfg := &Config{
 		DB:       db,
 		DBConfig: *dbConfig,
-		Auth: struct {
-			Domain      string
-			Key         string
-			ClientID    string
-			RedirectURI string
-			Port        string
-		}{
-			Domain:      os.Getenv("domain"),
-			Key:         os.Getenv("key"),
-			ClientID:    os.Getenv("clientid"),
-			RedirectURI: os.Getenv("redirecturi"),
-			Port:        os.Getenv("port"),
-		},
+		
 	}
 
 	return cfg, nil

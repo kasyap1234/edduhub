@@ -3,52 +3,62 @@ package config
 import (
 	"context"
 	"fmt"
-	"os"
 	"net/url"
+	"os"
 	"strings"
-	"github.com/zitadel/zitadel-go/pkg/client/zitadel"
-	"github.com/zitadel/zitadel-go/v3/pkg"
+
 	"github.com/zitadel/oidc/v3/pkg/client"
-	"github.com/zitadel/oidc/v3/pkg/oidc"
 )
 
 type AuthConfig struct {
-	Domain      string
-	Key         string
-	ClientID    string
-	ClientSecret string 
-	RedirectURI string
-	Port        string
-	PostLogoutRedirectURI string 
-	Client      *zitadel.Client
+	Domain                string
+	Key                   string
+	ClientID              string
+	ClientSecret          string
+	RedirectURI           string
+	Port                  string
+	PostLogoutRedirectURI string
+	Client                *client.Client
+	Scopes                []string
 }
 
 func LoadAuthConfig() (*AuthConfig, error) {
-	config := &AuthConfig{
-		Domain:      os.Getenv("ZITADEL_DOMAIN"),
-		Key:         os.Getenv("ZITADEL_KEY"),
-		ClientID:    os.Getenv("ZITADEL_CLIENT_ID"),
-		ClientSecret: os.Getenv("ZITADEL_ClIENT_SECRET"),
-		RedirectURI: os.Getenv("ZITADEL_REDIRECT_URI"),
-		Port:        os.Getenv("PORT"),
+	domain := os.Getenv("ZITADEL_DOMAIN")
+	if domain == "" {
+		return nil, fmt.Errorf("ZITADEL_DOMAIN is required")
 	}
 
-	ctx :=context.Background()
-	// Initialize Zitadel client
-	client, err :=client.New(
+	config := &AuthConfig{
+		Domain:       domain,
+		Key:          os.Getenv("ZITADEL_KEY"),
+		ClientID:     os.Getenv("ZITADEL_CLIENT_ID"),
+		ClientSecret: os.Getenv("ZITADEL_CLIENT_SECRET"),
+		RedirectURI:  os.Getenv("ZITADEL_REDIRECT_URI"),
+		Port:         os.Getenv("PORT"),
+		Scopes:       []string{"openid", "profile", "email"},
+	}
+
+	// Validate required fields
+	if config.ClientID == "" || config.ClientSecret == "" || config.RedirectURI == "" {
+		return nil, fmt.Errorf("missing required configuration")
+	}
+
+	ctx := context.Background()
+	// Initialize OIDC client
+	oidcClient, err := client.New(
 		ctx,
-		&url.URL{Scheme: "https", Host: config.Domain}, // Production should be HTTPS
+		&url.URL{Scheme: "https", Host: config.Domain},
 		client.WithClientID(config.ClientID),
-		client.WithClientSecret(config.ClientSecret), // Consider fetching from env vars
+		client.WithClientSecret(config.ClientSecret),
 		client.WithRedirectURL(config.RedirectURI),
+		client.WithScopes(config.Scopes...),
 		client.WithPostLogoutRedirectURI(config.PostLogoutRedirectURI),
-		client.WithInsecureAllowHTTP(strings.Contains(config.Domain, "localhost")), // Dev only
-		
+		client.WithInsecureAllowHTTP(strings.Contains(config.Domain, "localhost")),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize Zitadel client: %w", err)
+		return nil, fmt.Errorf("failed to initialize OIDC client: %w", err)
 	}
 
-	config.Client = client
+	config.Client = oidcClient
 	return config, nil
 }

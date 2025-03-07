@@ -17,11 +17,12 @@ type App struct {
 
 
 func (a *App) New() *App {
+	authcfg,err :=config.LoadAuthConfig()
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
-	authcfg,err :=config.LoadAuthConfig()
+	
 	return &App{
 		r:      chi.NewRouter(),
 		db:     cfg.DB,
