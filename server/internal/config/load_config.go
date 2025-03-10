@@ -9,7 +9,7 @@ import (
 type Config struct {
 	DB       *bun.DB
 	DBConfig DBConfig
-	AuthConfig *AuthConfig
+	// AuthConfig *AuthConfig
 }
 
 func NewConfig() (*Config, error) {
