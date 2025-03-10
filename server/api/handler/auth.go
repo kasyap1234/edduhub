@@ -9,12 +9,12 @@ import (
 )
 
 type AuthHandler struct {
-    authService *auth.AuthService
+    AuthService *auth.AuthService
 }
 
 func NewAuthHandler(authService *auth.AuthService)*AuthHandler{
     return &AuthHandler{
-        authService: authService,
+        AuthService: authService,
     }
 }
 
@@ -53,5 +53,5 @@ func (h*AuthHandler)LoginUser(c echo.Context)error {
 
 
 func (h*AuthHandler)VerifyToken(c echo.Context)error {
-    
+
 }
