@@ -46,3 +46,12 @@ func(h *AuthHandler)RegisterUser(e echo.Context)error {
 
     return e.JSON(http.StatusOK, map[string]string{"message": "User registered successfully"})
 }
+
+func (h*AuthHandler)LoginUser(c echo.Context)error {
+
+}
+
+
+func (h*AuthHandler)VerifyToken(c echo.Context)error {
+    
+}

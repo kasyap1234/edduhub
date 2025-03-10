@@ -9,17 +9,17 @@ import (
 type Config struct {
 	DB       *bun.DB
 	DBConfig DBConfig
-	// AuthConfig *AuthConfig
+	AuthConfig *AuthConfig
 }
 
 func NewConfig() (*Config, error) {
 	dbConfig := Start()
 	db := LoadDatabase()
-
+	authConfig:= AuthConfig()
 	cfg := &Config{
 		DB:       db,
 		DBConfig: *dbConfig,
-		
+		AuthConfig: authConfig,
 	}
 
 	return cfg, nil

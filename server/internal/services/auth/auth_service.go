@@ -5,14 +5,15 @@ import (
 	"eduhub/server/internal/config"
 	"fmt"
 	"strings"
-
+	"eduhub/server/internal/repository"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/management"
 	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel"
 )
 
 type AuthService struct {
-	client     *zitadel.Client
+	 
 	authConfig *config.AuthConfig
+
 }
 
 type RegisterUserParams struct {
@@ -25,8 +26,8 @@ type RegisterUserParams struct {
 
 func NewAuthService(cfg *config.AuthConfig) *AuthService {
 	return &AuthService{
-		client:     cfg.Client,
-		authConfig: cfg,
+			authConfig: cfg,
+			
 	}
 }
 
@@ -45,13 +46,13 @@ func (s *AuthService) GetLoginURL() string {
 
 func (s *AuthService) RegisterUser(ctx context.Context, params RegisterUserParams) error {
 	// Check if organization exists
-	org, err := s.client.ManagementAPI().GetOrganizationByID(ctx, params.OrgID)
+	org, err := s.authConfig.Client.ManagementAPI().GetOrganizationByID(ctx, params.OrgID)
 	if err != nil {
 		return fmt.Errorf("invalid organization: %w", err)
 	}
 
 	// Create user in the specific organization
-	_, err = s.client.ManagementAPI().CreateUser(ctx, &management.CreateUserRequest{
+	_, err = s.authConfig.Client.ManagementAPI().CreateUser(ctx, &management.CreateUserRequest{
 		Username: params.Email,
 		Password: params.Password,
 		Profile: &management.Profile{
@@ -66,14 +67,14 @@ func (s *AuthService) RegisterUser(ctx context.Context, params RegisterUserParam
 }
 
 func (s *AuthService) ExchangeCodeForToken(ctx context.Context, code string) (*zitadel.Token, error) {
-	return s.client.ExchangeAuthCode(ctx, code, s.authConfig.RedirectURI)
+	return s.authConfig.Client.ExchangeAuthCode(ctx, code, s.authConfig.RedirectURI)
 }
 
 func (s *AuthService) VerifyToken(ctx context.Context, token string) (*zitadel.TokenClaims, error) {
-	return s.client.VerifyAccessToken(ctx, token)
+	return s.authConfig.Client.VerifyAccessToken(ctx, token)
 }
 
 func (s *AuthService) ValidateOrganization(ctx context.Context, orgID string) error {
-	_, err := s.client.ManagementAPI().GetOrganizationByID(ctx, orgID)
+	_, err := s.authConfig.Client.ManagementAPI().GetOrganizationByID(ctx, orgID)
 	return err
 }
