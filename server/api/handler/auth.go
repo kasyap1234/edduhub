@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"eduhub/server/internal/helpers"
 	"eduhub/server/internal/services/auth"
-    "net/http"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -30,5 +32,17 @@ func(h *AuthHandler)RegisterUser(e echo.Context)error {
         return e.JSON(http.StatusBadRequest,map[string]string{"error": "invalid request body"})
 
     }
-    params := auth.RegisterUserParams
+    orgID:=helpers.NameToID(req.CollegeName)
+    params := auth.RegisterUserParams{
+        Email: req.Email, 
+        Password: req.Password, 
+        FirstName: req.FirstName,
+        LastName: req.LastName,
+        OrgID: orgID,
+    }
+    if err := h.authService.RegisterUser(e.Request().Context(), params); err != nil {
+        return e.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+    }
+
+    return e.JSON(http.StatusOK, map[string]string{"message": "User registered successfully"})
 }
