@@ -14,6 +14,7 @@ type App struct {
 	db     *bun.DB
 	config *config.Config
 	authConfig *config.AuthConfig
+	
 }
 
 
