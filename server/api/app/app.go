@@ -5,7 +5,6 @@ import (
 	"eduhub/server/internal/config"
 	"eduhub/server/internal/services/auth"
 	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/uptrace/bun"
@@ -72,14 +71,16 @@ func (a *App) authMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		// Use the auth handler to verify the token
-		claims, err := a.handlers.Auth.VerifyToken(c.Request().Context(), token)
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{
-				"error": "Invalid token",
-			})
-		}
+		// 	claims, err := a.handlers.Auth.VerifyToken(c.Request().Context(), token)
+		// 	if err != nil {
+		// 		return c.JSON(http.StatusUnauthorized, map[string]string{
+		// 			"error": "Invalid token",
+		// 		})
+		// 	}
 
-		c.Set("claims", claims)
-		return next(c)
+		// 	c.Set("claims", claims)
+		// 	return next(c)
+		// }
 	}
+
 }

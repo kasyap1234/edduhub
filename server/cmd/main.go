@@ -1,6 +1,16 @@
-package main 
+package main
 
-import "eduhub/server/api/app"
+import (
+	"eduhub/server/api/app"
+	"fmt"
+)
 func main(){
-	app :=app.New()
+	
+setup :=app.New().Start(); 
+if setup!=nil {
+	fmt.Println("initiated server")
+}
+
+
+	
 }
