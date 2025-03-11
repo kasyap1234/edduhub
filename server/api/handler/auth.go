@@ -4,7 +4,6 @@ import (
 	"eduhub/server/internal/helpers"
 	"eduhub/server/internal/services/auth"
 	"net/http"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -40,7 +39,7 @@ func(h *AuthHandler)RegisterUser(e echo.Context)error {
         LastName: req.LastName,
         OrgID: orgID,
     }
-    if err := h.authService.RegisterUser(e.Request().Context(), params); err != nil {
+    if err := h.AuthService.RegisterUser(e.Request().Context(), params); err != nil {
         return e.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
     }
 
