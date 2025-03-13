@@ -1,6 +1,9 @@
 package handler
 
-import "eduhub/server/internal/services/auth"
+import (
+	"eduhub/server/internal/services"
+	"eduhub/server/internal/services/auth"
+)
 
 type Handlers struct {
 	Auth *AuthHandler
@@ -10,9 +13,9 @@ type Handlers struct {
 	// attendance handler 
 }
 
-func NewHandlers()*Handlers{
+func NewHandlers(services *services.Services)*Handlers{
 	return &Handlers{
-		Auth: NewAuthHandler(),
+		Auth: NewAuthHandler(services.Auth),
 
 	}
 }
