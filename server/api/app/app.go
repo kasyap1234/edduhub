@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/uptrace/bun"
+	"eduhub/server/internal/middleware"
 )
 
 type App struct {
@@ -24,7 +25,7 @@ func New() *App {
 	}
 
 	// Initialize auth service
-	authService := auth.NewAuthService(cfg.AuthConfig)
+	
 
 	// Initialize handlers
 	handlers := handler.NewHandlers(authService)
@@ -50,22 +51,38 @@ func (a *App) Start() error {
 }
 
 func (a *App) setupRoutes() {
-	// Auth routes
+	// Initialize Kratos middleware
+	kratosMiddleware := middleware.NewKratosMiddleware(a.handlers.Auth.KratosService)
+
+	// Auth routes (public)
 	auth := a.e.Group("/auth")
-	auth.POST("/register", a.handlers.Auth.RegisterUser)
-	auth.GET("/login", a.handlers.Auth.LoginUser)
-	// auth.GET("/callback", a.handlers.Auth.HandleCallback)
+	auth.POST("/register", a.handlers.Auth.InitiateRegistration)
+	auth.GET("/login", a.handlers.Auth.HandleLogin)
+	auth.GET("/callback", a.handlers.Auth.HandleCallback)
 
 	// Protected routes
 	api := a.e.Group("/api")
-	api.Use(a.handlers.Auth.AuthService.VerifyTokenMiddleware)
+	api.Use(kratosMiddleware.ValidateSession)
 
-	// Organization specific routes
-	college := api.Group("/college/:orgID")
-	college.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			orgID := c.Param("orgID")
-			return a.handlers.Auth.AuthService.RequireOrganization(orgID)(next)(c)
-		}
-	})
+	// College-specific routes with role checks
+	college := api.Group("/college/:collegeID")
+	college.Use(kratosMiddleware.RequireCollege)
+
+	// // Academic routes
+	// academic := college.Group("/academic")
+	// academic.GET("/attendance", a.handlers.Academic.ViewAttendance)
+	// academic.POST("/attendance", a.handlers.Academic.MarkAttendance,
+	// 	kratosMiddleware.RequireRole(RoleFaculty, RoleAdmin))
+
+	// // Finance routes
+	// finance := college.Group("/finance")
+	// finance.GET("/fees", a.handlers.Finance.ViewFees)
+	// finance.POST("/fees", a.handlers.Finance.ManageFees,
+	// 	kratosMiddleware.RequireRole(RoleAdmin))
+
+	// // Admin routes
+	// admin := college.Group("/admin")
+	// admin.Use(kratosMiddleware.RequireRole(RoleAdmin))
+	// admin.GET("/reports", a.handlers.Admin.ViewReports)
+	// admin.POST("/users", a.handlers.Admin.ManageUsers)
 }
