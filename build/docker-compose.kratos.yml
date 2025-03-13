@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  kratos:
+    image: oryd/kratos:latest
+    ports:
+      - "4433:4433"  # Public API
+      - "4434:4434"  # Admin API
+    environment:
+      - DSN=postgres://kratos:secret@postgres:5432/kratos?sslmode=disable
+    volumes:
+      - ./kratos.yml:/etc/config/kratos.yml
+      - ./identity.schema.json:/etc/config/identity.schema.json
+    command: -c /etc/config/kratos.yml serve
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=kratos
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=kratos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

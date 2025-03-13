@@ -1,0 +1,40 @@
+# auth/docker-compose.kratos.yml
+version: '3.8'
+
+services:
+  kratos:
+    image: oryd/kratos:v0.13.0
+    ports:
+      - "4433:4433" # public
+      - "4434:4434" # admin
+    environment:
+      - DSN=memory
+      - LOG_LEVEL=trace
+    volumes:
+      - type: bind
+        source: ./kratos/kratos.yaml
+        target: /etc/config/kratos/kratos.yaml
+      - type: bind
+        source: ./kratos/identity.schema.json
+        target: /etc/config/kratos/identity.schema.json
+    command: serve -c /etc/config/kratos/kratos.yaml --dev --watch-courier
+    restart: unless-stopped
+    depends_on:
+      - mailslurper
+
+  mailslurper:
+    image: oryd/mailslurper:latest-smtps
+    ports:
+      - "4436:4436"
+      - "4437:4437"
+
+  kratos-selfservice-ui-node:
+    image: oryd/kratos-selfservice-ui-node:v0.13.0
+    environment:
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
+    ports:
+      - "4455:4455"
+    restart: unless-stopped
+    depends_on:
+      - kratos
