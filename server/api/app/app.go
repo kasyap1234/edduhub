@@ -6,10 +6,10 @@ import (
 	"eduhub/server/internal/services"
 	"eduhub/server/internal/services/auth"
 
-	"eduhub/server/internal/middleware"
+	localmid "eduhub/server/internal/middleware"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echomid "github.com/labstack/echo/v4/middleware"
 	"github.com/uptrace/bun"
 )
 
@@ -47,9 +47,9 @@ func New() *App {
 
 func (a *App) Start() error {
 	// Middleware
-	a.e.Use(middleware.Logger())
-	a.e.Use(middleware.Recover())
-	a.e.Use(middleware.CORS())
+	a.e.Use(echomid.Logger())
+	a.e.Use(echomid.Recover())
+	a.e.Use(echomid.CORS())
 
 	// Setup routes
 	a.setupRoutes()
@@ -62,6 +62,6 @@ func (a*App)setupRoutes(){
 	// auth routes  
 	// protected college routes 
 	// protected finance routes 
-	
+
 
 }
