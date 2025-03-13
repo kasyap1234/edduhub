@@ -25,10 +25,11 @@ func New() *App {
 	}
 
 	// Initialize auth service
-	
+	authService := auth.NewKratosService()
+
 
 	// Initialize handlers
-	handlers := handler.NewHandlers(authService)
+	authHandler:=handlers.
 
 	return &App{
 		e:        echo.New(),

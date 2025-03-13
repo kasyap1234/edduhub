@@ -10,9 +10,9 @@ type Handlers struct {
 	// attendance handler 
 }
 
-func NewHandlers(kratosService *auth.KratosService)*Handlers{
+func NewHandlers()*Handlers{
 	return &Handlers{
-		Auth: NewAuthHandler(kratosService),
-		
+		Auth: NewAuthHandler(),
+
 	}
 }
