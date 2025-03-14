@@ -60,8 +60,15 @@ func (a *App) Start() error {
 func (a*App)setupRoutes(){
 
 	// auth routes  
+
 	// protected college routes 
 	// protected finance routes 
+auth :=a.e.Group("/auth")
+
+auth.POST("/register",a.handlers.Auth.InitiateRegistration)
+auth.POST("/auth/register/complete",a.handlers.Auth.HandleRegistration)
+auth.GET("/login",a.handlers.Auth.HandleLogin)
+auth.GET("/callback",a.handlers.Auth.HandleCallback)
 
 
 }
