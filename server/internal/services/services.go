@@ -6,7 +6,7 @@ import (
 )
 
 type Services struct {
-	Auth *auth.KratosService
+	Auth auth.AuthService 
 	// Quiz *Quiz.QuizService 
 	// Fee *Fee.FeeService 
 }

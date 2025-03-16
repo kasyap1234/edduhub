@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func NewConfig() (*Config, error) {
-	dbConfig := Start()
+	dbConfig := LoadDatabaseConfig()
 	db := LoadDatabase()
 	authConfig,err:= LoadAuthConfig()
 	if err !=nil {

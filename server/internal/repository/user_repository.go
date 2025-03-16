@@ -3,7 +3,8 @@ import (
 	"gorm.io/gorm"
 )
 type UserRepository interface{
-
+FindByID(ID int)(*User)
+FindBy
 }
 
 

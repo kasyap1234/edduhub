@@ -14,6 +14,9 @@ const (
     ADMIN_URL  = "KRATOS_ADMIN_URL"
 )
 
+
+
+
 type KratosService struct {
     PublicURL  string
     AdminURL   string
