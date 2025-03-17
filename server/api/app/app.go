@@ -52,23 +52,23 @@ func (a *App) Start() error {
 	a.e.Use(echomid.CORS())
 
 	// Setup routes
-	a.setupRoutes()
+	 SetupRoutes(a.e,a.handlers,middleware)
 
 	return a.e.Start(":" + a.config.DBConfig.Port)
 }
 
-func (a*App)setupRoutes(){
+// func (a*App)setupRoutes(){
 
-	// auth routes  
+// 	// auth routes  
 
-	// protected college routes 
-	// protected finance routes 
-auth :=a.e.Group("/auth")
+// 	// protected college routes 
+// 	// protected finance routes 
+// auth :=a.e.Group("/auth")
 
-auth.POST("/register",a.handlers.Auth.InitiateRegistration)
-auth.POST("/auth/register/complete",a.handlers.Auth.HandleRegistration)
-auth.GET("/login",a.handlers.Auth.HandleLogin)
-auth.GET("/callback",a.handlers.Auth.HandleCallback)
+// auth.POST("/register",a.handlers.Auth.InitiateRegistration)
+// auth.POST("/auth/register/complete",a.handlers.Auth.HandleRegistration)
+// auth.GET("/login",a.handlers.Auth.HandleLogin)
+// auth.GET("/callback",a.handlers.Auth.HandleCallback)
 
 
-}
+// }

@@ -7,15 +7,14 @@ import (
 
 type Handlers struct {
 	Auth *AuthHandler
-	// other handlers 
-	// quiz handler 
-	// fee handler 
-	// attendance handler 
+	// other handlers
+	// quiz handler
+	// fee handler
+	// attendance handler
 }
 
-func NewHandlers(services *services.Services)*Handlers{
+func NewHandlers(services *services.Services) *Handlers {
 	return &Handlers{
 		Auth: NewAuthHandler(auth.NewKratosService()),
-
 	}
 }
