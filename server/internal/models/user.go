@@ -14,6 +14,7 @@ type Course struct {
 // Courses represents a collection of courses
 type Courses struct {
 	Items []Course `json:"items"`
+
 }
 
 // Subjects represents the courses a student is enrolled in
@@ -24,11 +25,12 @@ type Subjects struct {
 }
 
 type User struct {
-	ID        int      `json:"ID"`
-	CollegeID int      `json:"CollegeID"`
-	RollNo    string   `json:"RollNo"`
-	Batch     int      `json:"Batch"`
-	Year      int      `json:"Year"`
-	Sem       int      `json:"Sem"`
-	Subjects  Subjects `json:"Subjects"`
+	ID        int      `json:"ID" bun:"id,autoincrement"`
+	CollegeID int      `json:"CollegeID" bun:"college_id"`
+	RollNo    string   `json:"RollNo" bun:"roll_no,pk"`
+	Batch     int      `json:"Batch" bun:"batch"`
+	Year      int      `json:"Year" bun:"year"`
+	Sem       int      `json:"Sem" bun:"sem"`
+	Subjects  Subjects `json:"Subjects" bun:"subjects,json"`
 }
+
