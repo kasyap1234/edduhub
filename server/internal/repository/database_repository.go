@@ -23,42 +23,40 @@ type BaseDatabaseRepository[T any] struct {
 	DB *bun.DB
 }
 
-func NewBaseRepository[T any](db *bun.DB)*BaseDatabaseRepository[T]{
+func NewBaseRepository[T any](db *bun.DB) *BaseDatabaseRepository[T] {
 	return &BaseDatabaseRepository[T]{
-		DB : db,
+		DB: db,
 	}
 }
 
-func(d *BaseDatabaseRepository[T])Create(ctx context.Context,model *T)error {
- _,err :=d.DB.NewInsert().Model(model).Exec(ctx)
-   return err 
+func (d *BaseDatabaseRepository[T]) Create(ctx context.Context, model *T) error {
+	_, err := d.DB.NewInsert().Model(model).Exec(ctx)
+	return err
 }
 
-func(d *BaseDatabaseRepository[T])CreateMany(ctx context.Context,models []*T)error {
-	_,err :=d.DB.NewInsert().Model(&models).Exec(ctx)
-	return err 
+func (d *BaseDatabaseRepository[T]) CreateMany(ctx context.Context, models []*T) error {
+	_, err := d.DB.NewInsert().Model(&models).Exec(ctx)
+	return err
 }
 
-func(d *BaseDatabaseRepository[T])FindByID(ctx context.Context,id interface{})(*T,error){
-	model :=new(T)
-   err :=d.DB.NewSelect().Model(model).Where("id= ?",id).Scan(ctx)
-	if err !=nil {
-		return nil,err 
+func (d *BaseDatabaseRepository[T]) FindByID(ctx context.Context, id interface{}) (*T, error) {
+	model := new(T)
+	err := d.DB.NewSelect().Model(model).Where("id= ?", id).Scan(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return model, nil 
+	return model, nil
 }
 
-func(d *BaseDatabaseRepository[T])FindOne(ctx context.Context,query string,args ...interface{})(*T,error){
+func (d *BaseDatabaseRepository[T]) FindOne(ctx context.Context, query string, args ...interface{}) (*T, error) {
 
 }
 
-func(d*BaseDatabaseRepository[T])FindAll(ctx context.Context)([]*T,error){
+func (d *BaseDatabaseRepository[T]) FindAll(ctx context.Context) ([]*T, error) {
 	var models []*T
-	err :=d.DB.NewSelect().Model(&models).Scan(ctx)
-	if err !=nil {
-		return nil,err
+	err := d.DB.NewSelect().Model(&models).Scan(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return models,nil 
+	return models, nil
 }
-
-
