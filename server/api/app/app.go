@@ -4,9 +4,9 @@ import (
 	"eduhub/server/api/handler"
 	"eduhub/server/internal/config"
 	"eduhub/server/internal/services"
-	"eduhub/server/internal/services/auth"
+	// "eduhub/server/internal/services/auth"
 
-	localmid "eduhub/server/internal/middleware"
+	// localmid "eduhub/server/internal/middleware"
 
 	"github.com/labstack/echo/v4"
 	echomid "github.com/labstack/echo/v4/middleware"
