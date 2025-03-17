@@ -1,11 +1,14 @@
 # edduhub
 
+## Backend kratos 
 
-Backend kratos 
-
-base) tgt@tgt:~/Desktop/edduhub$ curl -s -X GET \
+```bash
+curl -s -X GET \
   -H "Accept: application/json" \
   "http://localhost:4433/self-service/registration/api" | jq
+```
+
+```json
 {
   "id": "3bd746e4-50c2-4dea-ac7a-3ebe4fc899f2",
   "oauth2_login_challenge": null,
@@ -187,7 +190,10 @@ base) tgt@tgt:~/Desktop/edduhub$ curl -s -X GET \
     ]
   }
 }
-(base) tgt@tgt:~/Desktop/edduhub$ curl -s -X POST \
+```
+
+```bash
+curl -s -X POST \
   -H "Content-Type: application/json" \
   -d '{
     "method": "password",
@@ -206,6 +212,9 @@ base) tgt@tgt:~/Desktop/edduhub$ curl -s -X GET \
     }
   }' \
   "http://localhost:4433/self-service/registration?flow=1" | jq
+```
+
+```json
 {
   "error": {
     "code": 400,
@@ -214,7 +223,10 @@ base) tgt@tgt:~/Desktop/edduhub$ curl -s -X GET \
     "message": "The request was malformed or contained invalid parameters"
   }
 }
-(base) tgt@tgt:~/Desktop/edduhub$ curl -s -X POST \
+```
+
+```bash
+curl -s -X POST \
   -H "Content-Type: application/json" \
   -d '{
     "method": "password",
@@ -233,6 +245,9 @@ base) tgt@tgt:~/Desktop/edduhub$ curl -s -X GET \
     }
   }' \
   "http://localhost:4433/self-service/registration?flow=3bd746e4-50c2-4dea-ac7a-3ebe4fc899f2" | jq
+```
+
+```json
 {
   "session_token": "ory_st_TNiTbefZF4qNkWr9DGIccMp8upaxzBZc",
   "session": {
@@ -356,3 +371,4 @@ base) tgt@tgt:~/Desktop/edduhub$ curl -s -X GET \
     }
   ]
 }
+```
