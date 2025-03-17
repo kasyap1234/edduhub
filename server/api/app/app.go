@@ -52,7 +52,7 @@ func (a *App) Start() error {
 	a.e.Use(echomid.CORS())
 
 	// Setup routes
-	 SetupRoutes(a.e,a.handlers,middleware)
+	 handler.SetupRoutes(a.e,a.handlers,middleware)
 
 	return a.e.Start(":" + a.config.DBConfig.Port)
 }
