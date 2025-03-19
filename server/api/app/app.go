@@ -33,7 +33,7 @@ func New() *App {
 
 
 
-	// Initialize handlers
+	
 	
 
 	return &App{
@@ -57,18 +57,3 @@ func (a *App) Start() error {
 	return a.e.Start(":" + a.config.DBConfig.Port)
 }
 
-// func (a*App)setupRoutes(){
-
-// 	// auth routes  
-
-// 	// protected college routes 
-// 	// protected finance routes 
-// auth :=a.e.Group("/auth")
-
-// auth.POST("/register",a.handlers.Auth.InitiateRegistration)
-// auth.POST("/auth/register/complete",a.handlers.Auth.HandleRegistration)
-// auth.GET("/login",a.handlers.Auth.HandleLogin)
-// auth.GET("/callback",a.handlers.Auth.HandleCallback)
-
-
-// }
