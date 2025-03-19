@@ -1,13 +1,18 @@
-package models 
+package models
+
+import "github.com/uptrace/bun"
 
 
 type Student struct {
-	StudentID uint `json:"student_id" bun:"student_id,auto_increment"`
-	UserID int `bun:"not_null"`
-	User *User `rel:"belongs-to,join:user_id=id"`
-	RollNo    string   `json:"RollNo" bun:"roll_no,pk"`
-	Batch     int      `json:"Batch" bun:"batch"`
-	Year      int      `json:"Year" bun:"year"`
-	Sem       int      `json:"Sem" bun:"sem"`
-	Subjects  Subjects `json:"Subjects" bun:"subjects,json"`
+	bun.BaseModel `bun:"table:students"`
+	ID       int      `json:"student_id" bun:",pk,autoincrement"`
+	UserID   int      `json:"user_id" bun:",notnull,unique"`
+	RollNo   string   `json:"roll_no" bun:",unique"`
+	Batch    int      `json:"batch"`
+	Year     int      `json:"year"`
+	Sem      int      `json:"sem"`
+	Subjects Subjects `json:"subjects" bun:",json"`
+
+	// Relations
+	User *User `bun:"rel:belongs-to,join:user_id=id"`
 }

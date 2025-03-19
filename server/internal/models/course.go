@@ -12,16 +12,19 @@ type Course struct {
 	Description   string     `json:"description,omitempty"`
 	Department    string     `json:"department,omitempty"`
 	Instructor    string     `json:"instructor,omitempty"`
-	Lectures      []*Lecture `bun:"rel:has-many,join:id=course_id"` // Fixed join syntax
+	Lectures      []*Lecture `bun:"rel:has-many,join:course_id=id"` // Fixed join syntax
 }
 
 // Lecture represents an individual class session
+
 type Lecture struct {
 	bun.BaseModel `bun:"table:lectures"`
-	ID            int      `bun:",pk,autoincrement"`
-	CourseID      int      `bun:",notnull"`
-	Course        *Course  `bun:"rel:belongs-to,join:course_id=id"` // Fixed relation syntax
-	QRCode        *QRCode  `json:"qrcode" bun:"rel:belongs-to,join:qr_code=id"`
+	ID            int     `json:"id" bun:",pk,autoincrement"`
+	CourseID      int     `json:"course_id" bun:",notnull"`
+	QRCodeID      int     `json:"qr_code_id"`
+	
+	Course  *Course `bun:"rel:belongs-to,join:course_id=id"`
+	QRCode  *QRCode `bun:"rel:belongs-to,join:qr_code_id=id"`
 }
 
 // QRCode represents a unique QR code for each lecture
