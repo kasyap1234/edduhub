@@ -49,7 +49,12 @@ func (d *BaseDatabaseRepository[T]) FindByID(ctx context.Context, id interface{}
 }
 
 func (d *BaseDatabaseRepository[T]) FindOne(ctx context.Context, query string, args ...interface{}) (*T, error) {
-
+	model := new(T)
+	err := d.DB.NewSelect().Model(model).Where(query, args...).Limit(1).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return model.nil
 }
 
 func (d *BaseDatabaseRepository[T]) FindAll(ctx context.Context) ([]*T, error) {
@@ -59,4 +64,18 @@ func (d *BaseDatabaseRepository[T]) FindAll(ctx context.Context) ([]*T, error) {
 		return nil, err
 	}
 	return models, nil
+}
+
+func (d *BaseDatabaseRepository[T]) FindWhere(ctx context.Context, query string, args ...interface{}) (*T, error) {
+	var models []*T
+	err := d.DB.NewSelect().Model(&models).Where(query, args...).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return models, nil
+}
+
+func (d *BaseDatabaseRepository[T]) Update(ctx context.Context, model *T) error {
+	_, err := d.DB.NewUpdate().Model(model).WherePK().Exec(ctx)
+	return err
 }
