@@ -15,6 +15,6 @@ type Handlers struct {
 
 func NewHandlers(services *services.Services) *Handlers {
 	return &Handlers{
-		Auth: NewAuthHandler(auth.NewKratosService()),
+		Auth: NewAuthHandler(services.Auth),
 	}
 }
