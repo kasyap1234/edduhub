@@ -17,8 +17,8 @@ func SetupRoutes(e *echo.Echo, a *Handlers, authMiddleware *middleware.AuthMiddl
 	auth.GET("/login", a.Auth.HandleLogin)
 	auth.GET("/callback", a.Auth.HandleCallback)
 
-	attendance:=e.Group("/attendance")
-	attendance.POST("/mark",a.Attendance.MarkAttendance)
+	attendance := e.Group("/attendance")
+	attendance.POST("/mark", a.Attendance.MarkAttendance)
 	attendance.GET("/student/{id}")
 	attendance.GET("/course/{id}")
 }
