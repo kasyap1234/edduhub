@@ -153,3 +153,7 @@ func (k *KratosService) CheckCollegeAccess(identity *Identity, collegeID string)
 func (k *KratosService) HasRole(identity *Identity, role string) bool {
     return identity.Traits.Role == role
 }
+
+func(k*KratosService)GetPublicURL()string{
+    return k.PublicURL
+}

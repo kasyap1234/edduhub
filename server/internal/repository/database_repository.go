@@ -23,7 +23,7 @@ type BaseDatabaseRepository[T any] struct {
 	DB *bun.DB
 }
 
-func NewBaseRepository[T any](db *bun.DB) *BaseDatabaseRepository[T] {
+func NewBaseRepository[T any](db *bun.DB) DatabaseRepository[T] {
 	return &BaseDatabaseRepository[T]{
 		DB: db,
 	}
@@ -54,7 +54,7 @@ func (d *BaseDatabaseRepository[T]) FindOne(ctx context.Context, query string, a
 	if err != nil {
 		return nil, err
 	}
-	return model.nil
+	return model,nil
 }
 
 func (d *BaseDatabaseRepository[T]) FindAll(ctx context.Context) ([]*T, error) {
@@ -66,7 +66,7 @@ func (d *BaseDatabaseRepository[T]) FindAll(ctx context.Context) ([]*T, error) {
 	return models, nil
 }
 
-func (d *BaseDatabaseRepository[T]) FindWhere(ctx context.Context, query string, args ...interface{}) (*T, error) {
+func (d *BaseDatabaseRepository[T]) FindWhere(ctx context.Context, query string, args ...interface{}) ([]*T, error) {
 	var models []*T
 	err := d.DB.NewSelect().Model(&models).Where(query, args...).Scan(ctx)
 	if err != nil {
@@ -78,4 +78,7 @@ func (d *BaseDatabaseRepository[T]) FindWhere(ctx context.Context, query string,
 func (d *BaseDatabaseRepository[T]) Update(ctx context.Context, model *T) error {
 	_, err := d.DB.NewUpdate().Model(model).WherePK().Exec(ctx)
 	return err
+}
+
+func(d *BaseDatabaseRepository[T])Count(ctx context.Context,query string ,args ...interface{})(int,error) {
 }

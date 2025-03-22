@@ -7,4 +7,5 @@ type AuthService interface {
     ValidateSession(ctx context.Context, sessionToken string) (*Identity, error)
     CheckCollegeAccess(identity *Identity, collegeID string) bool
     HasRole(identity *Identity, role string) bool
+    GetPublicURL()string 
 }

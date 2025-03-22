@@ -19,12 +19,12 @@ type Course struct {
 
 type Lecture struct {
 	bun.BaseModel `bun:"table:lectures"`
-	ID            int     `json:"id" bun:",pk,autoincrement"`
-	CourseID      int     `json:"course_id" bun:",notnull"`
-	QRCodeID      int     `json:"qr_code_id"`
-	
-	Course  *Course `bun:"rel:belongs-to,join:course_id=id"`
-	QRCode  *QRCode `bun:"rel:belongs-to,join:qr_code_id=id"`
+	ID            int `json:"id" bun:",pk,autoincrement"`
+	CourseID      int `json:"course_id" bun:",notnull"`
+	QRCodeID      int `json:"qr_code_id"`
+
+	Course *Course `bun:"rel:belongs-to,join:course_id=id"`
+	QRCode *QRCode `bun:"rel:belongs-to,join:qr_code_id=id"`
 }
 
 // QRCode represents a unique QR code for each lecture

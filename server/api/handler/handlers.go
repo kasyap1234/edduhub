@@ -11,6 +11,7 @@ type Handlers struct {
 	// quiz handler
 	// fee handler
 	// attendance handler
+	// Attendance *AttendanceHandler
 }
 
 func NewHandlers(services *services.Services) *Handlers {
