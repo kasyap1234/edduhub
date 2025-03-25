@@ -24,3 +24,19 @@ func NewUserRepository(db bun.DB) UserRepository {
 		db: &db,
 	}
 }
+
+func(u*userRepository)CreateUser(ctx context.Context,user*models.User)error {
+	userModel :=new(models.User)
+	_,err :=u.db.NewInsert().Model(userModel).Exec(ctx)
+	return err 
+}
+
+func(u*userRepository)FindByRollNo(ctx context.Context,RollNo string)*models.User{
+	user :=new(models.User)
+	err :=u.db.NewSelect().Model(user).Where("roll_no = ?",RollNo).Scan(ctx)
+	if err !=nil {
+		return nil 
+	}
+	return user 
+}
+
