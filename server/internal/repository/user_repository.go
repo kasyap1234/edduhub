@@ -56,5 +56,3 @@ func (u *userRepository) UpdateUser(ctx context.Context, model *models.User) (er
 return u.db.Update(ctx,model)
 }
 
-
-func(u*userRepository)

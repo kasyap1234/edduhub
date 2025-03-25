@@ -14,10 +14,24 @@ const (
     ADMIN_URL  = "KRATOS_ADMIN_URL"
 )
 
+type KratosService interface {
+    InitiateRegistrationFlow(ctx context.Context) (map[string]interface{}, error)
+    CompleteRegistration(ctx context.Context, flowID string, req RegistrationRequest) (*Identity, error)
+    ValidateSession(ctx context.Context, sessionToken string) (*Identity, error)
+    CheckCollegeAccess(identity *Identity, collegeID string) bool
+    HasRole(identity *Identity, role string) bool
+    HasPermission(ctx context.Context,identity *Identity,action,resource string)(bool,error)
+    AssignRole(ctx context.Context,identityID string,role string)error 
+    RemoveRole(ctx context.Context,identityID string, role string)error 
+    AddPermission(ctx context.Context, identityID, action, resource string) error
+    RemovePermission(ctx context.Context, identityID, action, resource string) error
+    
+    GetPublicURL()string 
+
+}
 
 
-
-type KratosService struct {
+type kratosService struct {
     PublicURL  string
     AdminURL   string
     HTTPClient *http.Client
@@ -56,8 +70,8 @@ type RegistrationRequest struct {
     } `json:"traits"`
 }
 
-func NewKratosService() *KratosService {
-    return &KratosService{
+func NewKratosService() *kratosService{
+    return &kratosService{
         PublicURL:  os.Getenv(PUBLIC_URL),
         AdminURL:   os.Getenv(ADMIN_URL),
         HTTPClient: &http.Client{},
@@ -65,7 +79,7 @@ func NewKratosService() *KratosService {
 }
 
 // InitiateRegistrationFlow starts registration process
-func (k *KratosService) InitiateRegistrationFlow(ctx context.Context) (map[string]interface{}, error) {
+func (k *kratosService) InitiateRegistrationFlow(ctx context.Context) (map[string]interface{}, error) {
     req, err := http.NewRequestWithContext(ctx, "GET", 
         fmt.Sprintf("%s/self-service/registration/api", k.PublicURL), nil)
     if err != nil {
@@ -87,7 +101,7 @@ func (k *KratosService) InitiateRegistrationFlow(ctx context.Context) (map[strin
 }
 
 // CompleteRegistration submits registration data
-func (k *KratosService) CompleteRegistration(ctx context.Context, flowID string, req RegistrationRequest) (*Identity, error) {
+func (k *kratosService) CompleteRegistration(ctx context.Context, flowID string, req RegistrationRequest) (*Identity, error) {
     data, err := json.Marshal(req)
     if err != nil {
         return nil, fmt.Errorf("failed to marshal registration data: %w", err)
@@ -115,7 +129,7 @@ func (k *KratosService) CompleteRegistration(ctx context.Context, flowID string,
 }
 
 // ValidateSession checks if session is valid and returns identity
-func (k *KratosService) ValidateSession(ctx context.Context, sessionToken string) (*Identity, error) {
+func (k *kratosService) ValidateSession(ctx context.Context, sessionToken string) (*Identity, error) {
     req, err := http.NewRequestWithContext(ctx, "GET", 
         fmt.Sprintf("%s/sessions/whoami", k.PublicURL), nil)
     if err != nil {
@@ -145,15 +159,15 @@ func (k *KratosService) ValidateSession(ctx context.Context, sessionToken string
 }
 
 // CheckCollegeAccess verifies if user belongs to specific college
-func (k *KratosService) CheckCollegeAccess(identity *Identity, collegeID string) bool {
+func (k *kratosService) CheckCollegeAccess(identity *Identity, collegeID string) bool {
     return identity.Traits.College.ID == collegeID
 }
 
 // HasRole checks if user has specific role
-func (k *KratosService) HasRole(identity *Identity, role string) bool {
+func (k *kratosService) HasRole(identity *Identity, role string) bool {
     return identity.Traits.Role == role
 }
 
-func(k*KratosService)GetPublicURL()string{
+func(k*kratosService)GetPublicURL()string{
     return k.PublicURL
 }

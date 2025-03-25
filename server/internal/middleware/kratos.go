@@ -14,11 +14,13 @@ const (
 
 type AuthMiddleware struct {
 	kratosService *auth.KratosService
+	ketoService *auth.KetoService
 }
 
-func NewAuthMiddleware(kratosService *auth.KratosService) *AuthMiddleware {
+func NewAuthMiddleware(kratosService *auth.KratosService,ketoService *auth.KetoService) *AuthMiddleware {
 	return &AuthMiddleware{
 		kratosService: kratosService,
+		ketoService: ketoService,
 	}
 }
 

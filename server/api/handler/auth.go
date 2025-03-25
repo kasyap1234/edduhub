@@ -10,7 +10,7 @@ import (
 )
 
 type AuthHandler struct {
-	AuthService auth.AuthService
+	authService 
 }
 
 func NewAuthHandler(authService auth.AuthService) *AuthHandler {

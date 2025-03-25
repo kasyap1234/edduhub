@@ -12,7 +12,7 @@ type Middleware struct {
 
 func NewMiddleware(services *services.Services) *Middleware {
 	return &Middleware{
-		authmiddleware: NewAuthMiddleware(auth.NewKratosService()),
+		authmiddleware: NewAuthMiddleware(auth.NewKratosService(),auth.NewKetoService()),
 	}
 
 }
