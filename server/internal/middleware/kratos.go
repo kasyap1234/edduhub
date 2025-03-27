@@ -13,14 +13,12 @@ const (
 )
 
 type AuthMiddleware struct {
-	kratosService *auth.KratosService
-	ketoService *auth.KetoService
+	AuthService auth.AuthService
 }
 
-func NewAuthMiddleware(kratosService *auth.KratosService,ketoService *auth.KetoService) *AuthMiddleware {
+func NewAuthMiddleware() *AuthMiddleware {
 	return &AuthMiddleware{
-		kratosService: kratosService,
-		ketoService: ketoService,
+		
 	}
 }
 
@@ -34,7 +32,7 @@ func (m *AuthMiddleware) ValidateSession(next echo.HandlerFunc) echo.HandlerFunc
 			})
 		}
 
-		identity, err := m.kratosService.ValidateSession(c.Request().Context(), sessionToken)
+		identity, err := m.AuthService.ValidateSession(c.Request().Context(), sessionToken)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, map[string]string{
 				"error": "Invalid session",
@@ -58,7 +56,7 @@ func (m *AuthMiddleware) RequireCollege(next echo.HandlerFunc) echo.HandlerFunc 
 		}
 
 		identity := c.Get("identity").(*auth.Identity)
-		if !m.kratosService.CheckCollegeAccess(identity, collegeID) {
+		if !m.AuthService.CheckCollegeAccess(identity, collegeID) {
 			return c.JSON(http.StatusForbidden, map[string]string{
 				"error": "Access denied to this college",
 			})
@@ -75,7 +73,7 @@ func (m *AuthMiddleware) RequireRole(roles ...string) echo.MiddlewareFunc {
 			identity := c.Get("identity").(*auth.Identity)
 
 			for _, role := range roles {
-				if m.kratosService.HasRole(identity, role) {
+				if m.AuthService.HasRole(identity, role) {
 					return next(c)
 				}
 			}
