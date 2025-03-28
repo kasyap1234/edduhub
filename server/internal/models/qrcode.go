@@ -11,3 +11,8 @@ type QRCode struct {
 	Code          string    `json:"code"`
 	ExpiresAt     time.Time `json:"expires_at"`
 }
+
+type AttendanceRequest struct {
+	StudentID int `json:"student_id"`
+	QRCodeID string `json:"qr_code_id"`
+}
