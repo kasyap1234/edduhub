@@ -3,7 +3,9 @@ package app
 import (
 	"eduhub/server/api/handler"
 	"eduhub/server/internal/config"
+	"eduhub/server/internal/middleware"
 	"eduhub/server/internal/services"
+"eduhub/server/internal/middleware"
 	// "eduhub/server/internal/services/auth"
 
 	// localmid "eduhub/server/internal/middleware"
@@ -19,6 +21,7 @@ type App struct {
 	config   *config.Config
 	services *services.Services
 	handlers *handler.Handlers
+	middleware *middleware.Middleware
 }
 
 func New() *App {
@@ -30,6 +33,7 @@ func New() *App {
 	// Initialize auth service
 	services :=services.NewServices(cfg)
 	handlers:=handler.NewHandlers(services)
+	mid :=middleware.NewMiddleware(services)
 
 
 
@@ -42,6 +46,7 @@ func New() *App {
 		config:   cfg,
 		services: services,
 		handlers: handlers,
+		middleware: mid, 
 	}
 }
 
@@ -52,7 +57,7 @@ func (a *App) Start() error {
 	a.e.Use(echomid.CORS())
 
 	// Setup routes
-	 handler.SetupRoutes(a.e,a.handlers,middleware)
+	 handler.SetupRoutes(a.e,a.handlers,a.middleware)
 
 	return a.e.Start(":" + a.config.DBConfig.Port)
 }

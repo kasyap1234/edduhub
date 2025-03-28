@@ -30,7 +30,7 @@ func NewKetoService() *ketoService {
 }
 
 func (k *ketoService) CheckPermission(ctx context.Context, subject, action, resource string) (bool, error) {
-	url := fmt.Sprintf("%s/relation-tuples/check", k.readURL)
+	endpoint := fmt.Sprintf("%s/relation-tuples/check", k.readURL)
 	query := map[string]string{
 		"namespace": "app",
 		"object":    resource,
@@ -38,7 +38,7 @@ func (k *ketoService) CheckPermission(ctx context.Context, subject, action, reso
 		"subject":   subject,
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return false, err
 	}

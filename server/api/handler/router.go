@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func SetupRoutes(e *echo.Echo, a *Handlers, authMiddleware *middleware.AuthMiddleware) {
+func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.Middleware) {
 
 	// auth routes
 
