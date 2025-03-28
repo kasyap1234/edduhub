@@ -5,7 +5,7 @@ import (
 )
 
 type AuthService interface {
-	InitiateRegistrationFlow(ctx context.Context) (map[string]interface{}, error)
+	InitiateRegistrationFlow(ctx context.Context) (map[string]any, error)
 	CompleteRegistration(ctx context.Context, flowID string, req RegistrationRequest) (*Identity, error)
 	ValidateSession(ctx context.Context, sessionToken string) (*Identity, error)
 	CheckCollegeAccess(identity *Identity, collegeID string) bool
@@ -23,14 +23,14 @@ type authService struct {
 	AuthZ *ketoService
 }
 
-func NewAuthService(kratos *kratosService, keto *ketoService) *authService {
+func NewAuthService(kratos *kratosService, keto *ketoService) AuthService {
 	return &authService{
 		Auth:  kratos,
 		AuthZ: keto,
 	}
 }
 
-func (a *authService) InitiateRegistrationFlow(ctx context.Context) (map[string]interface{}, error) {
+func (a *authService) InitiateRegistrationFlow(ctx context.Context) (map[string]any, error) {
 	return a.Auth.InitiateRegistrationFlow(ctx)
 }
 

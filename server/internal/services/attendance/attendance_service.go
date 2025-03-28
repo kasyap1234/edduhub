@@ -1,44 +1,46 @@
 package attendance
 
-import ( "github.com/uptrace/bun"
+import (
 	"eduhub/server/internal/models"
+
+	"github.com/uptrace/bun"
 )
+
 type AttendanceService interface {
 	GenerateQRCode(courseID int, lectureID int) (string, error)
-	GetAttendanceByLecture(courseID int ,lectureID int)(*models.Attendance,error)
-	GetAttendanceByCourse(courseID int)(*models.Attendance,error)
-	GetAttendanceByStudent(studentID int)(*models.Attendance,error)
-	GetAttendanceByStudentAndCourse(studentID int,courseID int)(*models.Attendance,error)
-	MarkAttendance(studentID int,courseID int, lectureID int)(bool,error)
+	GetAttendanceByLecture(courseID int, lectureID int) (*models.Attendance, error)
+	GetAttendanceByCourse(courseID int) (*models.Attendance, error)
+	GetAttendanceByStudent(studentID int) (*models.Attendance, error)
+	GetAttendanceByStudentAndCourse(studentID int, courseID int) (*models.Attendance, error)
+	MarkAttendance(studentID int, courseID int, lectureID int) (bool, error)
 }
 
 type attendanceService struct {
-	db *bun.DB 
+	db *bun.DB
 }
 
-func NewAttendanceRepository(db *bun.DB)AttendanceService{
+func NewAttendanceRepository(db *bun.DB) AttendanceService {
 	return &attendanceService{
-		db : db, 
+		db: db,
 	}
 }
 
-func(a*attendanceService)GetAttendanceByLecture(courseID int, lectureID int)(*models.Attendance,error){
+func (a *attendanceService) GetAttendanceByLecture(courseID int, lectureID int) (*models.Attendance, error) {
 
 }
 
-func(a*attendanceService)GetAttendanceByCourse(courseID int)(*models.Attendance,error){
+func (a *attendanceService) GetAttendanceByCourse(courseID int) (*models.Attendance, error) {
 
 }
 
-
-func(a*attendanceService)GetAttendanceByStudent(studentID int)(*models.Attendance,error){
-
-}
-
-func(a*attendanceService)GetAttendanceByStudentAndCourse(studentID int,courseID int)(*models.Attendance,error){
+func (a *attendanceService) GetAttendanceByStudent(studentID int) (*models.Attendance, error) {
 
 }
 
-func(a*attendanceService)MarkAttendance(studentID,courseID,lectureID int)(bool,error){
-	
+func (a *attendanceService) GetAttendanceByStudentAndCourse(studentID int, courseID int) (*models.Attendance, error) {
+
+}
+
+func (a *attendanceService) MarkAttendance(studentID, courseID, lectureID int) (bool, error) {
+
 }
