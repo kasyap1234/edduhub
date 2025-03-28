@@ -9,6 +9,7 @@ type AttendanceService interface {
 	GetAttendanceByCourse(courseID int)(*models.Attendance,error)
 	GetAttendanceByStudent(studentID int)(*models.Attendance,error)
 	GetAttendanceByStudentAndCourse(studentID int,courseID int)(*models.Attendance,error)
+	MarkAttendance(studentID int,courseID int, lectureID int)(bool,error)
 }
 
 type attendanceService struct {
@@ -35,5 +36,9 @@ func(a*attendanceService)GetAttendanceByStudent(studentID int)(*models.Attendanc
 }
 
 func(a*attendanceService)GetAttendanceByStudentAndCourse(studentID int,courseID int)(*models.Attendance,error){
+
+}
+
+func(a*attendanceService)MarkAttendance(studentID,courseID,lectureID int)(bool,error){
 	
 }
