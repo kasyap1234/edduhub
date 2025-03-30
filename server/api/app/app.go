@@ -5,7 +5,7 @@ import (
 	"eduhub/server/internal/config"
 	"eduhub/server/internal/middleware"
 	"eduhub/server/internal/services"
-"eduhub/server/internal/middleware"
+	"eduhub/server/internal/middleware"
 	// "eduhub/server/internal/services/auth"
 
 	// localmid "eduhub/server/internal/middleware"
