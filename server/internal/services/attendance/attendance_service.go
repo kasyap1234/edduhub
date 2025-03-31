@@ -11,7 +11,7 @@ import (
 type AttendanceService interface {
 	GenerateQRCode(courseID int, lectureID int) (string, error)
 	GetAttendanceByLecture(courseID int, lectureID int) ([]*models.Attendance, error)
-	GetAttendanceByCourse(courseID int) (*models.Attendance, error)
+	GetAttendanceByCourse(courseID int) ([]*models.Attendance, error)
 	GetAttendanceByStudent(studentID int) ([]*models.Attendance, error)
 	GetAttendanceByStudentAndCourse(studentID int, courseID int) ([]*models.Attendance, error)
 	MarkAttendance(studentID int, courseID int, lectureID int) (bool, error)
@@ -30,9 +30,9 @@ func NewAttendanceService(repo repository.AttendanceRepository) AttendanceServic
 func (a *attendanceService) GetAttendanceByLecture(courseID int, lectureID int) ([]*models.Attendance, error) {
 	return a.repo.GetAttendanceByLecture(context.Background(), courseID, lectureID)
 }
-
-func (a *attendanceService) GetAttendanceByCourse(courseID int) (*models.Attendance, error) {
-
+// to get attendance of all students in a course 
+func (a *attendanceService) GetAttendanceByCourse(courseID int) ([]*models.Attendance, error) {
+ return a.repo.GetAttendanceByCourse(context.Background(),courseID)
 }
 
 func (a *attendanceService) GetAttendanceByStudent(studentID int) ([]*models.Attendance, error) {
