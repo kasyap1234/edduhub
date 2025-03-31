@@ -5,7 +5,7 @@ import (
 	"eduhub/server/internal/config"
 	"eduhub/server/internal/middleware"
 	"eduhub/server/internal/services"
-	"eduhub/server/internal/middleware"
+
 	// "eduhub/server/internal/services/auth"
 
 	// localmid "eduhub/server/internal/middleware"
@@ -16,11 +16,11 @@ import (
 )
 
 type App struct {
-	e        *echo.Echo
-	db       *bun.DB
-	config   *config.Config
-	services *services.Services
-	handlers *handler.Handlers
+	e          *echo.Echo
+	db         *bun.DB
+	config     *config.Config
+	services   *services.Services
+	handlers   *handler.Handlers
 	middleware *middleware.Middleware
 }
 
@@ -31,22 +31,17 @@ func New() *App {
 	}
 
 	// Initialize auth service
-	services :=services.NewServices(cfg)
-	handlers:=handler.NewHandlers(services)
-	mid :=middleware.NewMiddleware(services)
-
-
-
-	
-	
+	services := services.NewServices(cfg)
+	handlers := handler.NewHandlers(services)
+	mid := middleware.NewMiddleware(services)
 
 	return &App{
-		e:        echo.New(),
-		db:       cfg.DB,
-		config:   cfg,
-		services: services,
-		handlers: handlers,
-		middleware: mid, 
+		e:          echo.New(),
+		db:         cfg.DB,
+		config:     cfg,
+		services:   services,
+		handlers:   handlers,
+		middleware: mid,
 	}
 }
 
@@ -57,8 +52,7 @@ func (a *App) Start() error {
 	a.e.Use(echomid.CORS())
 
 	// Setup routes
-	 handler.SetupRoutes(a.e,a.handlers,a.middleware)
+	handler.SetupRoutes(a.e, a.handlers, a.middleware)
 
 	return a.e.Start(":" + a.config.DBConfig.Port)
 }
-

@@ -19,7 +19,7 @@ type attendanceService struct {
 	db *bun.DB
 }
 
-func NewAttendanceRepository(db *bun.DB) AttendanceService {
+func NewAttendanceService(db *bun.DB) AttendanceService {
 	return &attendanceService{
 		db: db,
 	}

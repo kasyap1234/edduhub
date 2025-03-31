@@ -2,7 +2,6 @@ package handler
 
 import (
 	"eduhub/server/internal/services"
-	
 )
 
 type Handlers struct {
@@ -11,7 +10,7 @@ type Handlers struct {
 	// quiz handler
 	// fee handler
 	// attendance handler
-	// Attendance *AttendanceHandler
+	Attendance *AttendanceHandler
 }
 
 func NewHandlers(services *services.Services) *Handlers {
