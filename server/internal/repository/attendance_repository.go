@@ -57,3 +57,12 @@ func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, student
 	}
 	return records, nil
 }
+
+func(a *attendanceRepository)GetAttendanceByLecture(ctx context.Context, courseID int, lectureID int)([]*models.Attendance,error){
+	records,err := a.db.FindWhere(ctx,"course_id=? AND lecture_id=?",courseID,lectureID)
+	if err !=nil {
+		return nil,err 
+	}
+	return records,nil 
+}
+

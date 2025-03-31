@@ -2,6 +2,7 @@ package attendance
 
 import (
 	"eduhub/server/internal/models"
+	"eduhub/server/internal/repository"
 
 	"github.com/uptrace/bun"
 )
@@ -16,17 +17,17 @@ type AttendanceService interface {
 }
 
 type attendanceService struct {
-	db *bun.DB
+	repo repository.AttendanceRepository
 }
 
-func NewAttendanceService(db *bun.DB) AttendanceService {
+func NewAttendanceService(repo repository.AttendanceRepository) AttendanceService {
 	return &attendanceService{
-		db: db,
+	repo :repo ,
 	}
 }
 
 func (a *attendanceService) GetAttendanceByLecture(courseID int, lectureID int) (*models.Attendance, error) {
-
+return a.repo.GetAttendanceStudent()
 }
 
 func (a *attendanceService) GetAttendanceByCourse(courseID int) (*models.Attendance, error) {
