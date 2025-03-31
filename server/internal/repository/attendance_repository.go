@@ -10,6 +10,7 @@ type AttendanceRepository interface {
 	UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, status string) error
 	GetAttendanceStudentInCourse(ctx context.Context, studentID int, courseID int) ([]*models.Attendance, error)
 	GetAttendanceStudent(ctx context.Context, studentID int) ([]*models.Attendance, error)
+	GetAttendanceByLecture(ctx context.Context,lectureID int, courseID int)([]*models.Attendance,error)
 }
 
 type attendanceRepository struct {

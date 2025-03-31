@@ -1,6 +1,7 @@
 package attendance
 
 import (
+	"context"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
 
@@ -9,7 +10,7 @@ import (
 
 type AttendanceService interface {
 	GenerateQRCode(courseID int, lectureID int) (string, error)
-	GetAttendanceByLecture(courseID int, lectureID int) (*models.Attendance, error)
+	GetAttendanceByLecture(courseID int, lectureID int) ([]*models.Attendance, error)
 	GetAttendanceByCourse(courseID int) (*models.Attendance, error)
 	GetAttendanceByStudent(studentID int) (*models.Attendance, error)
 	GetAttendanceByStudentAndCourse(studentID int, courseID int) (*models.Attendance, error)
@@ -26,8 +27,8 @@ func NewAttendanceService(repo repository.AttendanceRepository) AttendanceServic
 	}
 }
 
-func (a *attendanceService) GetAttendanceByLecture(courseID int, lectureID int) (*models.Attendance, error) {
-return a.repo.GetAttendanceStudent()
+func (a *attendanceService) GetAttendanceByLecture(courseID int, lectureID int) ([]*models.Attendance, error) {
+return a.repo.GetAttendanceByLecture(context.Background(),courseID,lectureID)
 }
 
 func (a *attendanceService) GetAttendanceByCourse(courseID int) (*models.Attendance, error) {
