@@ -10,7 +10,7 @@ import (
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *models.User) error
 	FindByRollNo(ctx context.Context, RollNo string) (*models.User, error)
-	UpdateUser(ctx context.Context, user *models.User) (error)
+	UpdateUser(ctx context.Context, user *models.User) error
 	FreezeUser(ctx context.Context, RollNo string) error
 	DeleteUser(ctx context.Context, RollNo string) error
 }
@@ -44,15 +44,14 @@ func (u *userRepository) DeleteUser(ctx context.Context, RollNo string) error {
 }
 
 func (u *userRepository) FreezeUser(ctx context.Context, RollNo string) error {
-user ,err :=u.FindByRollNo(ctx,RollNo)
-if err !=nil{
-	return err
-}
- user.IsActive=false 
-return u.db.Update(ctx,user)
-}
-
-func (u *userRepository) UpdateUser(ctx context.Context, model *models.User) (error) {
-return u.db.Update(ctx,model)
+	user, err := u.FindByRollNo(ctx, RollNo)
+	if err != nil {
+		return err
+	}
+	user.IsActive = false
+	return u.db.Update(ctx, user)
 }
 
+func (u *userRepository) UpdateUser(ctx context.Context, model *models.User) error {
+	return u.db.Update(ctx, model)
+}

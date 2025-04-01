@@ -53,7 +53,7 @@ func (d *BaseDatabaseRepository[T]) FindOne(ctx context.Context, query string, a
 	if err != nil {
 		return nil, err
 	}
-	return model,nil
+	return model, nil
 }
 
 func (d *BaseDatabaseRepository[T]) FindAll(ctx context.Context) ([]*T, error) {
@@ -79,14 +79,13 @@ func (d *BaseDatabaseRepository[T]) Update(ctx context.Context, model *T) error 
 	return err
 }
 
-func(d *BaseDatabaseRepository[T])Count(ctx context.Context,query string ,args ...interface{})(int,error) {
+func (d *BaseDatabaseRepository[T]) Count(ctx context.Context, query string, args ...interface{}) (int, error) {
 }
 
-func(d*BaseDatabaseRepository[T])Delete(ctx context.Context, model *T) error{
-	_,err :=d.DB.NewDelete().Model(model).WherePK().Exec(ctx)
-	return err 
+func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error {
+	_, err := d.DB.NewDelete().Model(model).WherePK().Exec(ctx)
+	return err
 }
-
 
 // func(d*BaseDatabaseRepository[T])DeleteByID(ctx context.Context,id interface{})error {
 // 	_,err :=d.DB.NewDelete()

@@ -6,7 +6,7 @@ import (
 )
 
 type AttendanceRepository interface {
-	GetAttendanceByCourse(ctx context.Context,courseID int)([]*models.Attendance,error)
+	GetAttendanceByCourse(ctx context.Context, courseID int) ([]*models.Attendance, error)
 	MarkAttendance(ctx context.Context, studentID int, courseID int, lectureID int) (bool, error)
 	UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, status string) error
 	GetAttendanceStudentInCourse(ctx context.Context, studentID int, courseID int) ([]*models.Attendance, error)
@@ -81,10 +81,10 @@ func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, cours
 	return records, nil
 }
 
-func(a*attendanceRepository)GetAttendanceByCourse(ctx context.Context,courseID int)([]*models.Attendance,error){
-	records,err := a.db.FindWhere(ctx,"course_id=?",courseID)
-	if err !=nil {
-		return nil,err 
+func (a *attendanceRepository) GetAttendanceByCourse(ctx context.Context, courseID int) ([]*models.Attendance, error) {
+	records, err := a.db.FindWhere(ctx, "course_id=?", courseID)
+	if err != nil {
+		return nil, err
 	}
-	return records,nil 
+	return records, nil
 }

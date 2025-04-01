@@ -19,15 +19,15 @@ func NewRepository(db *bun.DB) *Repository {
 	attendanceDB := NewBaseRepository[models.Attendance](db)
 	studentDB := NewBaseRepository[models.Student](db)
 	userDB := NewBaseRepository[models.User](db)
-	
+
 	// Create the specific repositories using the typed database repositories
 	attendanceRepo := NewAttendanceRepository(attendanceDB)
 	studentRepo := NewStudentRepository(studentDB)
 	userRepo := NewUserRepository(userDB)
-	
+
 	// Create a generic database repository for any other needs
 	genericDB := NewBaseRepository[any](db)
-	
+
 	return &Repository{
 		AttendanceRepository: attendanceRepo,
 		StudentRepository:    studentRepo,
