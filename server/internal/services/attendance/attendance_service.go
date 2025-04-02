@@ -12,7 +12,7 @@ type AttendanceService interface {
 	GetAttendanceByCourse(courseID int) ([]*models.Attendance, error)
 	GetAttendanceByStudent(studentID int) ([]*models.Attendance, error)
 	GetAttendanceByStudentAndCourse(studentID int, courseID int) ([]*models.Attendance, error)
-	MarkAttendance(ctx context.Context,studentID int, courseID int, lectureID int) (bool, error)
+	MarkAttendance(ctx context.Context, studentID int, courseID int, lectureID int) (bool, error)
 }
 
 type attendanceService struct {
@@ -42,7 +42,7 @@ func (a *attendanceService) GetAttendanceByStudentAndCourse(studentID int, cours
 	return a.repo.GetAttendanceStudentInCourse(context.Background(), studentID, courseID)
 }
 
-func (a *attendanceService) MarkAttendance(ctx context.Context,studentID, courseID, lectureID int) (bool, error) {
+func (a *attendanceService) MarkAttendance(ctx context.Context, studentID, courseID, lectureID int) (bool, error) {
 	ok, err := a.repo.MarkAttendance(ctx, studentID, courseID, lectureID)
 	if err != nil {
 		return false, err
@@ -53,10 +53,10 @@ func (a *attendanceService) MarkAttendance(ctx context.Context,studentID, course
 	return false, nil
 }
 
-func(a*attendanceService)VerifyStudentEnrollment(ctx context.Context,studentID int ,courseID int)(bool,error){
-	enrolled,err :=a.repo.VerifyStudentEnrollment(ctx,studentID,courseID)
-	if err !=nil{
-		return false,err 
+func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, studentID int, courseID int) (bool, error) {
+	enrolled, err := a.repo.VerifyStudentEnrollment(ctx, studentID, courseID)
+	if err != nil {
+		return false, err
 	}
-	return enrolled,nil 
+	return enrolled, nil
 }
