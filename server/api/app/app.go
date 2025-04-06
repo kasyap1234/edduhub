@@ -6,10 +6,6 @@ import (
 	"eduhub/server/internal/middleware"
 	"eduhub/server/internal/services"
 
-	// "eduhub/server/internal/services/auth"
-
-	// localmid "eduhub/server/internal/middleware"
-
 	"github.com/labstack/echo/v4"
 	echomid "github.com/labstack/echo/v4/middleware"
 	"github.com/uptrace/bun"

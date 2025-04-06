@@ -4,6 +4,13 @@ import (
 	"context"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
+	"eduhub/server/internal/services/attendance"
+)
+
+const (
+	Present = "Present"
+	Absent  = "Absent"
+	Freezed = "Freezed"
 )
 
 type AttendanceService interface {
@@ -13,6 +20,8 @@ type AttendanceService interface {
 	GetAttendanceByStudent(studentID int) ([]*models.Attendance, error)
 	GetAttendanceByStudentAndCourse(studentID int, courseID int) ([]*models.Attendance, error)
 	MarkAttendance(ctx context.Context, studentID int, courseID int, lectureID int) (bool, error)
+	UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
+	FreezeAttendance(ctx context.Context, studentID int) error
 }
 
 type attendanceService struct {
@@ -59,4 +68,42 @@ func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, student
 		return false, err
 	}
 	return enrolled, nil
+}
+
+func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, studentID int, courseID int, lectureID int) error {
+	qrCode, err := a.GenerateQRCode(courseID, lectureID)
+	if err != nil {
+		return nil
+	}
+	err = a.ProcessQRCode(ctx, studentID, qrCode)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *attendanceService) UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error) {
+	switch currentStatus {
+	case attendance.Present:
+		err := a.repo.UpdateAttendance(ctx, studentID, courseID, lectureID, attendance.Absent)
+		if err != nil {
+			return false, err
+		}
+	case attendance.Absent:
+		err := a.repo.UpdateAttendance(ctx, studentID, courseID, lectureID, attendance.Present)
+		if err != nil {
+			return false, err
+		}
+
+	}
+	return true, nil
+
+}
+
+func (a *attendanceService) FreezeAttendance(ctx context.Context, studentID int) (bool, error) {
+	err := a.repo.FreezeAttendance(ctx, studentID)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
