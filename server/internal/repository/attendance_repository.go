@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"eduhub/server/internal/models"
+	"eduhub/server/internal/services/attendance"
 )
 
 type AttendanceRepository interface {
@@ -12,7 +13,8 @@ type AttendanceRepository interface {
 	GetAttendanceStudentInCourse(ctx context.Context, studentID int, courseID int) ([]*models.Attendance, error)
 	GetAttendanceStudent(ctx context.Context, studentID int) ([]*models.Attendance, error)
 	GetAttendanceByLecture(ctx context.Context, lectureID int, courseID int) ([]*models.Attendance, error)
-	VerifyStudentEnrollment(ctx context.Context,studentID int, courseID int)(bool,error)
+	VerifyStudentEnrollment(ctx context.Context, studentID int, courseID int) (bool, error)
+	FreezeAttendance(ctx context.Context, studentID int) error
 }
 
 type attendanceRepository struct {
@@ -63,7 +65,7 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 	return attendances, nil
 }
 
-// to get attendance of student across all courses and lectures 
+// to get attendance of student across all courses and lectures
 func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, studentID int) ([]*models.Attendance, error) {
 	records, err := a.db.FindWhere(ctx, "student_id = ?", studentID)
 	if err != nil {
@@ -79,7 +81,8 @@ func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, cours
 	}
 	return records, nil
 }
-// attendance of all students in a course 
+
+// attendance of all students in a course
 
 func (a *attendanceRepository) GetAttendanceByCourse(ctx context.Context, courseID int) ([]*models.Attendance, error) {
 	records, err := a.db.FindWhere(ctx, "course_id=?", courseID)
@@ -89,10 +92,20 @@ func (a *attendanceRepository) GetAttendanceByCourse(ctx context.Context, course
 	return records, nil
 }
 
-func(a*attendanceRepository)VerifyStudentEnrollment(ctx context.Context,studentID int,courseID int)(bool,error){
- _, err :=a.db.FindOne(ctx, "student_id=? AND course_id=?", studentID, courseID)
- if err !=nil{
-	return false,err 
- }
- return true, nil 
+func (a *attendanceRepository) VerifyStudentEnrollment(ctx context.Context, studentID int, courseID int) (bool, error) {
+	_, err := a.db.FindOne(ctx, "student_id=? AND course_id=?", studentID, courseID)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (a *attendanceRepository) FreezeAttendance(ctx context.Context, studentID int) error {
+	student, err := a.db.FindOne(ctx, "student_id=?", studentID)
+	if err != nil {
+		return err
+	}
+	student.Status = attendance.Freezed
+	return a.db.Update(ctx, student)
+
 }
