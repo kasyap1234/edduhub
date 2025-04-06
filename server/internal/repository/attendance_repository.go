@@ -109,3 +109,5 @@ func (a *attendanceRepository) FreezeAttendance(ctx context.Context, studentID i
 	return a.db.Update(ctx, student)
 
 }
+
+func(a *attendanceRepository)
