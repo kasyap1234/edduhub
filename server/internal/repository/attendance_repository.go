@@ -110,4 +110,3 @@ func (a *attendanceRepository) FreezeAttendance(ctx context.Context, studentID i
 
 }
 
-func(a *attendanceRepository)
