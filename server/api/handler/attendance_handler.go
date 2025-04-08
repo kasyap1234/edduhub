@@ -8,6 +8,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type ErrorResponse struct {
+	Error error
+}
+
+type Response struct {
+	Message any
+}
+
 type AttendanceHandler struct {
 	attendanceService attendance.AttendanceService
 }
