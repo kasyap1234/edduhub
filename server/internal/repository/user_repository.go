@@ -3,8 +3,6 @@ package repository
 import (
 	"context"
 	"eduhub/server/internal/models"
-
-	"github.com/uptrace/bun"
 )
 
 type UserRepository interface {

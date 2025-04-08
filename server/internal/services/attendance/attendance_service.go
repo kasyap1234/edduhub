@@ -22,15 +22,19 @@ type AttendanceService interface {
 	MarkAttendance(ctx context.Context, studentID int, courseID int, lectureID int) (bool, error)
 	UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
 	FreezeAttendance(ctx context.Context, studentID int) error
+	FreezeStudent(ctx context.Context, RollNo string) error
+	UnFreezeStudent(ctx context.Context, RollNo string) error
 }
 
 type attendanceService struct {
-	repo repository.AttendanceRepository
+	repo        repository.AttendanceRepository
+	studentRepo repository.StudentRepository
 }
 
-func NewAttendanceService(repo repository.AttendanceRepository) AttendanceService {
+func NewAttendanceService(repo repository.AttendanceRepository, userRepo repository.UserRepository) AttendanceService {
 	return &attendanceService{
-		repo: repo,
+		repo:        repo,
+		studentRepo: repository.StudentRepository,
 	}
 }
 
