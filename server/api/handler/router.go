@@ -19,7 +19,7 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 	auth.GET("/callback", a.Auth.HandleCallback)
 
 	attendance := e.Group("/attendance")
-	attendance.Use(m.ValidateSession)
 	attendance.POST("/", a.Attendance.MarkAttendance, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent))
-	attendance.GET("/get-attendance-course",)
+	attendance.GET("/get-attendance-course", a.Attendance.GetAttendanceByCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
+
 }

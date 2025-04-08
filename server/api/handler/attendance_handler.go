@@ -37,8 +37,8 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 }
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
-	ctx := c.Request().Context()
-	courseIDstr := c.QueryParam("courseIDstr")
+	// ctx := c.Request().Context()
+	courseIDstr := c.QueryParam("courseID")
 	courseID, _ := strconv.Atoi(courseIDstr)
 
 	attendance, err := a.attendanceService.GetAttendanceByCourse(courseID)
@@ -48,4 +48,29 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{"response": attendance})
 
+}
+
+func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
+	studentIDstr := c.QueryParam("studentID")
+	studentID, _ := strconv.Atoi(studentIDstr)
+	attendance, err := a.attendanceService.GetAttendanceByStudent(studentID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"response": attendance})
+}
+
+func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) error {
+
+	studentIDstr := c.QueryParam("studentID")
+	courseIDstr := c.QueryParam("courseID")
+	courseID, _ := strconv.Atoi(courseIDstr)
+	studentID, _ := strconv.Atoi(studentIDstr)
+
+	attendance, err := a.attendanceService.GetAttendanceByStudentAndCourse(studentID, courseID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
+
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"response": attendance})
 }
