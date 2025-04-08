@@ -50,6 +50,7 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 
 }
 
+// use structs instead of maps while returning c.JSON
 func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	studentIDstr := c.QueryParam("studentID")
 	studentID, _ := strconv.Atoi(studentIDstr)
