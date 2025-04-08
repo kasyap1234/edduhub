@@ -31,11 +31,12 @@ type attendanceService struct {
 	studentRepo repository.StudentRepository
 }
 
-func NewAttendanceService(repo repository.AttendanceRepository, userRepo repository.UserRepository) AttendanceService {
+func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repository.StudentRepository) AttendanceService {
 	return &attendanceService{
 		repo:        repo,
-		studentRepo: repository.StudentRepository,
+		studentRepo: studentRepo
 	}
+
 }
 
 func (a *attendanceService) GetAttendanceByLecture(courseID int, lectureID int) ([]*models.Attendance, error) {
@@ -110,4 +111,14 @@ func (a *attendanceService) FreezeAttendance(ctx context.Context, studentID int)
 		return false, err
 	}
 	return true, nil
+}
+
+func (a *attendanceService) FreezeStudent(ctx context.Context, RollNo string) error {
+	err := a.studentRepo.FreezeStudent(ctx, RollNo)
+	return err
+}
+
+func (a *attendanceService) UnFreezeStudent(ctx context.Context, RollNo string) error {
+	err := a.studentRepo.UnFreezeStudent(ctx, RollNo)
+	return err
 }
