@@ -16,7 +16,7 @@ type ErrorResponse struct {
 type Response struct {
 	Message any
 }
-type attendance models.Attendance
+type attendanceModel models.Attendance
 
 type AttendanceHandler struct {
 	attendanceService attendance.AttendanceService
@@ -53,11 +53,10 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 
 	attendance, err := a.attendanceService.GetAttendanceByCourse(courseID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,err)
+		return c.JSON(http.StatusInternalServerError, err)
 
 	}
-	return c.JSON(http.StatusOK,attendance)
-
+	return c.JSON(http.StatusOK, attendance)
 
 }
 
@@ -69,7 +68,7 @@ func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err})
 	}
-	return c.JSON(http.StatusOK,attendance)
+	return c.JSON(http.StatusOK, attendance)
 }
 
 func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) error {
@@ -84,5 +83,5 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
 
 	}
-	return c.JSON(http.StatusOK,attendance))
+	return c.JSON(http.StatusOK, attendance)
 }
