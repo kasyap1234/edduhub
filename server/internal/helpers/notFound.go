@@ -15,4 +15,5 @@ func NotFound(c echo.Context,data any)error {
 	return c.JSON(http.StatusNotFound,NotFoundResponse{
 		Data : data,
 	}
+)
 }
