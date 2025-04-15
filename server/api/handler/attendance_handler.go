@@ -42,13 +42,12 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	studentID, _ := strconv.Atoi(studentIDstr)
 	courseID, _ := strconv.Atoi(courseIDstr)
 	lectureID, _ := strconv.Atoi(lectureIDstr)
-	ok, err := a.attendanceService.MarkAttendance(ctx, studentID, courseID, lectureID)
+	ok, _ := a.attendanceService.MarkAttendance(ctx, studentID, courseID, lectureID)
 	if ok {
 		//
-		return c.JSON(200, AttendanceResponse{Success: true, Message: "Attendance marked successfull"})
+		return helpers.Success(c, "attendance marked")
 	}
-	return c.JSON(http.StatusInternalServerError, helpers.ErrorResponse{Message: err.Error()})
-
+	return helpers.Error(c, "attendance not marked")
 }
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {

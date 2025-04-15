@@ -21,5 +21,7 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 	attendance := e.Group("/attendance")
 	attendance.POST("/", a.Attendance.MarkAttendance, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent))
 	attendance.GET("/get-attendance-course", a.Attendance.GetAttendanceByCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
-
+	attendance.GET("/student/:studentID", a.Attendance.GetAttendanceForStudent, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent))
+	attendance.GET("/student/:studentID/course/:courseID", a.Attendance.GetAttendanceByStudentAndCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent))
+	attendance.GET("course", a.Attendance.GetAttendanceByCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 }
