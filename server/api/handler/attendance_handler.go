@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"eduhub/server/internal/helpers"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/services/attendance"
 	"net/http"
@@ -13,6 +14,10 @@ type ErrorResponse struct {
 	Error error
 }
 
+type AttendanceResponse struct {
+	Success bool
+	Message string
+}
 type Response struct {
 	Message any
 }
@@ -40,9 +45,9 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	ok, err := a.attendanceService.MarkAttendance(ctx, studentID, courseID, lectureID)
 	if ok {
 		//
-		return nil
+		return c.JSON(200, AttendanceResponse{Success: true, Message: "Attendance marked successfull"})
 	}
-	return err
+	return c.JSON(http.StatusInternalServerError, helpers.ErrorResponse{Message: err.Error()})
 
 }
 

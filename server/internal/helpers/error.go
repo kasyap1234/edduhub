@@ -7,11 +7,11 @@ import (
 )
 
 type ErrorResponse struct {
-	error any `json:"error"`
+	Message any `json:"error"`
 }
 
 func Error(c echo.Context, error any) error {
 	return c.JSON(http.StatusInternalServerError, ErrorResponse{
-		error: error,
+		Message: error,
 	})
 }
