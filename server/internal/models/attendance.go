@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/uptrace/bun"
 	"time"
+
+	"github.com/uptrace/bun"
 )
 
 type Attendance struct {
@@ -10,6 +11,7 @@ type Attendance struct {
 	ID            int       `json:"id" bun:"pk,autoincrement"`
 	StudentID     int       `json:"studentId" bun:"student_id"`
 	CourseID      int       `json:"courseId" bun:"course_id"`
+	CollegeID     int       `json:"collegeIDcollege_id"`
 	Date          time.Time `json:"date" bun:"date"`
 	Status        string    `json:"status" bun:"status"`
 	ScannedAt     time.Time `json:"scannedAt" bun:"scanned_at"`

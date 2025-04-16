@@ -6,6 +6,7 @@ type Student struct {
 	bun.BaseModel `bun:"table:students"`
 	ID            int      `json:"student_id" bun:",pk,autoincrement"`
 	UserID        int      `json:"user_id" bun:",notnull,unique"`
+	CollegeID     int      `json:"college_id" bun:"college_id,notnull"`
 	RollNo        string   `json:"roll_no" bun:",unique"`
 	Batch         int      `json:"batch"`
 	Year          int      `json:"year"`

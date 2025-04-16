@@ -19,7 +19,7 @@ type AttendanceService interface {
 	GetAttendanceByCourse(courseID int) ([]*models.Attendance, error)
 	GetAttendanceByStudent(studentID int) ([]*models.Attendance, error)
 	GetAttendanceByStudentAndCourse(studentID int, courseID int) ([]*models.Attendance, error)
-	MarkAttendance(ctx context.Context, studentID int, courseID int, lectureID int) (bool, error)
+	MarkAttendance(ctx context.Context, collegeID int,studentID int, courseID int, lectureID int) (bool, error)
 	UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
 	FreezeAttendance(ctx context.Context, studentID int) error
 	FreezeStudent(ctx context.Context, RollNo string) error
@@ -39,24 +39,24 @@ func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repo
 
 }
 
-func (a *attendanceService) GetAttendanceByLecture(courseID int, lectureID int) ([]*models.Attendance, error) {
+func (a *attendanceService) GetAttendanceByLecture(collegeID int,courseID int, lectureID int) ([]*models.Attendance, error) {
 	return a.repo.GetAttendanceByLecture(context.Background(), courseID, lectureID)
 }
 
 // to get attendance of all students in a course
-func (a *attendanceService) GetAttendanceByCourse(courseID int) ([]*models.Attendance, error) {
+func (a *attendanceService) GetAttendanceByCourse(collegeID int,courseID int) ([]*models.Attendance, error) {
 	return a.repo.GetAttendanceByCourse(context.Background(), courseID)
 }
 
-func (a *attendanceService) GetAttendanceByStudent(studentID int) ([]*models.Attendance, error) {
+func (a *attendanceService) GetAttendanceByStudent(collegeID int,studentID int) ([]*models.Attendance, error) {
 	return a.repo.GetAttendanceStudent(context.Background(), studentID)
 }
 
-func (a *attendanceService) GetAttendanceByStudentAndCourse(studentID int, courseID int) ([]*models.Attendance, error) {
+func (a *attendanceService) GetAttendanceByStudentAndCourse(collegeID int,studentID int, courseID int) ([]*models.Attendance, error) {
 	return a.repo.GetAttendanceStudentInCourse(context.Background(), studentID, courseID)
 }
 
-func (a *attendanceService) MarkAttendance(ctx context.Context, studentID, courseID, lectureID int) (bool, error) {
+func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int,studentID, courseID, lectureID int) (bool, error) {
 	ok, err := a.repo.MarkAttendance(ctx, studentID, courseID, lectureID)
 	if err != nil {
 		return false, err
@@ -67,7 +67,7 @@ func (a *attendanceService) MarkAttendance(ctx context.Context, studentID, cours
 	return false, nil
 }
 
-func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, studentID int, courseID int) (bool, error) {
+func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, collegeID int,studentID int, courseID int) (bool, error) {
 	enrolled, err := a.repo.VerifyStudentEnrollment(ctx, studentID, courseID)
 	if err != nil {
 		return false, err
@@ -75,7 +75,7 @@ func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, student
 	return enrolled, nil
 }
 
-func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, studentID int, courseID int, lectureID int) error {
+func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) error {
 	qrCode, err := a.GenerateQRCode(courseID, lectureID)
 	if err != nil {
 		return nil
@@ -87,7 +87,7 @@ func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, studen
 	return nil
 }
 
-func (a *attendanceService) UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error) {
+func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID,studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error) {
 	switch currentStatus {
 	case attendance.Present:
 		err := a.repo.UpdateAttendance(ctx, studentID, courseID, lectureID, attendance.Absent)
@@ -105,7 +105,7 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, studentID int,
 
 }
 
-func (a *attendanceService) FreezeAttendance(ctx context.Context, studentID int) (bool, error) {
+func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID ,studentID int) (bool, error) {
 	err := a.repo.FreezeAttendance(ctx, studentID)
 	if err != nil {
 		return false, err

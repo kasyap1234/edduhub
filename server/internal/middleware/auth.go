@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"eduhub/server/internal/services/auth"
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -12,14 +13,14 @@ const (
 	RoleStudent = "student"
 )
 
-// AuthMiddleware uses AuthService to perform authentication (via Kratos) 
+// AuthMiddleware uses AuthService to perform authentication (via Kratos)
 // and authorization (via Ory Keto) checks.
 type AuthMiddleware struct {
 	AuthService auth.AuthService
 }
 
 // NewAuthMiddleware now accepts an auth.AuthService instance,
-// ensuring that the middleware has access to both authentication 
+// ensuring that the middleware has access to both authentication
 // (session validation) and authorization (permission checking) logic.
 func NewAuthMiddleware(authSvc auth.AuthService) *AuthMiddleware {
 	return &AuthMiddleware{
@@ -27,8 +28,8 @@ func NewAuthMiddleware(authSvc auth.AuthService) *AuthMiddleware {
 	}
 }
 
-// ValidateSession checks if the session token provided in the request 
-// is valid. The AuthService.ValidateSession function should use Ory Kratos 
+// ValidateSession checks if the session token provided in the request
+// is valid. The AuthService.ValidateSession function should use Ory Kratos
 // to validate the session.
 func (m *AuthMiddleware) ValidateSession(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -57,12 +58,6 @@ func (m *AuthMiddleware) ValidateSession(next echo.HandlerFunc) echo.HandlerFunc
 // Under a multitenant setup, this helps isolate college-specific resources.
 func (m *AuthMiddleware) RequireCollege(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		collegeID := c.Param("collegeID")
-		if collegeID == "" {
-			return c.JSON(http.StatusBadRequest, map[string]string{
-				"error": "College ID is required",
-			})
-		}
 
 		identity, ok := c.Get("identity").(*auth.Identity)
 		if !ok {
@@ -70,15 +65,26 @@ func (m *AuthMiddleware) RequireCollege(next echo.HandlerFunc) echo.HandlerFunc 
 				"error": "Unauthorized",
 			})
 		}
-		if !m.AuthService.CheckCollegeAccess(identity, collegeID) {
-			return c.JSON(http.StatusForbidden, map[string]string{
-				"error": "Access denied to this college",
-			})
-		}
+		userCollegeID := identity.Traits.College.ID
+		c.Set("college_id", userCollegeID)
 
 		return next(c)
 	}
 }
+
+// func (m *AuthMiddleware) CheckCollegeAccess(next echo.HandlerFunc) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		identity := c.Get("identity").(*auth.Identity)
+// 		if identity == nil {
+// 			return c.JSON(http.StatusUnauthorized, map[string]string{
+// 				"error": "Unauthorized",
+// 			})
+// 		}
+// 		userCollegeID := identity.Traits.College
+// 		c.Set("college_id", userCollegeID)
+// 		return next(c)
+// 	}
+// }
 
 // RequireRole ensures the user has at least one of the specified roles.
 // The AuthService.HasRole method should return true for a given identity if it holds the role.
@@ -130,5 +136,6 @@ func (m *AuthMiddleware) RequirePermission(resource, action string) echo.Middlew
 				})
 			}
 			return next(c)
-		}	}
+		}
+	}
 }

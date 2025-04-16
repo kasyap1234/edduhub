@@ -6,6 +6,7 @@ import "github.com/uptrace/bun"
 type Course struct {
 	bun.BaseModel `bun:"table:courses"`
 	ID            int        `json:"id" bun:",pk,autoincrement"`
+	CollegeID     int        `json:"college_id" bun:"college_id,notnull"`
 	Name          string     `json:"name"`
 	Code          string     `json:"code"`
 	Credits       int        `json:"credits"`
@@ -20,6 +21,7 @@ type Course struct {
 type Lecture struct {
 	bun.BaseModel `bun:"table:lectures"`
 	ID            int `json:"id" bun:",pk,autoincrement"`
+	CollegeID     int `json:"college_id" bun:"college_id,notnull"`
 	CourseID      int `json:"course_id" bun:",notnull"`
 	QRCodeID      int `json:"qr_code_id"`
 
