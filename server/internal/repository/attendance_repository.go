@@ -66,16 +66,16 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 }
 
 // to get attendance of student across all courses and lectures
-func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, studentID int) ([]*models.Attendance, error) {
-	records, err := a.db.FindWhere(ctx, "student_id = ?", studentID)
+func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, collegeID, studentID int) ([]*models.Attendance, error) {
+	records, err := a.db.FindWhere(ctx, "student_id = ? AND college_id=?", studentID, collegeID)
 	if err != nil {
 		return nil, err
 	}
 	return records, nil
 }
 
-func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, courseID int, lectureID int) ([]*models.Attendance, error) {
-	records, err := a.db.FindWhere(ctx, "course_id=? AND lecture_id=?", courseID, lectureID)
+func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, collegeID, courseID int, lectureID int) ([]*models.Attendance, error) {
+	records, err := a.db.FindWhere(ctx, "course_id=? AND lecture_id=? AND college_id=?", courseID, lectureID, collegeID)
 	if err != nil {
 		return nil, err
 	}

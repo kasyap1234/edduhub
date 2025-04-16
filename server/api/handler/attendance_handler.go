@@ -36,13 +36,18 @@ func NewAttedanceHandler(attendance attendance.AttendanceService) *AttendanceHan
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	// return a.attendanceService.MarkAttendance(c, studentID , courseID int, lectureID int)
 	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return err
+	}
+
 	studentIDstr := c.QueryParam("studentID")
 	courseIDstr := c.QueryParam("courseID")
 	lectureIDstr := c.QueryParam("lectureID")
 	studentID, _ := strconv.Atoi(studentIDstr)
 	courseID, _ := strconv.Atoi(courseIDstr)
 	lectureID, _ := strconv.Atoi(lectureIDstr)
-	ok, _ := a.attendanceService.MarkAttendance(ctx, studentID, courseID, lectureID)
+	ok, _ := a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if ok {
 		//
 		return helpers.Success(c, "attendance marked")
@@ -52,6 +57,10 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 	// ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return err
+	}
 	courseIDstr := c.QueryParam("courseID")
 	courseID, _ := strconv.Atoi(courseIDstr)
 

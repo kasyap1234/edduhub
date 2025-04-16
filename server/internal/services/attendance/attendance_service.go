@@ -14,16 +14,16 @@ const (
 )
 
 type AttendanceService interface {
-	GenerateQRCode(courseID int, lectureID int) (string, error)
-	GetAttendanceByLecture(courseID int, lectureID int) ([]*models.Attendance, error)
-	GetAttendanceByCourse(courseID int) ([]*models.Attendance, error)
-	GetAttendanceByStudent(studentID int) ([]*models.Attendance, error)
-	GetAttendanceByStudentAndCourse(studentID int, courseID int) ([]*models.Attendance, error)
+	GenerateQRCode(collegeID,courseID int, lectureID int) (string, error)
+	GetAttendanceByLecture(collegeID,courseID int, lectureID int) ([]*models.Attendance, error)
+	GetAttendanceByCourse(collegeID,courseID int) ([]*models.Attendance, error)
+	GetAttendanceByStudent(collegeID,studentID int) ([]*models.Attendance, error)
+	GetAttendanceByStudentAndCourse(collegeID,studentID int, courseID int) ([]*models.Attendance, error)
 	MarkAttendance(ctx context.Context, collegeID int,studentID int, courseID int, lectureID int) (bool, error)
-	UpdateAttendance(ctx context.Context, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
-	FreezeAttendance(ctx context.Context, studentID int) error
-	FreezeStudent(ctx context.Context, RollNo string) error
-	UnFreezeStudent(ctx context.Context, RollNo string) error
+	UpdateAttendance(ctx context.Context,collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
+	FreezeAttendance(ctx context.Context,collegeID, studentID int) error
+	FreezeStudent(ctx context.Context, collegeID int,RollNo string) error
+	UnFreezeStudent(ctx context.Context, collegeID int,RollNo string) error
 }
 
 type attendanceService struct {
