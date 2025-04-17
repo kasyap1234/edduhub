@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"eduhub/server/internal/models"
+	"eduhub/server/internal/services/attendance"
 )
 
 type AttendanceRepository interface {
