@@ -101,12 +101,12 @@ func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, colleg
 
 func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error) {
 	switch currentStatus {
-	case attendance.Present:
+	case Present:
 		err := a.repo.UpdateAttendance(ctx, studentID, courseID, lectureID, attendance.Absent)
 		if err != nil {
 			return false, err
 		}
-	case attendance.Absent:
+	case Absent:
 		err := a.repo.UpdateAttendance(ctx, studentID, courseID, lectureID, attendance.Present)
 		if err != nil {
 			return false, err
