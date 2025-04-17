@@ -2,6 +2,7 @@ package services
 
 import (
 	"eduhub/server/internal/config"
+	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services/attendance"
 	"eduhub/server/internal/services/auth"
 )
@@ -18,7 +19,8 @@ func NewServices(cfg *config.Config) *Services {
 	ketoService := auth.NewKetoService()
 	authService := auth.NewAuthService(kratosService, ketoService)
 	db := config.LoadDatabase()
-	attendanceService := attendance.NewAttendanceService(db)
+	repository := repository.NewRepository(db)
+	attendanceService := attendance.NewAttendanceService(repository.AttendanceRepository, repository.StudentRepository)
 	return &Services{
 		Auth:       authService,
 		Attendance: attendanceService,
