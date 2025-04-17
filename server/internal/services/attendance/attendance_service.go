@@ -4,7 +4,6 @@ import (
 	"context"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
-	"eduhub/server/internal/services/attendance"
 )
 
 const (
@@ -102,16 +101,15 @@ func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, colleg
 func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error) {
 	switch currentStatus {
 	case Present:
-		err := a.repo.UpdateAttendance(ctx, studentID, courseID, lectureID, attendance.Absent)
-		if err != nil {
-			return false, err
-		}
-	case Absent:
-		err := a.repo.UpdateAttendance(ctx, studentID, courseID, lectureID, attendance.Present)
-		if err != nil {
-			return false, err
-		}
+		updatedStatus = Absent
 
+	case Absent:
+		updatedStatus = Present
+
+	}
+	err := a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, currentStatus, updatedStatus)
+	if err != nil {
+		return false, err
 	}
 	return true, nil
 
