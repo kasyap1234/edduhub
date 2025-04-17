@@ -14,11 +14,11 @@ const (
 )
 
 type AttendanceService interface {
-	GenerateQRCode(collegeID,courseID int, lectureID int) (string, error)
-	GetAttendanceByLecture(collegeID,courseID int, lectureID int) ([]*models.Attendance, error)
-	GetAttendanceByCourse(collegeID,courseID int) ([]*models.Attendance, error)
-	GetAttendanceByStudent(collegeID,studentID int) ([]*models.Attendance, error)
-	GetAttendanceByStudentAndCourse(collegeID,studentID int, courseID int) ([]*models.Attendance, error)
+	GenerateQRCode(ctx context.Context,collegeID,courseID int, lectureID int) (string, error)
+	GetAttendanceByLecture(ctx context.Context,collegeID,courseID int, lectureID int) ([]*models.Attendance, error)
+	GetAttendanceByCourse(ctx context.Context,collegeID,courseID int) ([]*models.Attendance, error)
+	GetAttendanceByStudent(ctx context.Context,collegeID,studentID int) ([]*models.Attendance, error)
+	GetAttendanceByStudentAndCourse(ctx context.Context,collegeID,studentID int, courseID int) ([]*models.Attendance, error)
 	MarkAttendance(ctx context.Context, collegeID int,studentID int, courseID int, lectureID int) (bool, error)
 	UpdateAttendance(ctx context.Context,collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
 	FreezeAttendance(ctx context.Context,collegeID, studentID int) error
@@ -39,21 +39,21 @@ func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repo
 
 }
 
-func (a *attendanceService) GetAttendanceByLecture(collegeID int,courseID int, lectureID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByLecture(context.Background(), collegeID,courseID, lectureID)
+func (a *attendanceService) GetAttendanceByLecture(ctx context.Context,collegeID int,courseID int, lectureID int) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceByLecture(ctx,collegeID,courseID, lectureID)
 }
 
 // to get attendance of all students in a course
-func (a *attendanceService) GetAttendanceByCourse(collegeID int,courseID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByCourse(context.Background(),collegeID, courseID)
+func (a *attendanceService) GetAttendanceByCourse(ctx context.Context,collegeID int,courseID int) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceByCourse(ctx,collegeID, courseID)
 }
 
-func (a *attendanceService) GetAttendanceByStudent(collegeID int,studentID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceStudent(context.Background(), collegeID,studentID)
+func (a *attendanceService) GetAttendanceByStudent(ctx context.Context,collegeID int,studentID int) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceStudent(ctx, collegeID,studentID)
 }
 
-func (a *attendanceService) GetAttendanceByStudentAndCourse(collegeID int,studentID int, courseID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceStudentInCourse(context.Background(),collegeID, studentID, courseID)
+func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context,collegeID int,studentID int, courseID int) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceStudentInCourse(ctx,collegeID, studentID, courseID)
 }
 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int,studentID, courseID, lectureID int) (bool, error) {
@@ -113,12 +113,12 @@ func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID ,stu
 	return true, nil
 }
 
-func (a *attendanceService) FreezeStudent(ctx context.Context, RollNo string) error {
+func (a *attendanceService) FreezeStudent(ctx context.Context, collegeID int,RollNo string) error {
 	err := a.studentRepo.FreezeStudent(ctx, RollNo)
 	return err
 }
 
-func (a *attendanceService) UnFreezeStudent(ctx context.Context, RollNo string) error {
+func (a *attendanceService) UnFreezeStudent(ctx context.Context, collegeID int,RollNo string) error {
 	err := a.studentRepo.UnFreezeStudent(ctx, RollNo)
 	return err
 }

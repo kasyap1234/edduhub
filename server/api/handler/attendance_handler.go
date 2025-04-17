@@ -56,7 +56,7 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 }
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
-	// ctx := c.Request().Context()
+	ctx := c.Request().Context()
 	collegeID, err := helpers.ExtractCollegeID(c)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 	courseIDstr := c.QueryParam("courseID")
 	courseID, _ := strconv.Atoi(courseIDstr)
 
-	attendance, err := a.attendanceService.GetAttendanceByCourse(collegeID,courseID)
+	attendance, err := a.attendanceService.GetAttendanceByCourse(ctx, collegeID, courseID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 
@@ -75,9 +75,14 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 
 // use structs instead of maps while returning c.JSON
 func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
+	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return err
+	}
 	studentIDstr := c.QueryParam("studentID")
 	studentID, _ := strconv.Atoi(studentIDstr)
-	attendance, err := a.attendanceService.GetAttendanceByStudent(studentID)
+	attendance, err := a.attendanceService.GetAttendanceByStudent(ctx, collegeID, studentID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err})
 	}
@@ -85,13 +90,17 @@ func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 }
 
 func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) error {
-
+	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return err
+	}
 	studentIDstr := c.QueryParam("studentID")
 	courseIDstr := c.QueryParam("courseID")
 	courseID, _ := strconv.Atoi(courseIDstr)
 	studentID, _ := strconv.Atoi(studentIDstr)
 
-	attendance, err := a.attendanceService.GetAttendanceByStudentAndCourse(studentID, courseID)
+	attendance, err := a.attendanceService.GetAttendanceByStudentAndCourse(ctx, collegeID, studentID, courseID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
 
