@@ -9,6 +9,5 @@ type Logger interface {
 
 func NewLogger()Logger{
 	return &NewZapLogger(
-
 	)
 }

@@ -2,6 +2,7 @@ package attendance
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,7 +23,7 @@ type QRCodeData struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-func (a *attendanceService) GenerateQRCode(collegeID int, courseID int, lectureID int) (string, error) {
+func (a *attendanceService) GenerateQRCode(ctx context.Context, collegeID int, courseID int, lectureID int) (string, error) {
 	// generate qr code
 	// return qr code
 	// need to check if student is enrolled in the course for marking attendance
@@ -44,8 +45,9 @@ func (a *attendanceService) GenerateQRCode(collegeID int, courseID int, lectureI
 	if err != nil {
 		return "", err
 	}
-	qrBase64 := fmt.Sprintf("data ,%s", qrBytes)
-	return qrBase64, nil
+	qrBase64 := base64.StdEncoding.EncodeToString(qrBytes)
+	qrDataURI := fmt.Sprintf("data:image/png;base64,%s", qrBase64)
+	return qrDataURI, nil
 
 }
 
@@ -66,6 +68,9 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, st
 	}
 	if !enrolled {
 		return errors.New("student is not enrolled in the course")
+	}
+	if qrData.CollegeID != collegeID {
+		return errors.New("college id does not match")
 	}
 	marked, err := a.MarkAttendance(ctx, qrData.CollegeID, studentID, qrData.CourseID, qrData.LectureID)
 	if err != nil {
