@@ -72,22 +72,6 @@ func (m *AuthMiddleware) RequireCollege(next echo.HandlerFunc) echo.HandlerFunc 
 	}
 }
 
-// func (m *AuthMiddleware) CheckCollegeAccess(next echo.HandlerFunc) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		identity := c.Get("identity").(*auth.Identity)
-// 		if identity == nil {
-// 			return c.JSON(http.StatusUnauthorized, map[string]string{
-// 				"error": "Unauthorized",
-// 			})
-// 		}
-// 		userCollegeID := identity.Traits.College
-// 		c.Set("college_id", userCollegeID)
-// 		return next(c)
-// 	}
-// }
-
-// RequireRole ensures the user has at least one of the specified roles.
-// The AuthService.HasRole method should return true for a given identity if it holds the role.
 func (m *AuthMiddleware) RequireRole(roles ...string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -111,10 +95,6 @@ func (m *AuthMiddleware) RequireRole(roles ...string) echo.MiddlewareFunc {
 	}
 }
 
-// RequirePermission ensures the user has the required permission on a given resource using Ory Keto.
-// The AuthService.CheckPermission method should interface with the Ory Keto (via client-go)
-// to check if the user (by identity.ID) has the specific action permitted on the resource.
-// For example, resource could be a college identifier and action could be "view", "edit", etc.
 func (m *AuthMiddleware) RequirePermission(resource, action string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

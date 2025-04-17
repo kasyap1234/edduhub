@@ -14,3 +14,4 @@ func GetUserRole(c echo.Context)(string,error) {
 	}
 	return identity.Traits.Role,nil 
 }
+

@@ -74,5 +74,5 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, studentID int, qr
 
 	}
 
-return nil 
+	return nil
 }

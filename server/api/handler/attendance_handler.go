@@ -64,7 +64,7 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 	courseIDstr := c.QueryParam("courseID")
 	courseID, _ := strconv.Atoi(courseIDstr)
 
-	attendance, err := a.attendanceService.GetAttendanceByCourse(courseID)
+	attendance, err := a.attendanceService.GetAttendanceByCourse(collegeID,courseID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 

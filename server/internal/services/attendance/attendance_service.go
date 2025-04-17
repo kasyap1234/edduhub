@@ -40,24 +40,24 @@ func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repo
 }
 
 func (a *attendanceService) GetAttendanceByLecture(collegeID int,courseID int, lectureID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByLecture(context.Background(), courseID, lectureID)
+	return a.repo.GetAttendanceByLecture(context.Background(), collegeID,courseID, lectureID)
 }
 
 // to get attendance of all students in a course
 func (a *attendanceService) GetAttendanceByCourse(collegeID int,courseID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByCourse(context.Background(), courseID)
+	return a.repo.GetAttendanceByCourse(context.Background(),collegeID, courseID)
 }
 
 func (a *attendanceService) GetAttendanceByStudent(collegeID int,studentID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceStudent(context.Background(), studentID)
+	return a.repo.GetAttendanceStudent(context.Background(), collegeID,studentID)
 }
 
 func (a *attendanceService) GetAttendanceByStudentAndCourse(collegeID int,studentID int, courseID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceStudentInCourse(context.Background(), studentID, courseID)
+	return a.repo.GetAttendanceStudentInCourse(context.Background(),collegeID, studentID, courseID)
 }
 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int,studentID, courseID, lectureID int) (bool, error) {
-	ok, err := a.repo.MarkAttendance(ctx, studentID, courseID, lectureID)
+	ok, err := a.repo.MarkAttendance(ctx, collegeID,studentID, courseID, lectureID)
 	if err != nil {
 		return false, err
 	}
@@ -68,7 +68,7 @@ func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int,st
 }
 
 func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, collegeID int,studentID int, courseID int) (bool, error) {
-	enrolled, err := a.repo.VerifyStudentEnrollment(ctx, studentID, courseID)
+	enrolled, err := a.repo.VerifyStudentEnrollment(ctx, collegeID,studentID, courseID)
 	if err != nil {
 		return false, err
 	}
