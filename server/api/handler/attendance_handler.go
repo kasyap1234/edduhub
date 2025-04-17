@@ -33,6 +33,39 @@ func NewAttedanceHandler(attendance attendance.AttendanceService) *AttendanceHan
 	}
 }
 
+func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
+	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return err
+	}
+	courseIDStr := c.Param("courseID")
+	lectureIDstr := c.Param("lectureID")
+	courseID, err := strconv.Atoi(courseIDStr)
+	lectureID, err := strconv.Atoi(lectureIDstr)
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+	qrCode, err := a.attendanceService.GenerateQRCode(ctx, collegeID, courseID, lectureID)
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+	return helpers.Success(c, qrCode)
+}
+
+func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
+	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return helpers.Error(c, err)
+	}
+	// TODO extract student ID from context , need to link studentid from kratos with db ;
+	studentID, err := helpers.ExtractStudentID(c)
+	if err != nil {
+		return helpers.Error(c, err)
+
+	}
+}
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	// return a.attendanceService.MarkAttendance(c, studentID , courseID int, lectureID int)
 	ctx := c.Request().Context()
