@@ -4,6 +4,7 @@ import (
 	"context"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
+	"eduhub/server/internal/services/attendance"
 )
 
 const (
@@ -40,7 +41,6 @@ func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repo
 }
 
 func (a *attendanceService) GetAttendanceByLecture(ctx context.Context, collegeID int, courseID int, lectureID int) ([]*models.Attendance, error) {
-
 	return a.repo.GetAttendanceByLecture(ctx, collegeID, courseID, lectureID)
 }
 
@@ -69,19 +69,30 @@ func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, s
 }
 
 func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error) {
-	enrolled, err := a.studentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
+	student, err := a.studentRepo.GetStudentByID(ctx, collegeID, studentID)
 	if err != nil {
 		return false, err
 	}
+	if !student.IsActive {
+		return false, nil
+	}
+	if student.CollegeID != collegeID {
+		return false, nil
+	}
+	enrolled, err := a.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
+	if err != nil {
+		return false, err
+	}
+	// check if student is enrolled in the course (TODO)
 	return enrolled, nil
 }
 
 func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) error {
-	qrCode, err := a.GenerateQRCode(courseID, lectureID)
+	qrCode, err := a.GenerateQRCode(ctx, collegeID, courseID, lectureID)
 	if err != nil {
 		return nil
 	}
-	err = a.ProcessQRCode(ctx, studentID, qrCode)
+	err = a.ProcessQRCode(ctx, collegeID, studentID, qrCode)
 	if err != nil {
 		return err
 	}
@@ -107,7 +118,7 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 }
 
 func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error) {
-	err := a.repo.FreezeAttendance(ctx, studentID)
+	err := a.repo.FreezeAttendance(ctx, collegeID, studentID)
 	if err != nil {
 		return false, err
 	}
