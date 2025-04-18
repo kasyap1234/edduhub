@@ -65,6 +65,7 @@ func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
 		return helpers.Error(c, err)
 
 	}
+
 }
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	// return a.attendanceService.MarkAttendance(c, studentID , courseID int, lectureID int)

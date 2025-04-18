@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"eduhub/server/internal/middleware"
+	"eduhub/server/internal/models"
+	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services/auth"
 
 	"fmt"
@@ -11,11 +14,13 @@ import (
 
 type AuthHandler struct {
 	authService auth.AuthService
+	StudentRepo repository.StudentRepository
 }
 
-func NewAuthHandler(authService auth.AuthService) *AuthHandler {
+func NewAuthHandler(authService auth.AuthService, studentRepo repository.StudentRepository) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
+		StudentRepo: studentRepo,
 	}
 }
 
@@ -32,6 +37,7 @@ func (h *AuthHandler) InitiateRegistration(c echo.Context) error {
 
 // HandleRegistration processes the registration
 func (h *AuthHandler) HandleRegistration(c echo.Context) error {
+	ctx :=c.Request().Context()
 	flowID := c.QueryParam("flow")
 	if flowID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -51,6 +57,33 @@ func (h *AuthHandler) HandleRegistration(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": err.Error(),
 		})
+	role :=identity.Traits.Role
+	collegeID :=identity.Traits.College.ID
+	collegeID, err := strconv.Atoi(collegeID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+		switch role {
+		case middleware.RoleStudent: 
+		 rollNo :=identity.Trails.RollNo 
+		 student := models.Student{
+			KratosIdentityID: identity.ID,
+			CollegeID: collegeID,
+			RollNo : rollNo, 
+			IsActive: true,
+		 }
+		 if err := h.StudentRepo.CreateStudent(ctx,&student); err !=nil{
+			return c.JSON(http.StatusInternalServerError, map[string]string{
+				"error": err.Error(),
+			})
+		case middleware.RoleFaculty : 
+		// faculty based code , 
+		case middleware.RoleAdmin : 
+		// admin based code , 
+	}
+	
+		}
 	}
 
 	return c.JSON(http.StatusOK, identity)

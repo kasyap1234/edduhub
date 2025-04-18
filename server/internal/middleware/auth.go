@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"eduhub/server/internal/helpers"
+	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services/auth"
 	"net/http"
 
@@ -11,20 +13,27 @@ const (
 	RoleAdmin   = "admin"
 	RoleFaculty = "faculty"
 	RoleStudent = "student"
+
+	identityContextKey  = "identity"
+	collegeIDContextKey = "college_id"
+	studentIDContextKey = "student_id"
+	facultyIDContextKey = "faculty_id"
 )
 
 // AuthMiddleware uses AuthService to perform authentication (via Kratos)
 // and authorization (via Ory Keto) checks.
 type AuthMiddleware struct {
 	AuthService auth.AuthService
+	StudentRepo repository.StudentRepository
 }
 
 // NewAuthMiddleware now accepts an auth.AuthService instance,
 // ensuring that the middleware has access to both authentication
 // (session validation) and authorization (permission checking) logic.
-func NewAuthMiddleware(authSvc auth.AuthService) *AuthMiddleware {
+func NewAuthMiddleware(authSvc auth.AuthService, studentRepo repository.StudentRepository) *AuthMiddleware {
 	return &AuthMiddleware{
 		AuthService: authSvc,
+		StudentRepo: studentRepo,
 	}
 }
 
@@ -48,7 +57,7 @@ func (m *AuthMiddleware) ValidateSession(next echo.HandlerFunc) echo.HandlerFunc
 		}
 
 		// Store identity in context for later use by other middleware handlers.
-		c.Set("identity", identity)
+		c.Set(identityContextKey, identity)
 		return next(c)
 	}
 }
@@ -72,6 +81,28 @@ func (m *AuthMiddleware) RequireCollege(next echo.HandlerFunc) echo.HandlerFunc 
 	}
 }
 
+func (m *AuthMiddleware) LoadStudentProfile(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		identity, ok := c.Get(identityContextKey).(*auth.Identity)
+		if !ok || identity == nil {
+			return helpers.Error(c, "Unauthorized")
+		}
+		if identity.Traits.Role == RoleStudent {
+			student, err := m.StudentRepo.FindByKratosID(c.Request().Context(), identity.ID)
+			if err != nil {
+				return helpers.Error(c, "Unauthorized")
+			}
+			if student == nil {
+				helpers.Error(c, "Not registered")
+			}
+			if !student.IsActive {
+				return helpers.Error(c, "Inactive")
+			}
+			c.Set(studentIDContextKey, student.StudentID)
+		}
+		return next(c)
+	}
+}
 func (m *AuthMiddleware) RequireRole(roles ...string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

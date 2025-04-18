@@ -1,18 +1,22 @@
 package middleware
 
 import (
+	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services"
 	"eduhub/server/internal/services/auth"
 )
 
 type Middleware struct {
-	authmiddleware *AuthMiddleware
+	Auth *AuthMiddleware
 	// other middleware
 }
 
-func NewMiddleware(services *services.Services) *Middleware {
+func NewMiddleware(services *services.Services, repos *repository.Repository) *Middleware {
+	authSvc := auth.NewAuthService(auth.NewKratosService(), auth.NewKetoService())
+	studentRepo := repos.StudentRepository
 	return &Middleware{
-		authmiddleware: NewAuthMiddleware(auth.NewAuthService(auth.NewKratosService(), auth.NewKetoService())),
+
+		Auth: NewAuthMiddleware(authSvc, studentRepo),
 	}
 
 }
