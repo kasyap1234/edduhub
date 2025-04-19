@@ -5,6 +5,7 @@ import (
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services/auth"
+	"eduhub/server/internal/services/student"
 
 	"fmt"
 	"net/http"
@@ -17,11 +18,12 @@ type AuthHandler struct {
 	StudentService services.StudentService 
 }
 
-func NewAuthHandler(authService auth.AuthService, studentRepo repository.StudentRepository) *AuthHandler {
+func NewAuthHandler(authService auth.AuthService, studentService student.StudentService) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
 		// initialise student service 
-		
+		StudentService: studentService,
+
 	}
 }
 
@@ -44,7 +46,7 @@ func (h *AuthHandler) HandleRegistration(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Missing flow ID",
 		})
-	}
+	}	
 
 	var req auth.RegistrationRequest
 	if err := c.Bind(&req); err != nil {
@@ -74,7 +76,7 @@ func (h *AuthHandler) HandleRegistration(c echo.Context) error {
 			RollNo : rollNo, 
 			IsActive: true,
 		 }
-		 if err := h.StudentRepo.CreateStudent(ctx,&student); err !=nil{
+		 if err := h.StudentService.CreateStudent(ctx,&student); err !=nil{
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"error": err.Error(),
 			})
