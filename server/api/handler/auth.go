@@ -91,9 +91,11 @@ func (h *AuthHandler) HandleRegistration(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, identity)
 }
+}
+
 
 // HandleLogin processes login
-func (h *AuthHandler) HandleLogin(c echo.Context) error {
+func (h *AuthHandler)HandleLogin(c echo.Context) error {
 	// Will be redirected to Kratos UI
 	loginURL := fmt.Sprintf("%s/self-service/login/browser", h.authService.GetPublicURL())
 	return c.Redirect(http.StatusTemporaryRedirect, loginURL)

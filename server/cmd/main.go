@@ -11,5 +11,4 @@ func main() {
 	if setup != nil {
 		fmt.Println("initiated server")
 	}
-
 }

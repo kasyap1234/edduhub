@@ -7,13 +7,13 @@ import (
 )
 
 type NotFoundResponse struct {
-	Data any `json:"data"`
+	Data   interface{} `json:"data"`
+	Status int         `json:"status"`
 }
 
-
-func NotFound(c echo.Context,data any)error {
-	return c.JSON(http.StatusNotFound,NotFoundResponse{
-		Data : data,
-	}
-)
+func NotFound(c echo.Context, data interface{}, status int) error {
+	return c.JSON(http.StatusNotFound, NotFoundResponse{
+		Data:   data,
+		Status: status,
+	})
 }

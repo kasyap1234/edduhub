@@ -7,9 +7,13 @@ import (
 )
 
 type SuccessResponse struct {
-	Data any `json:"data"`
+	Data   any `json:"data"`
+	Status int `json:"status"`
 }
 
-func Success(c echo.Context, data any) error {
-	return c.JSON(http.StatusOK, SuccessResponse{Data: data})
+func Success(c echo.Context, data any, status int) error {
+	return c.JSON(http.StatusOK, SuccessResponse{
+		Data:   data,
+		Status: status,
+	})
 }
