@@ -4,6 +4,7 @@ import (
 	"eduhub/server/api/handler"
 	"eduhub/server/internal/config"
 	"eduhub/server/internal/middleware"
+	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services"
 
 	"github.com/labstack/echo/v4"
@@ -29,7 +30,8 @@ func New() *App {
 	// Initialize auth service
 	services := services.NewServices(cfg)
 	handlers := handler.NewHandlers(services)
-	mid := middleware.NewMiddleware(services)
+	repoes := repository.NewRepository(cfg.DB)
+	mid := middleware.NewMiddleware(services, repoes)
 
 	return &App{
 		e:          echo.New(),
@@ -48,7 +50,7 @@ func (a *App) Start() error {
 	a.e.Use(echomid.CORS())
 
 	// Setup routes
-	handler.SetupRoutes(a.e, a.handlers, a.middleware)
+	handler.SetupRoutes(a.e, a.handlers, a.middleware.Auth)
 
 	return a.e.Start(":" + a.config.DBConfig.Port)
 }
