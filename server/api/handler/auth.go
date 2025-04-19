@@ -14,13 +14,14 @@ import (
 
 type AuthHandler struct {
 	authService auth.AuthService
-	StudentRepo repository.StudentRepository
+	StudentService services.StudentService 
 }
 
 func NewAuthHandler(authService auth.AuthService, studentRepo repository.StudentRepository) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
-		StudentRepo: studentRepo,
+		// initialise student service 
+		
 	}
 }
 
