@@ -84,9 +84,9 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	ok, _ := a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if ok {
 		//
-		return helpers.Success(c, "attendance marked")
+		return helpers.Success(c, "attendance marked", http.StatusOK)
 	}
-	return helpers.Error(c, "attendance not marked")
+	return helpers.Error(c, "attendance not marked", http.StatusInternalServerError)
 }
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
