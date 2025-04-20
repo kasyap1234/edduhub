@@ -59,6 +59,7 @@ func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
 	if err != nil {
 		return helpers.Error(c, err, 400)
 	}
+	
 	// TODO extract student ID from context , need to link studentid from kratos with db ;
 	studentID, err := helpers.ExtractStudentID(c)
 	if err != nil {

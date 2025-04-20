@@ -23,8 +23,8 @@ type kratosService struct {
 type Identity struct {
 	ID     string `json:"id"`
 	Traits struct {
-		Email   string `json:"email"`
-		Name    struct {
+		Email string `json:"email"`
+		Name  struct {
 			First string `json:"first"`
 			Last  string `json:"last"`
 		} `json:"name"`
@@ -32,7 +32,8 @@ type Identity struct {
 			ID   string `json:"id"`
 			Name string `json:"name"`
 		} `json:"college"`
-		Role string `json:"role"`
+		Role   string `json:"role"`
+		RollNo string `json:"rollNo"`
 	} `json:"traits"`
 }
 
@@ -40,8 +41,8 @@ type RegistrationRequest struct {
 	Method   string `json:"method"`
 	Password string `json:"password"`
 	Traits   struct {
-		Email   string `json:"email"`
-		Name    struct {
+		Email string `json:"email"`
+		Name  struct {
 			First string `json:"first"`
 			Last  string `json:"last"`
 		} `json:"name"`
@@ -49,7 +50,8 @@ type RegistrationRequest struct {
 			ID   string `json:"id"`
 			Name string `json:"name"`
 		} `json:"college"`
-		Role string `json:"role"`
+		Role   string `json:"role"`
+		RollNo string `json:"rollNo"`
 	} `json:"traits"`
 }
 

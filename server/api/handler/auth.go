@@ -71,6 +71,7 @@ func (h *AuthHandler) HandleRegistration(c echo.Context) error {
 	}
 	switch role {
 	case middleware.RoleStudent:
+		rollNo := identity.Traits.RollNo
 		
 		student := models.Student{
 			KratosIdentityID: identity.ID,
