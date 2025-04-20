@@ -4,6 +4,7 @@ import (
 	"eduhub/server/internal/helpers"
 	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services/auth"
+	"eduhub/server/internal/services/student"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -24,7 +25,8 @@ const (
 // and authorization (via Ory Keto) checks.
 type AuthMiddleware struct {
 	AuthService auth.AuthService
-	StudentRepo repository.StudentRepository
+	// StudentRepo repository.StudentRepository
+	StudentService student.StudentService
 }
 
 // NewAuthMiddleware now accepts an auth.AuthService instance,
@@ -85,18 +87,23 @@ func (m *AuthMiddleware) LoadStudentProfile(next echo.HandlerFunc) echo.HandlerF
 	return func(c echo.Context) error {
 		identity, ok := c.Get(identityContextKey).(*auth.Identity)
 		if !ok || identity == nil {
-			return helpers.Error(c, "Unauthorized")
+			return helpers.Error(c, "Unauthorized", 403)
 		}
+		ctx := c.Request().Context()
+		kratosID := identity.ID
 		if identity.Traits.Role == RoleStudent {
-			student, err := m.StudentRepo.FindByKratosID(c.Request().Context(), identity.ID)
+			// student, err := m.StudentRepo.FindByKratosID(c.Request().Context(), identity.ID)
+
+			student, err := m.StudentService.FindByKratosID(ctx, kratosID)
+
 			if err != nil {
-				return helpers.Error(c, "Unauthorized")
+				return helpers.Error(c, "Unauthorized", 403)
 			}
 			if student == nil {
-				helpers.Error(c, "Not registered")
+				helpers.Error(c, "Not registered", 401)
 			}
 			if !student.IsActive {
-				return helpers.Error(c, "Inactive")
+				return helpers.Error(c, "Inactive", 401)
 			}
 			c.Set(studentIDContextKey, student.StudentID)
 		}
