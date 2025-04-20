@@ -13,7 +13,6 @@ type AttendanceRepository interface {
 	GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error)
 	GetAttendanceStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error)
 	GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error)
-	VerifyStudentEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error)
 	FreezeAttendance(ctx context.Context, collegeID int, studentID int) error
 }
 
@@ -92,8 +91,6 @@ func (a *attendanceRepository) GetAttendanceByCourse(ctx context.Context, colleg
 	}
 	return records, nil
 }
-
-
 
 func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID, studentID int) error {
 	student, err := a.db.FindOne(ctx, "college_id=? AND student_id=?", collegeID, studentID)
