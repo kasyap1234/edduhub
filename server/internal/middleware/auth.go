@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"eduhub/server/internal/helpers"
-	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services/auth"
 	"eduhub/server/internal/services/student"
 	"net/http"
@@ -32,10 +31,10 @@ type AuthMiddleware struct {
 // NewAuthMiddleware now accepts an auth.AuthService instance,
 // ensuring that the middleware has access to both authentication
 // (session validation) and authorization (permission checking) logic.
-func NewAuthMiddleware(authSvc auth.AuthService, studentRepo repository.StudentRepository) *AuthMiddleware {
+func NewAuthMiddleware(authSvc auth.AuthService, studentService student.StudentService) *AuthMiddleware {
 	return &AuthMiddleware{
-		AuthService: authSvc,
-		StudentRepo: studentRepo,
+		AuthService:    authSvc,
+		StudentService: studentService,
 	}
 }
 
