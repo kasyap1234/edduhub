@@ -3,9 +3,10 @@ package handler
 import (
 	"eduhub/server/internal/middleware"
 	"eduhub/server/internal/models"
-	"eduhub/server/internal/repository"
+	"eduhub/server/internal/services"
 	"eduhub/server/internal/services/auth"
 	"eduhub/server/internal/services/student"
+	"strconv"
 
 	"fmt"
 	"net/http"
@@ -14,16 +15,15 @@ import (
 )
 
 type AuthHandler struct {
-	authService auth.AuthService
-	StudentService services.StudentService 
+	authService    auth.AuthService
+	StudentService services.StudentService
 }
 
 func NewAuthHandler(authService auth.AuthService, studentService student.StudentService) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
-		// initialise student service 
+		// initialise student service
 		StudentService: studentService,
-
 	}
 }
 
@@ -40,13 +40,13 @@ func (h *AuthHandler) InitiateRegistration(c echo.Context) error {
 
 // HandleRegistration processes the registration
 func (h *AuthHandler) HandleRegistration(c echo.Context) error {
-	ctx :=c.Request().Context()
+	ctx := c.Request().Context()
 	flowID := c.QueryParam("flow")
 	if flowID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Missing flow ID",
 		})
-	}	
+	}
 
 	var req auth.RegistrationRequest
 	if err := c.Bind(&req); err != nil {
@@ -60,42 +60,40 @@ func (h *AuthHandler) HandleRegistration(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": err.Error(),
 		})
-	role :=identity.Traits.Role
-	collegeID :=identity.Traits.College.ID
-	collegeID, err := strconv.Atoi(collegeID)
+	}
+	role := identity.Traits.Role
+	collegeIDStr := identity.Traits.College.ID
+	collegeID, err := strconv.Atoi(collegeIDStr)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": err.Error(),
 		})
-		switch role {
-		case middleware.RoleStudent: 
-		 rollNo :=identity.Trails.RollNo 
-		 student := models.Student{
+	}
+	switch role {
+	case middleware.RoleStudent:
+		
+		student := models.Student{
 			KratosIdentityID: identity.ID,
-			CollegeID: collegeID,
-			RollNo : rollNo, 
-			IsActive: true,
-		 }
-		 if err := h.StudentService.CreateStudent(ctx,&student); err !=nil{
+			CollegeID:        collegeID,
+			RollNo:           rollNo,
+			IsActive:         true,
+		}
+		if err := h.StudentService.CreateStudent(ctx, &student); err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"error": err.Error(),
 			})
-		case middleware.RoleFaculty : 
-		// faculty based code , 
-		case middleware.RoleAdmin : 
-		// admin based code , 
-	}
-	
 		}
+	case middleware.RoleFaculty:
+		// faculty based code
+	case middleware.RoleAdmin:
+		// admin based code
 	}
 
 	return c.JSON(http.StatusOK, identity)
 }
-}
-
 
 // HandleLogin processes login
-func (h *AuthHandler)HandleLogin(c echo.Context) error {
+func (h *AuthHandler) HandleLogin(c echo.Context) error {
 	// Will be redirected to Kratos UI
 	loginURL := fmt.Sprintf("%s/self-service/login/browser", h.authService.GetPublicURL())
 	return c.Redirect(http.StatusTemporaryRedirect, loginURL)
@@ -119,5 +117,3 @@ func (h *AuthHandler) HandleCallback(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, identity)
 }
-
-			

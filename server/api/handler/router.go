@@ -15,7 +15,7 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 	auth := e.Group("/auth")
 	auth.POST("/register", a.Auth.InitiateRegistration)
 	auth.POST("/auth/register/complete", a.Auth.HandleRegistration)
-	auth.GET("/login", a.Auth.HandleLogin)
+	auth.GET("/login",a.Auth.HandleLogin)
 	auth.GET("/callback", a.Auth.HandleCallback)
 	
 	apiGroup := e.Group("/api", m.ValidateSession, m.RequireCollege)
@@ -27,4 +27,5 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 	attendance.GET("/student/:studentID/course/:courseID", a.Attendance.GetAttendanceByStudentAndCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent))
 	attendance.GET("course", a.Attendance.GetAttendanceByCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 	// to do add multitenancy properly
+	
 }
