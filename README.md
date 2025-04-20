@@ -2,6 +2,20 @@
 
 ## Backend kratos 
 
+
+ Running Tests with Taskfile
+
+Navigate to your server directory in the terminal:
+
+Run only unit tests: task test:unit
+Run only integration tests (Docker must be running): task test:integration
+Run all tests: task test or simply task (since it's the default)
+Run linters: task lint
+Tidy modules: task tidy
+Build the app: task build
+Generate and view coverage
+
+
 ```bash
 curl -s -X GET \
   -H "Accept: application/json" \
