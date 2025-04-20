@@ -78,7 +78,7 @@ func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, college
 	if student.CollegeID != collegeID {
 		return false, nil
 	}
-	enrolled, err := a.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
+	enrolled, err := a.studentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
 	if err != nil {
 		return false, err
 	}
@@ -107,7 +107,7 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 		updatedStatus = Present
 
 	}
-	err := a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, currentStatus, updatedStatus)
+	err := a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, updatedStatus)
 	if err != nil {
 		return false, err
 	}

@@ -17,7 +17,8 @@ type StudentService interface {
 }
 
 type studentService struct {
-	StudentRepo repository.StudentRepository
+	StudentRepo    repository.StudentRepository
+	AttendanceRepo repository.AttendanceRepository
 }
 
 func NewstudentService(studentRepo repository.StudentRepository) StudentService {

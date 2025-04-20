@@ -43,11 +43,11 @@ func (u *userRepository) DeleteUser(ctx context.Context, RollNo string) error {
 
 func (u *userRepository) FreezeUser(ctx context.Context, RollNo string) error {
 	user, err := u.FindByRollNo(ctx, RollNo)
-	if err != nil {
-		return err
+	if err == nil {
+		user.IsActive = false
+		return u.db.Update(ctx, user)
 	}
-	user.IsActive = false
-	return u.db.Update(ctx, user)
+	return err
 }
 
 func (u *userRepository) UpdateUser(ctx context.Context, model *models.User) error {

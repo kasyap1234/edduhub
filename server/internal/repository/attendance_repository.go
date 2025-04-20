@@ -59,7 +59,7 @@ func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID i
 
 func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
 
-	attendances, err := a.db.FindWhere(ctx, "college_id=? AND student_id=? AND course_id=?", studentID, courseID)
+	attendances, err := a.db.FindWhere(ctx, "college_id=? AND student_id=? AND course_id=?", collegeID, studentID, courseID)
 	if err != nil {
 		return nil, err
 	}
@@ -93,13 +93,7 @@ func (a *attendanceRepository) GetAttendanceByCourse(ctx context.Context, colleg
 	return records, nil
 }
 
-func (a *attendanceRepository) VerifyStudentEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error) {
-	_, err := a.db.FindOne(ctx, "college_id=? AND student_id=? AND course_id=?", collegeID, studentID, courseID)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
+
 
 func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID, studentID int) error {
 	student, err := a.db.FindOne(ctx, "college_id=? AND student_id=?", collegeID, studentID)
