@@ -14,6 +14,7 @@ type StudentService interface {
 	FreezeStudent(ctx context.Context, RollNo string) error
 	UnFreezeStudent(ctx context.Context, RollNo string) error
 	FindByKratosID(ctx context.Context, kratosID string) (*models.Student, error)
+	VerifyStudentEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
 }
 
 type studentService struct {
@@ -55,4 +56,8 @@ func (s *studentService) FreezeStudent(ctx context.Context, RollNo string) error
 
 func (s *studentService) UnFreezeStudent(ctx context.Context, RollNo string) error {
 	return s.StudentRepo.UnFreezeStudent(ctx, RollNo)
+}
+
+func (s *studentService) VerifyStudentEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error) {
+	return s.StudentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
 }
