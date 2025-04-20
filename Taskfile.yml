@@ -1,10 +1,103 @@
-version : '3'
+# version : '3'
 
-tasks: 
-  build: 
-    cmds:
-      - go build -v -i main.go
-  run: 
-    cmds: 
-    - go run main.go 
+# tasks: 
+#   build: 
+#     cmds:
+#       - go build -v -i main.go
+#   run: 
+#     cmds: 
+#     - go run main.go 
   
+# Taskfile.yml
+version: '3'
+
+vars:
+  # Define variables for paths or commands if needed
+  APP_NAME: edduhub
+  COVERAGE_UNIT_OUT: coverage-unit.out
+  COVERAGE_INTEGRATION_OUT: coverage-integration.out
+  COVERAGE_MERGED_OUT: coverage-merged.out
+  COVERAGE_HTML_OUT: coverage.html
+
+tasks:
+  default:
+    desc: Run all tests (unit and integration)
+    cmds:
+      - task: test
+
+  test:
+    desc: Run both unit and integration tests
+    deps: [test:unit, test:integration]
+
+  test:unit:
+    desc: Run unit tests
+    # Use -short flag if needed to skip long tests during normal dev
+    # Use -race flag to detect race conditions
+    cmds:
+      - go test -tags=unit -race -coverprofile={{.COVERAGE_UNIT_OUT}} ./...
+    # Set environment variables if needed for tests
+    # env:
+    #   SOME_VAR: some_value
+
+  test:integration:
+    desc: Run integration tests (requires Docker running)
+    cmds:
+      # Ensure Docker is running before attempting
+      - docker info > /dev/null || (echo "Docker is not running. Please start Docker." && exit 1)
+      - go test -tags=integration -race -coverprofile={{.COVERAGE_INTEGRATION_OUT}} -v ./... # -v for verbose output
+
+  cover:
+    desc: Generate and view code coverage report (run after tests)
+    deps: [cover:merge] # Depends on merging first
+    cmds:
+      - go tool cover -html={{.COVERAGE_MERGED_OUT}}
+    silent: true # Don't echo the command
+
+  cover:merge:
+    desc: Merge unit and integration test coverage profiles
+    # Requires gocovmerge: go install github.com/wadey/gocovmerge@latest
+    # If only running one type of test, you can simplify the 'cover' task
+    cmds:
+      # Check if both files exist before merging
+      - |
+        if [ -f {{.COVERAGE_UNIT_OUT}} ] && [ -f {{.COVERAGE_INTEGRATION_OUT}} ]; then
+          gocovmerge {{.COVERAGE_UNIT_OUT}} {{.COVERAGE_INTEGRATION_OUT}} > {{.COVERAGE_MERGED_OUT}}
+        elif [ -f {{.COVERAGE_UNIT_OUT}} ]; then
+          cp {{.COVERAGE_UNIT_OUT}} {{.COVERAGE_MERGED_OUT}}
+        elif [ -f {{.COVERAGE_INTEGRATION_OUT}} ]; then
+          cp {{.COVERAGE_INTEGRATION_OUT}} {{.COVERAGE_MERGED_OUT}}
+        else
+          echo "No coverage files found to merge."
+          exit 1
+        fi
+      - echo "Coverage merged into {{.COVERAGE_MERGED_OUT}}"
+
+  lint:
+    desc: Run golangci-lint
+    # Requires golangci-lint: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    cmds:
+      - golangci-lint run ./...
+
+  tidy:
+    desc: Run go mod tidy
+    cmds:
+      - go mod tidy -v
+
+  build:
+    desc: Build the main application binary
+    # Adjust path to your main.go if different
+    cmds:
+      - go build -o bin/{{.APP_NAME}} ./cmd/server
+    # sources: # Optional: Only rebuild if source files change
+    #   - ./**/*.go
+    #   - go.mod
+    #   - go.sum
+    # generated:
+    #   - bin/{{.APP_NAME}}
+
+  clean:
+    desc: Remove coverage files and built binary
+    cmds:
+      - rm -f {{.COVERAGE_UNIT_OUT}} {{.COVERAGE_INTEGRATION_OUT}} {{.COVERAGE_MERGED_OUT}} {{.COVERAGE_HTML_OUT}}
+      - rm -f bin/{{.APP_NAME}}
+
