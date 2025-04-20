@@ -44,25 +44,25 @@ func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
 	courseID, err := strconv.Atoi(courseIDStr)
 	lectureID, err := strconv.Atoi(lectureIDstr)
 	if err != nil {
-		return helpers.Error(c, err)
+		return helpers.Error(c, err, 400)
 	}
 	qrCode, err := a.attendanceService.GenerateQRCode(ctx, collegeID, courseID, lectureID)
 	if err != nil {
-		return helpers.Error(c, err)
+		return helpers.Error(c, err, 400)
 	}
-	return helpers.Success(c, qrCode)
+	return helpers.Success(c, qrCode, 200)
 }
 
 func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
 	ctx := c.Request().Context()
 	collegeID, err := helpers.ExtractCollegeID(c)
 	if err != nil {
-		return helpers.Error(c, err)
+		return helpers.Error(c, err, 400)
 	}
 	// TODO extract student ID from context , need to link studentid from kratos with db ;
 	studentID, err := helpers.ExtractStudentID(c)
 	if err != nil {
-		return helpers.Error(c, err)
+		return helpers.Error(c, err, 400)
 
 	}
 
