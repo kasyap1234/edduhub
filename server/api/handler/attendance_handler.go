@@ -59,7 +59,7 @@ func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
 	if err != nil {
 		return helpers.Error(c, err, 400)
 	}
-	
+
 	// TODO extract student ID from context , need to link studentid from kratos with db ;
 	studentID, err := helpers.ExtractStudentID(c)
 	if err != nil {
@@ -76,10 +76,14 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 		return err
 	}
 
-	studentIDstr := c.QueryParam("studentID")
+	studentID, err := helpers.ExtractStudentID(c)
+	if err != nil {
+		return err
+
+	}
 	courseIDstr := c.QueryParam("courseID")
 	lectureIDstr := c.QueryParam("lectureID")
-	studentID, _ := strconv.Atoi(studentIDstr)
+
 	courseID, _ := strconv.Atoi(courseIDstr)
 	lectureID, _ := strconv.Atoi(lectureIDstr)
 	ok, _ := a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
@@ -115,8 +119,11 @@ func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	studentIDstr := c.QueryParam("studentID")
-	studentID, _ := strconv.Atoi(studentIDstr)
+	studentID, err := helpers.ExtractStudentID(c)
+	if err != nil {
+		return err
+	}
+
 	attendance, err := a.attendanceService.GetAttendanceByStudent(ctx, collegeID, studentID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err})
@@ -130,11 +137,15 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 	if err != nil {
 		return err
 	}
-	studentIDstr := c.QueryParam("studentID")
+	studentID, err := helpers.ExtractStudentID(c)
+	if err != nil {
+		return err
+	}
 	courseIDstr := c.QueryParam("courseID")
-	courseID, _ := strconv.Atoi(courseIDstr)
-	studentID, _ := strconv.Atoi(studentIDstr)
-
+	courseID, err := strconv.Atoi(courseIDstr)
+	if err != nil {
+		return err
+	}
 	attendance, err := a.attendanceService.GetAttendanceByStudentAndCourse(ctx, collegeID, studentID, courseID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
