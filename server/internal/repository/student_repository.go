@@ -21,7 +21,7 @@ type studentRepository struct {
 	db DatabaseRepository[models.Student]
 }
 
-func NewStudentRepository(db DatabaseRepository[models.Student], courseDB DatabaseRepository[models.Course]) StudentRepository {
+func NewStudentRepository(db DatabaseRepository[models.Student]) StudentRepository {
 	return &studentRepository{
 		db: db,
 	}
