@@ -17,6 +17,7 @@ type DatabaseRepository[T any] interface {
 	Delete(ctx context.Context, model *T) error
 	Count(ctx context.Context, query string, args ...interface{}) (int, error)
 	// transaction
+	Exists(ctx context.Context, model *T, query string, args ...interface{}) (bool, error)
 }
 
 type BaseDatabaseRepository[T any] struct {
@@ -88,7 +89,10 @@ func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error 
 	return err
 }
 
-
+func (d *BaseDatabaseRepository[T]) Exists(ctx context.Context, model *T, query string, args ...interface{}) (bool, error) {
+	exists, err := d.DB.NewSelect().Model(model).Where(query, args...).Exists()
+	return exists, err
+}
 
 //Student <-> Course: This is Many-to-Many. You need to create  the enrollments table/model. This is the standard and necessary approach.
 //Course <-> Lecture: This is One-to-Many (One Course, Many Lectures). You correctly have course_id in the lectures table. No join table needed. .Relation() works directly.
@@ -96,8 +100,6 @@ func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error 
 //Course <-> Attendance: One-to-Many. Correctly have course_id in attendance. No join table needed. .Relation() works directly.
 //Lecture <-> Attendance: One-to-Many. Correctly have lecture_id in attendance. No join table needed. .Relation() works directly.
 // Permissions (Keto): Your assignment_helper.go uses Keto for permissions (e.g., Faculty-Course, Student-Course). Keto acts as an external system managing these relationships (relation tuples). You do not need database join tables for these specific permission relationships because Keto handles them.
-
-
 
 // only need to create a dedicated join table (like enrollments) when you have a Many-to-Many relationship between two core entities in your database.
 
@@ -112,4 +114,3 @@ func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error 
 // If it's M:N, create a join table/model like you did for enrollments.
 // If it's 1:1 or 1:N, just add the appropriate foreign key column to one of the existing models/tables.
 // You don't need to create extra join tables for relationships that are already handled correctly by foreign keys (like Course-Lecture, Student-Attendance, etc.).
-
