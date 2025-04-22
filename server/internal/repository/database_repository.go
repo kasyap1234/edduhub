@@ -91,3 +91,5 @@ func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error 
 // func(d*BaseDatabaseRepository[T])DeleteByID(ctx context.Context,id interface{})error {
 // 	_,err :=d.DB.NewDelete()
 // }
+
+

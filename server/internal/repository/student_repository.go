@@ -15,18 +15,15 @@ type StudentRepository interface {
 	FreezeStudent(ctx context.Context, RollNo string) error
 	UnFreezeStudent(ctx context.Context, RollNo string) error
 	FindByKratosID(ctx context.Context, kratosID string) (*models.Student, error)
-	VerifyStudentEnrollment(ctx context.Context, collegeID, studentID, courseId int) (bool, error)
 }
 
 type studentRepository struct {
-	db       DatabaseRepository[models.Student]
-	enrollmentDB  DatabaseRepository[models.Course]
+	db DatabaseRepository[models.Student]
 }
 
-func NewStudentRepository(db DatabaseRepository[models.Student],courseDB DatabaseRepository[models.Course]) StudentRepository {
+func NewStudentRepository(db DatabaseRepository[models.Student], courseDB DatabaseRepository[models.Course]) StudentRepository {
 	return &studentRepository{
 		db: db,
-		courseDB: courseDB,
 	}
 }
 
@@ -85,14 +82,4 @@ func (s *studentRepository) UnFreezeStudent(ctx context.Context, RollNo string) 
 	}
 	return err
 
-}
-func (s *studentRepository) VerifyStudentEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error) {
-	_, err := s.db.FindOne(ctx, "college_id=? AND student_id=? ", collegeID, studentID)
-	_ ,err := s.
-
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
 }
