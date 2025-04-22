@@ -90,7 +90,7 @@ func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error 
 }
 
 func (d *BaseDatabaseRepository[T]) Exists(ctx context.Context, model *T, query string, args ...interface{}) (bool, error) {
-	exists, err := d.DB.NewSelect().Model(model).Where(query, args...).Exists()
+	exists, err := d.DB.NewSelect().Model(&model).Where(query, args...).Exists(ctx)
 	return exists, err
 }
 

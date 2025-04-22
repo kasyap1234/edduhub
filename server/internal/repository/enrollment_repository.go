@@ -40,10 +40,6 @@ func (e *enrollmentRepository) IsStudentEnrolled(ctx context.Context, studentID,
 	// 	return false, errors.New("error checking enrollment existence")
 	// }
 	// return true, nil
-	_, err := e.db.FindOne(ctx, "student_id=? AND course_id=?", studentID, courseID)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-
+	exists, err := e.db.Exists(ctx, (*models.Enrollment)(nil), "student_id=? AND course_id=?", studentID, courseID)
+	return exists, err
 }
