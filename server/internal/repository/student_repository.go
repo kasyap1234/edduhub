@@ -10,7 +10,7 @@ import (
 type StudentRepository interface {
 	CreateStudent(ctx context.Context, student *models.Student) error
 	GetStudentByRollNo(ctx context.Context, rollNo string) (*models.Student, error)
-	GetStudentByID(ctx context.Context, studentID int) (*models.Student, error)
+	GetStudentByID(ctx context.Context, collegeID int, studentID int) (*models.Student, error)
 	UpdateStudent(ctx context.Context, model *models.Student) error
 	FreezeStudent(ctx context.Context, RollNo string) error
 	UnFreezeStudent(ctx context.Context, RollNo string) error
@@ -54,7 +54,7 @@ func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo strin
 
 }
 
-func (s *studentRepository) GetStudentByID(ctx context.Context, studentID int) (*models.Student, error) {
+func (s *studentRepository) GetStudentByID(ctx context.Context, collegeIDint, studentID int) (*models.Student, error) {
 	student, err := s.db.FindOne(ctx, "student_id=?", studentID)
 	return student, err
 }
