@@ -7,21 +7,50 @@ serve:
     port: 4466
 
 namespaces:
-  - name: app
+  - name: courses
     id: 1
     relations:
-      - name: member
-        types:
-          - app/user
+      - name: faculty
+      - name: student
+      - name: admin
+      - name: manage_qr
+      - name: view_attendance
+      - name: mark_attendance
+      - name: manage_assignments
+      - name: submit_assignments
+      - name: grade_assignments
+
+  - name: departments
+    id: 2
+    relations:
+      - name: head
+      - name: faculty_member
+      - name: manage_courses
+      - name: view_analytics
+
+  - name: resources
+    id: 3
+    relations:
       - name: owner
-        types:
-          - app/resource
-      - name: edit
-        types:
-          - app/resource
-      - name: view
-        types:
-          - app/resource
+      - name: viewer
+      - name: editor
+      - name: uploader
+      - name: download
+
+  - name: assignments
+    id: 4
+    relations:
+      - name: creator
+      - name: submitter
+      - name: grader
+      - name: viewer
+
+  - name: announcements
+    id: 5
+    relations:
+      - name: publisher
+      - name: viewer
+      - name: manager
 
 log:
   level: debug

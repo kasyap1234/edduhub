@@ -18,6 +18,9 @@ const (
 	collegeIDContextKey = "college_id"
 	studentIDContextKey = "student_id"
 	facultyIDContextKey = "faculty_id"
+
+	AttendanceResource = "attendance"
+	MarkAction         = "mark"
 )
 
 // AuthMiddleware uses AuthService to perform authentication (via Kratos)
@@ -154,5 +157,38 @@ func (m *AuthMiddleware) RequirePermission(resource, action string) echo.Middlew
 			}
 			return next(c)
 		}
+	}
+}
+
+// VerifyStudentOwnership ensures a student can only access their own resources
+func (m *AuthMiddleware) VerifyStudentOwnership(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		identity, ok := c.Get(identityContextKey).(*auth.Identity)
+		if !ok || identity == nil {
+			return helpers.Error(c, "Unauthorized", http.StatusUnauthorized)
+		}
+
+		// Get the authenticated student's ID from context
+		authenticatedStudentID := c.Get(studentIDContextKey)
+		if authenticatedStudentID == nil {
+			return helpers.Error(c, "Student context not found", http.StatusUnauthorized)
+		}
+
+		// Get the requested student ID from params/query
+		requestedStudentID, err := helpers.ExtractStudentID(c)
+		if err != nil {
+			return helpers.Error(c, "Invalid student ID", http.StatusBadRequest)
+		}
+
+		// Verify if the authenticated student is accessing their own resource
+		if requestedStudentID != authenticatedStudentID.(int) {
+			// Check if the user has admin/faculty role that allows them to override
+			allowed, err := m.AuthService.CheckPermission(c.Request().Context(), identity, MarkAction, AttendanceResource)
+			if err != nil || !allowed {
+				return helpers.Error(c, "Access denied", http.StatusForbidden)
+			}
+		}
+
+		return next(c)
 	}
 }

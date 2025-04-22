@@ -9,8 +9,12 @@ import (
 	"os"
 )
 
+// subject (who wants to do something)
+// object (on whom they want to act on )
+// relation (like edges in a graph)
+
 type KetoService interface {
-	CheckPermission(ctx context.Context, subject, action, resource string) (bool, error)
+	CheckPermission(ctx context.Context, namespace, subject, action, resource string) (bool, error)
 	CreateRelation(ctx context.Context, namespace, object, relation, subject string) error
 	DeleteRelation(ctx context.Context, namespace, object, relation, subject string) error
 }
@@ -29,10 +33,10 @@ func NewKetoService() *ketoService {
 	}
 }
 
-func (k *ketoService) CheckPermission(ctx context.Context, subject, action, resource string) (bool, error) {
+func (k *ketoService) CheckPermission(ctx context.Context, namespace, subject, action, resource string) (bool, error) {
 	endpoint := fmt.Sprintf("%s/relation-tuples/check", k.readURL)
 	query := map[string]string{
-		"namespace": "app",
+		"namespace": namespace,
 		"object":    resource,
 		"relation":  action,
 		"subject":   subject,

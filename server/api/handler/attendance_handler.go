@@ -2,26 +2,12 @@ package handler
 
 import (
 	"eduhub/server/internal/helpers"
-	"eduhub/server/internal/models"
 	"eduhub/server/internal/services/attendance"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
-
-type ErrorResponse struct {
-	Error error
-}
-
-type AttendanceResponse struct {
-	Success bool
-	Message string
-}
-type Response struct {
-	Message any
-}
-type attendanceModel models.Attendance
 
 type AttendanceHandler struct {
 	attendanceService attendance.AttendanceService
@@ -69,29 +55,44 @@ func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
 
 }
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
-	// return a.attendanceService.MarkAttendance(c, studentID , courseID int, lectureID int)
 	ctx := c.Request().Context()
+
 	collegeID, err := helpers.ExtractCollegeID(c)
 	if err != nil {
-		return err
+		return helpers.Error(c, "Invalid college ID", http.StatusBadRequest)
 	}
 
 	studentID, err := helpers.ExtractStudentID(c)
 	if err != nil {
-		return err
-
+		return helpers.Error(c, "Invalid student ID", http.StatusBadRequest)
 	}
-	courseIDstr := c.QueryParam("courseID")
-	lectureIDstr := c.QueryParam("lectureID")
 
-	courseID, _ := strconv.Atoi(courseIDstr)
-	lectureID, _ := strconv.Atoi(lectureIDstr)
-	ok, _ := a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
-	if ok {
-		//
-		return helpers.Success(c, "attendance marked", http.StatusOK)
+	courseIDStr := c.QueryParam("courseID")
+	lectureIDStr := c.QueryParam("lectureID")
+
+	courseID, err := strconv.Atoi(courseIDStr)
+	if err != nil {
+		return helpers.Error(c, "Invalid course ID", http.StatusBadRequest)
 	}
-	return helpers.Error(c, "attendance not marked", http.StatusInternalServerError)
+
+	lectureID, err := strconv.Atoi(lectureIDStr)
+	if err != nil {
+		return helpers.Error(c, "Invalid lecture ID", http.StatusBadRequest)
+	}
+
+	ok, err := a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
+	if err != nil {
+		return helpers.Error(c, err.Error(), http.StatusForbidden)
+	}
+
+	if !ok {
+		return helpers.Error(c, "Failed to mark attendance", http.StatusInternalServerError)
+	}
+
+	return helpers.Success(c, map[string]interface{}{
+		"message": "Attendance marked successfully",
+		"status":  true,
+	}, http.StatusOK)
 }
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {

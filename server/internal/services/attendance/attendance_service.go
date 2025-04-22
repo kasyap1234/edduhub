@@ -4,6 +4,7 @@ import (
 	"context"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
+	"fmt"
 )
 
 const (
@@ -57,14 +58,31 @@ func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context,
 }
 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID, lectureID int) (bool, error) {
+	// First verify student enrollment and active status
+	enrolled, err := a.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
+	if err != nil {
+		return false, fmt.Errorf("failed to verify enrollment: %w", err)
+	}
+	if !enrolled {
+		return false, fmt.Errorf("student not enrolled in course")
+	}
+
+	// Verify student is active
+	student, err := a.studentRepo.GetStudentByID(ctx, collegeID, studentID)
+	if err != nil {
+		return false, fmt.Errorf("failed to get student: %w", err)
+	}
+	if !student.IsActive {
+		return false, fmt.Errorf("student account is not active")
+	}
+
+	// Mark attendance only if all verifications pass
 	ok, err := a.repo.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to mark attendance: %w", err)
 	}
-	if ok {
-		return true, nil
-	}
-	return false, nil
+
+	return ok, nil
 }
 
 func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error) {
