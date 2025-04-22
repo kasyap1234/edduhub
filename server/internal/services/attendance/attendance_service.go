@@ -28,14 +28,16 @@ type AttendanceService interface {
 }
 
 type attendanceService struct {
-	repo        repository.AttendanceRepository
-	studentRepo repository.StudentRepository
+	repo           repository.AttendanceRepository
+	studentRepo    repository.StudentRepository
+	enrollmentRepo repository.EnrollmentRepository
 }
 
-func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repository.StudentRepository) AttendanceService {
+func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repository.StudentRepository, enrollmentRepo repository.EnrollmentRepository) AttendanceService {
 	return &attendanceService{
-		repo:        repo,
-		studentRepo: studentRepo,
+		repo:           repo,
+		studentRepo:    studentRepo,
+		enrollmentRepo: enrollmentRepo,
 	}
 
 }
@@ -96,12 +98,9 @@ func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, college
 	if student.CollegeID != collegeID {
 		return false, nil
 	}
-	enrolled, err := a.studentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
-	if err != nil {
-		return false, err
-	}
-	// check if student is enrolled in the course (TODO)
-	return enrolled, nil
+	// enrolled, err := a.studentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
+	exists, err := a.enrollmentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID)
+	return exists, err
 }
 
 func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) error {

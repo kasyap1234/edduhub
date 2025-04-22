@@ -53,8 +53,8 @@ func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo strin
 
 }
 
-func (s *studentRepository) GetStudentByID(ctx context.Context, collegeIDint, studentID int) (*models.Student, error) {
-	student, err := s.db.FindOne(ctx, "student_id=?", studentID)
+func (s *studentRepository) GetStudentByID(ctx context.Context, collegeID, studentID int) (*models.Student, error) {
+	student, err := s.db.FindOne(ctx, "college_id=? AND student_id=?", collegeID,studentID)
 	return student, err
 }
 
