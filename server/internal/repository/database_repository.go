@@ -82,6 +82,8 @@ func (d *BaseDatabaseRepository[T]) Update(ctx context.Context, model *T) error 
 }
 
 func (d *BaseDatabaseRepository[T]) Count(ctx context.Context, query string, args ...interface{}) (int, error) {
+    count, err := d.DB.NewSelect().Model((*T)(nil)).Where(query, args...).Count(ctx)
+    return count, err
 }
 
 func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error {
