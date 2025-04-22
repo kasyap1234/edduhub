@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"eduhub/server/internal/models"
-	"eduhub/server/internal/services/attendance"
 )
 
 type AttendanceRepository interface {
@@ -97,7 +96,7 @@ func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID, 
 	if err != nil {
 		return err
 	}
-	student.Status = attendance.Freezed
+	student.Status = "FREEZED"
 	return a.db.Update(ctx, student)
 
 }

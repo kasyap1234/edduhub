@@ -3,7 +3,6 @@ package handler
 import (
 	"eduhub/server/internal/middleware"
 	"eduhub/server/internal/models"
-	"eduhub/server/internal/services"
 	"eduhub/server/internal/services/auth"
 	"eduhub/server/internal/services/student"
 	"strconv"
@@ -16,7 +15,7 @@ import (
 
 type AuthHandler struct {
 	authService    auth.AuthService
-	StudentService services.StudentService
+	StudentService student.StudentService
 }
 
 func NewAuthHandler(authService auth.AuthService, studentService student.StudentService) *AuthHandler {
@@ -72,7 +71,7 @@ func (h *AuthHandler) HandleRegistration(c echo.Context) error {
 	switch role {
 	case middleware.RoleStudent:
 		rollNo := identity.Traits.RollNo
-		
+
 		student := models.Student{
 			KratosIdentityID: identity.ID,
 			CollegeID:        collegeID,

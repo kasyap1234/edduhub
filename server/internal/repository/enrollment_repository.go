@@ -7,7 +7,7 @@ import (
 
 type EnrollmentRepository interface {
 	CreateEnrollment(ctx context.Context, enrollment *models.Enrollment) error
-	IsStudentEnrolled(ctx context.Context, studentID, courseID int) (bool, error)
+	IsStudentEnrolled(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
 }
 
 type enrollmentRepository struct {
@@ -25,7 +25,7 @@ func (e *enrollmentRepository) CreateEnrollment(ctx context.Context, enrollment 
 	return err
 }
 
-func (e *enrollmentRepository) IsStudentEnrolled(ctx context.Context, studentID, courseID int) (bool, error) {
+func (e *enrollmentRepository) IsStudentEnrolled(ctx context.Context, collegeID, studentID, courseID int) (bool, error) {
 	// _, err := e.db.NewSelect().
 	// 	Model((*models.Enrollment)(nil)).
 	// 	// Add the WHERE clause to find the specific link.
@@ -40,6 +40,6 @@ func (e *enrollmentRepository) IsStudentEnrolled(ctx context.Context, studentID,
 	// 	return false, errors.New("error checking enrollment existence")
 	// }
 	// return true, nil
-	exists, err := e.db.Exists(ctx, (*models.Enrollment)(nil), "student_id=? AND course_id=?", studentID, courseID)
+	exists, err := e.db.Exists(ctx, (*models.Enrollment)(nil), "college_id=? AND student_id=? AND course_id=?", collegeID, studentID, courseID)
 	return exists, err
 }

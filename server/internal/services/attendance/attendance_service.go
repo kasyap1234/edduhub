@@ -22,7 +22,7 @@ type AttendanceService interface {
 	MarkAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
 	UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
 	FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error)
-
+	VerifyStudentEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
 	FreezeStudent(ctx context.Context, collegeID int, RollNo string) error
 	UnFreezeStudent(ctx context.Context, collegeID int, RollNo string) error
 }
@@ -99,7 +99,7 @@ func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, college
 		return false, nil
 	}
 	// enrolled, err := a.studentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
-	exists, err := a.enrollmentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID)
+	exists, err := a.enrollmentRepo.IsStudentEnrolled(ctx,studentID,courseID)
 	return exists, err
 }
 

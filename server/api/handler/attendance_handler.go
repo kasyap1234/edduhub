@@ -39,21 +39,22 @@ func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
 	return helpers.Success(c, qrCode, 200)
 }
 
-func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
-	ctx := c.Request().Context()
-	collegeID, err := helpers.ExtractCollegeID(c)
-	if err != nil {
-		return helpers.Error(c, err, 400)
-	}
+// func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
+// 	ctx := c.Request().Context()
+// 	collegeID, err := helpers.ExtractCollegeID(c)
+// 	if err != nil {
+// 		return helpers.Error(c, err, 400)
+// 	}
 
-	// TODO extract student ID from context , need to link studentid from kratos with db ;
-	studentID, err := helpers.ExtractStudentID(c)
-	if err != nil {
-		return helpers.Error(c, err, 400)
+// 	// TODO extract student ID from context , need to link studentid from kratos with db ;
+// 	studentID, err := helpers.ExtractStudentID(c)
+// 	if err != nil {
+// 		return helpers.Error(c, err, 400)
 
-	}
+// 	}
+	
 
-}
+
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -79,8 +80,9 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	if err != nil {
 		return helpers.Error(c, "Invalid lecture ID", http.StatusBadRequest)
 	}
-
-	ok, err := a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
+	ok,err :=a.attendanceService.VerifyStudentEnrollment(ctx,collegeID,studentID,courseID)
+	
+	ok, err = a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if err != nil {
 		return helpers.Error(c, err.Error(), http.StatusForbidden)
 	}

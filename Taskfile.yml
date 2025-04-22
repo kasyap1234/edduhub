@@ -87,7 +87,7 @@ tasks:
     desc: Build the main application binary
     # Adjust path to your main.go if different
     cmds:
-      - go build -o bin/{{.APP_NAME}} ./cmd/server
+      - go build -o bin/{{.APP_NAME}} ./server/cmd
     # sources: # Optional: Only rebuild if source files change
     #   - ./**/*.go
     #   - go.mod

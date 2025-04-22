@@ -57,7 +57,7 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, st
 		return errors.New("invalid qr code")
 	}
 
-	enrolled, err := a.VerifyStudentEnrollment(ctx, studentID, qrData.CollegeID, qrData.CourseID)
+	
 
 	if err != nil {
 		return err
