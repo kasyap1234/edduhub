@@ -88,8 +88,28 @@ func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error 
 	return err
 }
 
-// func(d*BaseDatabaseRepository[T])DeleteByID(ctx context.Context,id interface{})error {
-// 	_,err :=d.DB.NewDelete()
-// }
 
+
+//Student <-> Course: This is Many-to-Many. You need to create  the enrollments table/model. This is the standard and necessary approach.
+//Course <-> Lecture: This is One-to-Many (One Course, Many Lectures). You correctly have course_id in the lectures table. No join table needed. .Relation() works directly.
+//Student <-> Attendance: One-to-Many. Correctly have student_id in attendance. No join table needed. .Relation() works directly.
+//Course <-> Attendance: One-to-Many. Correctly have course_id in attendance. No join table needed. .Relation() works directly.
+//Lecture <-> Attendance: One-to-Many. Correctly have lecture_id in attendance. No join table needed. .Relation() works directly.
+// Permissions (Keto): Your assignment_helper.go uses Keto for permissions (e.g., Faculty-Course, Student-Course). Keto acts as an external system managing these relationships (relation tuples). You do not need database join tables for these specific permission relationships because Keto handles them.
+
+
+
+// only need to create a dedicated join table (like enrollments) when you have a Many-to-Many relationship between two core entities in your database.
+
+// For One-to-One and One-to-Many relationships, a simple foreign key in one of the tables is sufficient.
+
+// Bun's .Relation() feature is designed to work seamlessly with both scenarios:
+
+// It uses the foreign keys directly for 1:1 and 1:N relationships.
+// It traverses through the join table model for M:N relationships.
+// Therefore, for other features, analyze the relationship type:
+
+// If it's M:N, create a join table/model like you did for enrollments.
+// If it's 1:1 or 1:N, just add the appropriate foreign key column to one of the existing models/tables.
+// You don't need to create extra join tables for relationships that are already handled correctly by foreign keys (like Course-Lecture, Student-Attendance, etc.).
 
