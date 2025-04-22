@@ -16,4 +16,7 @@ type Student struct {
 	IsActive         bool     `json:"is_active" bun:",default:true"`
 	// Relations
 	// User *User `bun:"rel:belongs-to,join:user_id=id"`
+	Enrollments []*Enrollment `json:"enrollments,omitempty" bun:"rel:has-many,join:student_id=student_id"`
+	// Load attendance records for this student
+	Attendances []*Attendance `json:"attendances,omitempty" bun:"rel:has-many,join:student_id=student_id"`
 }

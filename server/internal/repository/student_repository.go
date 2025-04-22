@@ -19,12 +19,14 @@ type StudentRepository interface {
 }
 
 type studentRepository struct {
-	db DatabaseRepository[models.Student]
+	db       DatabaseRepository[models.Student]
+	enrollmentDB  DatabaseRepository[models.Course]
 }
 
-func NewStudentRepository(db DatabaseRepository[models.Student]) StudentRepository {
+func NewStudentRepository(db DatabaseRepository[models.Student],courseDB DatabaseRepository[models.Course]) StudentRepository {
 	return &studentRepository{
 		db: db,
+		courseDB: courseDB,
 	}
 }
 
@@ -77,7 +79,7 @@ func (s *studentRepository) FreezeStudent(ctx context.Context, RollNo string) er
 
 func (s *studentRepository) UnFreezeStudent(ctx context.Context, RollNo string) error {
 	student, err := s.GetStudentByRollNo(ctx, RollNo)
-	if err != nil {
+	if err == nil {
 		student.IsActive = true
 		return s.db.Update(ctx, student)
 	}
@@ -85,9 +87,12 @@ func (s *studentRepository) UnFreezeStudent(ctx context.Context, RollNo string) 
 
 }
 func (s *studentRepository) VerifyStudentEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error) {
-	_, err := s.db.FindOne(ctx, "college_id=? AND student_id=? AND course_id=?", collegeID, studentID, courseID)
+	_, err := s.db.FindOne(ctx, "college_id=? AND student_id=? ", collegeID, studentID)
+	_ ,err := s.
+
 	if err != nil {
 		return false, err
 	}
+
 	return true, nil
 }
