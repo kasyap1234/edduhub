@@ -7,8 +7,9 @@ import (
 
 func main() {
 
-	setup := app.New().Start()
-	if setup != nil {
+	setup := app.New()
+	err := setup.Start()
+	if err != nil {
 		fmt.Println("initiated server")
 	}
 }
