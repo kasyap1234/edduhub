@@ -9,7 +9,7 @@ import (
 type StudentService interface {
 	CreateStudent(ctx context.Context, student *models.Student) error
 	GetStudentByRollNo(ctx context.Context, rollNo string) (*models.Student, error)
-	GetStudentByID(ctx context.Context, studentID int) (*models.Student, error)
+	GetStudentByID(ctx context.Context, collegeID, studentID int) (*models.Student, error)
 	UpdateStudent(ctx context.Context, model *models.Student) error
 	FreezeStudent(ctx context.Context, RollNo string) error
 	UnFreezeStudent(ctx context.Context, RollNo string) error
@@ -41,8 +41,8 @@ func (s *studentService) GetStudentByRollNo(ctx context.Context, rollNo string) 
 	return student, err
 }
 
-func (s *studentService) GetStudentByID(ctx context.Context, studentID int) (*models.Student, error) {
-	student, err := s.StudentRepo.GetStudentByID(ctx, studentID)
+func (s *studentService) GetStudentByID(ctx context.Context, collegeID, studentID int) (*models.Student, error) {
+	student, err := s.StudentRepo.GetStudentByID(ctx, collegeID, studentID)
 	return student, err
 }
 
