@@ -5,6 +5,7 @@ import (
 	"eduhub/server/internal/services/auth"
 	"eduhub/server/internal/services/student"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -135,7 +136,7 @@ func (m *AuthMiddleware) RequireRole(roles ...string) echo.MiddlewareFunc {
 	}
 }
 
-func (m *AuthMiddleware) RequirePermission(resource, action string) echo.MiddlewareFunc {
+func (m *AuthMiddleware) RequirePermission(subject, resource, action string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			identity, ok := c.Get("identity").(*auth.Identity)
@@ -144,7 +145,7 @@ func (m *AuthMiddleware) RequirePermission(resource, action string) echo.Middlew
 					"error": "Unauthorized",
 				})
 			}
-			allowed, err := m.AuthService.CheckPermission(c.Request().Context(), identity, resource, action)
+			allowed, err := m.AuthService.CheckPermission(c.Request().Context(), identity, subject, resource, action)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]string{
 					"error": "Error checking permissions",
@@ -183,7 +184,7 @@ func (m *AuthMiddleware) VerifyStudentOwnership(next echo.HandlerFunc) echo.Hand
 		// Verify if the authenticated student is accessing their own resource
 		if requestedStudentID != authenticatedStudentID.(int) {
 			// Check if the user has admin/faculty role that allows them to override
-			allowed, err := m.AuthService.CheckPermission(c.Request().Context(), identity, MarkAction, AttendanceResource)
+			allowed, err := m.AuthService.CheckPermission(c.Request().Context(), identity, strconv.Itoa(requestedStudentID), MarkAction, AttendanceResource)
 			if err != nil || !allowed {
 				return helpers.Error(c, "Access denied", http.StatusForbidden)
 			}

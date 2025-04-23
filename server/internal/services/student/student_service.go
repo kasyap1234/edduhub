@@ -20,11 +20,14 @@ type StudentService interface {
 type studentService struct {
 	StudentRepo    repository.StudentRepository
 	AttendanceRepo repository.AttendanceRepository
+	EnrollmentRepo repository.EnrollmentRepository
 }
 
-func NewstudentService(studentRepo repository.StudentRepository) StudentService {
+func NewstudentService(studentRepo repository.StudentRepository,attendance repository.AttendanceRepository,enrollment repository.EnrollmentRepository) StudentService {
 	return &studentService{
 		StudentRepo: studentRepo,
+		AttendanceRepo: attendance,
+		EnrollmentRepo: enrollment,
 	}
 }
 func (s *studentService) CreateStudent(ctx context.Context, student *models.Student) error {
@@ -59,5 +62,5 @@ func (s *studentService) UnFreezeStudent(ctx context.Context, RollNo string) err
 }
 
 func (s *studentService) VerifyStudentEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error) {
-	return s.StudentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
+	return s.EnrollmentRepo.IsStudentEnrolled(ctx, collegeID, studentID, courseID)
 }

@@ -22,9 +22,9 @@ func NewServices(cfg *config.Config) *Services {
 	authService := auth.NewAuthService(kratosService, ketoService)
 	db := config.LoadDatabase()
 	repository := repository.NewRepository(db)
-	studentService := student.NewstudentService(repository.StudentRepository)
+	studentService := student.NewstudentService(repository.StudentRepository, repository.AttendanceRepository, repository.EnrollmentRepository)
 
-	attendanceService := attendance.NewAttendanceService(repository.AttendanceRepository, repository.StudentRepository)
+	attendanceService := attendance.NewAttendanceService(repository.AttendanceRepository, repository.StudentRepository, repository.EnrollmentRepository)
 	return &Services{
 		Auth:           authService,
 		Attendance:     attendanceService,

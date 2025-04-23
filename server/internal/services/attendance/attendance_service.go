@@ -99,7 +99,7 @@ func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, college
 		return false, nil
 	}
 	// enrolled, err := a.studentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
-	exists, err := a.enrollmentRepo.IsStudentEnrolled(ctx,studentID,courseID)
+	exists, err := a.enrollmentRepo.IsStudentEnrolled(ctx, studentID, courseID)
 	return exists, err
 }
 
