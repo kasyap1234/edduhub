@@ -45,7 +45,7 @@ func (s *studentRepository) FindByKratosID(ctx context.Context, kratosID string)
 }
 
 func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo string) (*models.Student, error) {
-	student, err := s.db.FindOne(ctx, "rollNo = ?", rollNo)
+	student, err := s.db.FindOne(ctx, "roll_no = ?", rollNo)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo strin
 }
 
 func (s *studentRepository) GetStudentByID(ctx context.Context, collegeID, studentID int) (*models.Student, error) {
-	student, err := s.db.FindOne(ctx, "college_id=? AND student_id=?", collegeID,studentID)
+	student, err := s.db.FindOne(ctx, "college_id=? AND student_id=?", collegeID, studentID)
 	return student, err
 }
 

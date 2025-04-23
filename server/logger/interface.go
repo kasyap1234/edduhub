@@ -5,9 +5,6 @@ type Logger interface {
 	Error(msg string, fields ...interface{})
 
 }
-// logger interface implements zap logger (hides zaplogger )
 
-func NewLogger()Logger{
-	return &NewZapLogger(
-	)
-}
+
+

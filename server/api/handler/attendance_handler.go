@@ -13,7 +13,7 @@ type AttendanceHandler struct {
 	attendanceService attendance.AttendanceService
 }
 
-func NewAttedanceHandler(attendance attendance.AttendanceService) *AttendanceHandler {
+func NewAttendanceHandler(attendance attendance.AttendanceService) *AttendanceHandler {
 	return &AttendanceHandler{
 		attendanceService: attendance,
 	}
@@ -28,6 +28,9 @@ func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
 	courseIDStr := c.Param("courseID")
 	lectureIDstr := c.Param("lectureID")
 	courseID, err := strconv.Atoi(courseIDStr)
+	if err !=nil {
+		return helpers.Error(c,err.Error(),400)
+	}
 	lectureID, err := strconv.Atoi(lectureIDstr)
 	if err != nil {
 		return helpers.Error(c, err, 400)
@@ -38,22 +41,6 @@ func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
 	}
 	return helpers.Success(c, qrCode, 200)
 }
-
-// func (a *AttendanceHandler) ProcessQRCode(c echo.Context) error {
-// 	ctx := c.Request().Context()
-// 	collegeID, err := helpers.ExtractCollegeID(c)
-// 	if err != nil {
-// 		return helpers.Error(c, err, 400)
-// 	}
-
-// 	// TODO extract student ID from context , need to link studentid from kratos with db ;
-// 	studentID, err := helpers.ExtractStudentID(c)
-// 	if err != nil {
-// 		return helpers.Error(c, err, 400)
-
-// 	}
-	
-
 
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	ctx := c.Request().Context()
@@ -80,21 +67,17 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	if err != nil {
 		return helpers.Error(c, "Invalid lecture ID", http.StatusBadRequest)
 	}
-	ok,err :=a.attendanceService.VerifyStudentEnrollment(ctx,collegeID,studentID,courseID)
-	
+
 	ok, err = a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if err != nil {
-		return helpers.Error(c, err.Error(), http.StatusForbidden)
+		return helpers.Error(c, err.Error(), http.StatusInternalServerError)
 	}
 
 	if !ok {
 		return helpers.Error(c, "Failed to mark attendance", http.StatusInternalServerError)
 	}
 
-	return helpers.Success(c, map[string]interface{}{
-		"message": "Attendance marked successfully",
-		"status":  true,
-	}, http.StatusOK)
+	return helpers.Success(c, "attendance marked", http.StatusOK)
 }
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
@@ -104,14 +87,16 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 		return err
 	}
 	courseIDstr := c.QueryParam("courseID")
-	courseID, _ := strconv.Atoi(courseIDstr)
-
+	courseID, err := strconv.Atoi(courseIDstr)
+	if err != nil {
+		return helpers.Error(c, "Invalid course ID", http.StatusBadRequest)
+	}
 	attendance, err := a.attendanceService.GetAttendanceByCourse(ctx, collegeID, courseID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 
 	}
-	return c.JSON(http.StatusOK, attendance)
+	return helpers.Success(c, attendance, http.StatusOK)
 
 }
 
@@ -119,6 +104,10 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	ctx := c.Request().Context()
 	collegeID, err := helpers.ExtractCollegeID(c)
+	studentID,err := helpers.ExtractStudentID(c)
+	if err !=nil{
+		return helpers.Error(c,)
+	}
 	if err != nil {
 		return err
 	}

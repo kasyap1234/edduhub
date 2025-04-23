@@ -99,7 +99,7 @@ func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, college
 		return false, nil
 	}
 	// enrolled, err := a.studentRepo.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
-	exists, err := a.enrollmentRepo.IsStudentEnrolled(ctx, studentID, courseID)
+	exists, err := a.enrollmentRepo.IsStudentEnrolled(ctx, collegeID, studentID, courseID)
 	return exists, err
 }
 
@@ -108,7 +108,7 @@ func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, colleg
 	if err != nil {
 		return nil
 	}
-	err = a.ProcessQRCode(ctx, collegeID, studentID, qrCode)
+	err = a.ProcessQRCode(ctx, collegeID, studentID, courseID, qrCode)
 	if err != nil {
 		return err
 	}

@@ -1,27 +1,31 @@
 package config
 
 import (
-	"github.com/uptrace/bun"
 	"log"
+
+	"github.com/uptrace/bun"
 )
 
 type Config struct {
 	DB         *bun.DB
-	DBConfig   DBConfig
+	DBConfig   *DBConfig
 	AuthConfig *AuthConfig
 }
 
 func NewConfig() (*Config, error) {
-	dbConfig := LoadDatabaseConfig()
+	dbConfig, err := LoadDatabaseConfig()
+	if err != nil {
+		return nil, err
+	}
 	db := LoadDatabase()
 	authConfig, err := LoadAuthConfig()
 	if err != nil {
 		log.Fatal("error loading auth config")
 	}
-
+	
 	cfg := &Config{
 		DB:         db,
-		DBConfig:   *dbConfig,
+		DBConfig:   dbConfig,
 		AuthConfig: authConfig,
 	}
 

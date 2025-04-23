@@ -17,7 +17,7 @@ func NewHandlers(services *services.Services) *Handlers {
 	return &Handlers{
 
 		Auth:       NewAuthHandler(services.Auth, services.StudentService),
-		Attendance: NewAttedanceHandler(services.Attendance),
+		Attendance: NewAttendanceHandler(services.Attendance),
 		// other handlers
 
 	}

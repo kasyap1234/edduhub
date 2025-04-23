@@ -15,7 +15,9 @@ type Middleware struct {
 func NewMiddleware(services *services.Services, repos *repository.Repository) *Middleware {
 	authSvc := auth.NewAuthService(auth.NewKratosService(), auth.NewKetoService())
 	studentRepo := repos.StudentRepository
-	studentService := student.NewstudentService(studentRepo)
+	enrollmentRepo := repos.EnrollmentRepository
+	attendanceRepo := repos.AttendanceRepository
+	studentService := student.NewstudentService(studentRepo, attendanceRepo, enrollmentRepo)
 	return &Middleware{
 
 		Auth: NewAuthMiddleware(authSvc, studentService),

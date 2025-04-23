@@ -26,7 +26,7 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 		m.RequireRole(middleware.RoleStudent),
 		m.LoadStudentProfile,
 		m.VerifyStudentOwnership)
-	//attendance.POST("/Mark/Manual",a.Attendance.)
+	
 	attendance.GET("/course/:courseID/lecture/:lectureID/qrcode", a.Attendance.GenerateQRCode, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 	attendance.GET("/get-attendance-course", a.Attendance.GetAttendanceByCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 	attendance.GET("/student/:studentID", a.Attendance.GetAttendanceForStudent, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent), m.LoadStudentProfile)
