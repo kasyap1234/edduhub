@@ -4,7 +4,6 @@ import (
 	"eduhub/server/api/handler"
 	"eduhub/server/internal/config"
 	"eduhub/server/internal/middleware"
-	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services"
 
 	"github.com/labstack/echo/v4"
@@ -30,8 +29,8 @@ func New() *App {
 	// Initialize auth service
 	services := services.NewServices(cfg)
 	handlers := handler.NewHandlers(services)
-	repoes := repository.NewRepository(cfg.DB)
-	mid := middleware.NewMiddleware(services, repoes)
+
+	mid := middleware.NewMiddleware(services)
 
 	return &App{
 		e:          echo.New(),

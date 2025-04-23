@@ -1,9 +1,7 @@
 package middleware
 
 import (
-	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services"
-
 )
 
 type Middleware struct {
@@ -13,10 +11,8 @@ type Middleware struct {
 
 func NewMiddleware(services *services.Services) *Middleware {
 	authSvc := services.Auth
-	studentRepo := repos.StudentRepository
-	enrollmentRepo := repos.EnrollmentRepository
-	attendanceRepo := repos.AttendanceRepository
-	studentService :=services.studentService
+
+	studentService := services.StudentService
 	return &Middleware{
 
 		Auth: NewAuthMiddleware(authSvc, studentService),
