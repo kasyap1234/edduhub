@@ -21,7 +21,7 @@ type QRCodeData struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-func (a *attendanceService) GenerateQRCode(courseID int, lectureID int) (string, error) {
+func (a *attendanceService) GenerateQRCode(ctx context.Context, collegeID int, courseID int, lectureID int) (string, error) {
 	// generate qr code
 	// return qr code
 	// need to check if student is enrolled in the course for marking attendance
@@ -47,14 +47,13 @@ func (a *attendanceService) GenerateQRCode(courseID int, lectureID int) (string,
 
 }
 
-
-func (a *attendanceService) ProcessQRCode(ctx context.Context, studentID int, qrCodeContent string) error {
+func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error {
 	var qrData QRCodeData
 	if err := json.Unmarshal([]byte(qrCodeContent), &qrData); err != nil {
 		return errors.New("invalid qr code")
 	}
 
-	enrolled, err := a.VerifyStudentEnrollment(ctx, studentID, qrData.CourseID)
+	enrolled, err := a.VerifyStudentEnrollment(ctx, collegeID, studentID, qrData.CourseID)
 
 	if err != nil {
 		return err
@@ -66,7 +65,7 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, studentID int, qr
 	if !enrolled {
 		return errors.New("student is not enrolled in the course")
 	}
-	marked, err := a.MarkAttendance(ctx, studentID, qrData.CourseID, qrData.LectureID)
+	marked, err := a.MarkAttendance(ctx, collegeID, studentID, qrData.CourseID, qrData.LectureID)
 	if err != nil {
 		return err
 	}
@@ -74,6 +73,5 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, studentID int, qr
 		return errors.New("attendance not marked")
 
 	}
-return nil
+	return nil
 }
-

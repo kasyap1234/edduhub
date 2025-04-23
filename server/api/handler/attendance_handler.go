@@ -28,8 +28,8 @@ func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
 	courseIDStr := c.Param("courseID")
 	lectureIDstr := c.Param("lectureID")
 	courseID, err := strconv.Atoi(courseIDStr)
-	if err !=nil {
-		return helpers.Error(c,err.Error(),400)
+	if err != nil {
+		return helpers.Error(c, err.Error(), 400)
 	}
 	lectureID, err := strconv.Atoi(lectureIDstr)
 	if err != nil {
@@ -68,7 +68,7 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 		return helpers.Error(c, "Invalid lecture ID", http.StatusBadRequest)
 	}
 
-	ok, err = a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
+	ok, err := a.attendanceService.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if err != nil {
 		return helpers.Error(c, err.Error(), http.StatusInternalServerError)
 	}
@@ -104,23 +104,17 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	ctx := c.Request().Context()
 	collegeID, err := helpers.ExtractCollegeID(c)
-	studentID,err := helpers.ExtractStudentID(c)
-	if err !=nil{
-		return helpers.Error(c,)
-	}
-	if err != nil {
-		return err
-	}
 	studentID, err := helpers.ExtractStudentID(c)
 	if err != nil {
-		return err
+		return helpers.Error(c, "invalid studentID", 400)
 	}
 
 	attendance, err := a.attendanceService.GetAttendanceByStudent(ctx, collegeID, studentID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err})
+		return helpers.Error(c, "unable to get attendance by student", http.StatusInternalServerError)
+
 	}
-	return c.JSON(http.StatusOK, attendance)
+	return helpers.Success(c, attendance, http.StatusOK)
 }
 
 func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) error {
