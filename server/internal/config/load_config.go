@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"github.com/uptrace/bun"
 )
@@ -10,6 +11,7 @@ type Config struct {
 	DB         *bun.DB
 	DBConfig   *DBConfig
 	AuthConfig *AuthConfig
+	AppPort    string
 }
 
 func NewConfig() (*Config, error) {
@@ -22,11 +24,13 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		log.Fatal("error loading auth config")
 	}
-	
+
+	AppPort := os.Getenv("APP_PORT")
 	cfg := &Config{
 		DB:         db,
 		DBConfig:   dbConfig,
 		AuthConfig: authConfig,
+		AppPort:    AppPort,
 	}
 
 	return cfg, nil

@@ -29,7 +29,7 @@ func New() *App {
 	// Initialize auth service
 	services := services.NewServices(cfg)
 	handlers := handler.NewHandlers(services)
-
+	// repos := repository.NewRepository(cfg.DB)
 	mid := middleware.NewMiddleware(services)
 
 	return &App{
@@ -51,5 +51,5 @@ func (a *App) Start() error {
 	// Setup routes
 	handler.SetupRoutes(a.e, a.handlers, a.middleware.Auth)
 
-	return a.e.Start(":" + a.config.DBConfig.Port)
+	return a.e.Start(":" + a.config.AppPort)
 }

@@ -13,6 +13,7 @@ type AttendanceRepository interface {
 	GetAttendanceStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error)
 	GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error)
 	FreezeAttendance(ctx context.Context, collegeID int, studentID int) error
+	// ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
 }
 
 type attendanceRepository struct {
@@ -100,3 +101,18 @@ func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID, 
 	return a.db.Update(ctx, student)
 
 }
+
+
+// func(a*attendanceRepository)ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error){
+// 	attendance := &models.Attendance{
+// 		CollegeID: collegeID,
+// 		StudentID: studentID,
+// 		CourseID:  courseID,
+// 		LectureID: lectureID,
+// 	}
+// 	err := a.db.Create(ctx, attendance)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	return true, nil
+// }

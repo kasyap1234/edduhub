@@ -22,11 +22,11 @@ type AttendanceService interface {
 	MarkAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
 	UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
 	FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error)
-	VerifyStudentEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
+	VerifyStudentStateAndEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
 	FreezeStudent(ctx context.Context, collegeID int, RollNo string) error
 	UnFreezeStudent(ctx context.Context, collegeID int, RollNo string) error
+	ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error
 }
-
 type attendanceService struct {
 	repo           repository.AttendanceRepository
 	studentRepo    repository.StudentRepository
@@ -60,26 +60,17 @@ func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context,
 }
 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID, lectureID int) (bool, error) {
-	// First verify student enrollment and active status
-	enrolled, err := a.VerifyStudentEnrollment(ctx, collegeID, studentID, courseID)
-	if err != nil {
-		return false, fmt.Errorf("failed to verify enrollment: %w", err)
-	}
-	if !enrolled {
-		return false, fmt.Errorf("student not enrolled in course")
-	}
 
-	// Verify student is active
-	student, err := a.studentRepo.GetStudentByID(ctx, collegeID, studentID)
-	if err != nil {
-		return false, fmt.Errorf("failed to get student: %w", err)
+	ok, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentID, courseID)
+	if !ok {
+		return false, err
 	}
-	if !student.IsActive {
-		return false, fmt.Errorf("student account is not active")
+	if err != nil {
+		return false, err
 	}
 
 	// Mark attendance only if all verifications pass
-	ok, err := a.repo.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
+	ok, err = a.repo.MarkAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if err != nil {
 		return false, fmt.Errorf("failed to mark attendance: %w", err)
 	}
@@ -87,7 +78,7 @@ func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, s
 	return ok, nil
 }
 
-func (a *attendanceService) VerifyStudentEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error) {
+func (a *attendanceService) VerifyStudentStateAndEnrollment(ctx context.Context, collegeID int, studentID int, courseID int) (bool, error) {
 	student, err := a.studentRepo.GetStudentByID(ctx, collegeID, studentID)
 	if err != nil {
 		return false, err

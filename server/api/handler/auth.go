@@ -1,11 +1,8 @@
 package handler
 
 import (
-	"eduhub/server/internal/middleware"
-	"eduhub/server/internal/models"
+	"eduhub/server/internal/helpers"
 	"eduhub/server/internal/services/auth"
-	"eduhub/server/internal/services/student"
-	"strconv"
 
 	"fmt"
 	"net/http"
@@ -14,15 +11,12 @@ import (
 )
 
 type AuthHandler struct {
-	authService    auth.AuthService
-	StudentService student.StudentService
+	authService auth.AuthService
 }
 
-func NewAuthHandler(authService auth.AuthService, studentService student.StudentService) *AuthHandler {
+func NewAuthHandler(authService auth.AuthService) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
-		// initialise student service
-		StudentService: studentService,
 	}
 }
 
@@ -39,57 +33,22 @@ func (h *AuthHandler) InitiateRegistration(c echo.Context) error {
 
 // HandleRegistration processes the registration
 func (h *AuthHandler) HandleRegistration(c echo.Context) error {
-	ctx := c.Request().Context()
 	flowID := c.QueryParam("flow")
 	if flowID == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Missing flow ID",
-		})
+		return helpers.Error(c, "empty flowID", 400)
 	}
 
 	var req auth.RegistrationRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid request body",
-		})
+		return helpers.Error(c, "Invalid Registration Request", 400)
 	}
 
 	identity, err := h.authService.CompleteRegistration(c.Request().Context(), flowID, req)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
-		})
-	}
-	role := identity.Traits.Role
-	collegeIDStr := identity.Traits.College.ID
-	collegeID, err := strconv.Atoi(collegeIDStr)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": err.Error(),
-		})
-	}
-	switch role {
-	case middleware.RoleStudent:
-		rollNo := identity.Traits.RollNo
-
-		student := models.Student{
-			KratosIdentityID: identity.ID,
-			CollegeID:        collegeID,
-			RollNo:           rollNo,
-			IsActive:         true,
-		}
-		if err := h.StudentService.CreateStudent(ctx, &student); err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error": err.Error(),
-			})
-		}
-	case middleware.RoleFaculty:
-		// faculty based code
-	case middleware.RoleAdmin:
-		// admin based code
+		helpers.Error(c, "unable to complete registration", http.StatusNotFound)
 	}
 
-	return c.JSON(http.StatusOK, identity)
+	return helpers.Success(c, identity, http.StatusOK)
 }
 
 // HandleLogin processes login
@@ -103,17 +62,13 @@ func (h *AuthHandler) HandleLogin(c echo.Context) error {
 func (h *AuthHandler) HandleCallback(c echo.Context) error {
 	sessionToken := c.Request().Header.Get("X-Session-Token")
 	if sessionToken == "" {
-		return c.JSON(http.StatusUnauthorized, map[string]string{
-			"error": "No session token provided",
-		})
+		return helpers.Error(c, "empty session token", 400)
 	}
 
 	identity, err := h.authService.ValidateSession(c.Request().Context(), sessionToken)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{
-			"error": "Invalid session",
-		})
+		return helpers.Error(c, "invalid identity", http.StatusInternalServerError)
 	}
 
-	return c.JSON(http.StatusOK, identity)
+	return helpers.Success(c, identity, http.StatusOK)
 }

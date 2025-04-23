@@ -1,8 +1,6 @@
 package helpers
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -12,7 +10,7 @@ type ErrorResponse struct {
 }
 
 func Error(c echo.Context, error any, status int) error {
-	return c.JSON(http.StatusInternalServerError, ErrorResponse{
+	return c.JSON(status, ErrorResponse{
 		Message: error,
 		Status:  status,
 	})
