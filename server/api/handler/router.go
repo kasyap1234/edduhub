@@ -21,11 +21,10 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 	apiGroup := e.Group("/api", m.ValidateSession, m.RequireCollege)
 
 	attendance := apiGroup.Group("/attendance")
-	attendance.POST("/Mark/Scan", a.Attendance.MarkAttendance,
+	attendance.POST("/Mark/Scan/course/:courseID/lecture/:lectureID", a.Attendance.MarkAttendance,
 		m.RequireRole(middleware.RoleStudent),
 		m.LoadStudentProfile,
 		m.VerifyStudentOwnership)
-
 	attendance.GET("/course/:courseID/lecture/:lectureID/qrcode", a.Attendance.GenerateQRCode, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 	attendance.GET("/get-attendance-course", a.Attendance.GetAttendanceByCourse, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 	attendance.GET("/student/:studentID", a.Attendance.GetAttendanceForStudent, m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent), m.LoadStudentProfile, m.VerifyStudentOwnership)

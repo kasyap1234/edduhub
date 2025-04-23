@@ -176,7 +176,7 @@ func (m *AuthMiddleware) VerifyStudentOwnership(next echo.HandlerFunc) echo.Hand
 		}
 
 		// Get the requested student ID from params/query
-		requestedStudentID, err := helpers.ExtractStudentID(c)
+		requestedStudentID, err := helpers.GetIDFromParam(c, "studentID")
 		if err != nil {
 			return helpers.Error(c, "Invalid student ID", http.StatusBadRequest)
 		}

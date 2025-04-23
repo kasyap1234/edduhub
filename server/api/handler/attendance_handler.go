@@ -21,20 +21,12 @@ func NewAttendanceHandler(attendance attendance.AttendanceService) *AttendanceHa
 
 func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
 	ctx := c.Request().Context()
+
 	collegeID, err := helpers.ExtractCollegeID(c)
 	if err != nil {
 		return err
 	}
-	// courseIDStr := c.Param("courseID")
-	// lectureIDstr := c.Param("lectureID")
-	// courseID, err := strconv.Atoi(courseIDStr)
-	// if err != nil {
-	// 	return helpers.Error(c, err.Error(), 400)
-	// }
-	// lectureID, err := strconv.Atoi(lectureIDstr)
-	// if err != nil {
-	// 	return helpers.Error(c, err, 400)
-	// }
+
 	courseID, err := helpers.GetIDFromParam(c, "courseID")
 	if err != nil {
 		return err
@@ -86,16 +78,18 @@ func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 
 func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 	ctx := c.Request().Context()
+
 	collegeID, err := helpers.ExtractCollegeID(c)
 	if err != nil {
 		return err
 	}
+
 	courseIDstr := c.QueryParam("courseID")
 	courseID, err := strconv.Atoi(courseIDstr)
 	if err != nil {
 		return helpers.Error(c, "Invalid course ID", http.StatusBadRequest)
 	}
-	// courseID, err := helpers.GetIDFromParam(c, "courseID")
+
 	attendance, err := a.attendanceService.GetAttendanceByCourse(ctx, collegeID, courseID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
@@ -108,6 +102,7 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 // use structs instead of maps while returning c.JSON
 func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	ctx := c.Request().Context()
+
 	collegeID, err := helpers.ExtractCollegeID(c)
 	studentID, err := helpers.ExtractStudentID(c)
 	if err != nil {
@@ -124,6 +119,7 @@ func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 
 func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) error {
 	ctx := c.Request().Context()
+
 	collegeID, err := helpers.ExtractCollegeID(c)
 	if err != nil {
 		return err
@@ -132,19 +128,17 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 	if err != nil {
 		return err
 	}
+
 	courseIDstr := c.QueryParam("courseID")
 	courseID, err := strconv.Atoi(courseIDstr)
 	if err != nil {
 		return err
 	}
-	// courseID, err := helpers.GetIDFromParam(c, "courseID")
-	// if err != nil {
-	// 	return err
-	// }
+
 	attendance, err := a.attendanceService.GetAttendanceByStudentAndCourse(ctx, collegeID, studentID, courseID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
+		return helpers.Error(c, "unable to get attendance", http.StatusInternalServerError)
 
 	}
-	return c.JSON(http.StatusOK, attendance)
+	return helpers.Success(c, attendance, 200)
 }
