@@ -4,7 +4,6 @@ import (
 	"eduhub/server/internal/helpers"
 	"eduhub/server/internal/services/attendance"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -84,8 +83,8 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 		return err
 	}
 
-	courseIDstr := c.QueryParam("courseID")
-	courseID, err := strconv.Atoi(courseIDstr)
+	courseID, err := helpers.GetIDFromParam(c, "courseID")
+
 	if err != nil {
 		return helpers.Error(c, "Invalid course ID", http.StatusBadRequest)
 	}
@@ -124,13 +123,12 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 	if err != nil {
 		return err
 	}
-	studentID, err := helpers.ExtractStudentID(c)
+	studentID, err := helpers.GetIDFromParam(c, "studentID")
 	if err != nil {
 		return err
 	}
 
-	courseIDstr := c.QueryParam("courseID")
-	courseID, err := strconv.Atoi(courseIDstr)
+	courseID, err := helpers.GetIDFromParam(c, "courseID")
 	if err != nil {
 		return err
 	}
@@ -141,4 +139,16 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 
 	}
 	return helpers.Success(c, attendance, 200)
+}
+
+func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
+
+}
+
+func (a *AttendanceHandler) GetCourseAttendanceReport(c echo.Context) error {
+
+}
+
+func (a *AttendanceHandler) GetStudentAttendanceReport(c echo.Context) error {
+
 }
