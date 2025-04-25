@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"eduhub/server/internal/models"
 	"errors"
+
+	"eduhub/server/internal/models"
 )
 
 type StudentRepository interface {
@@ -50,7 +51,6 @@ func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo strin
 		return nil, err
 	}
 	return student, nil
-
 }
 
 func (s *studentRepository) GetStudentByID(ctx context.Context, collegeID, studentID int) (*models.Student, error) {
@@ -61,7 +61,6 @@ func (s *studentRepository) GetStudentByID(ctx context.Context, collegeID, stude
 func (s *studentRepository) UpdateStudent(ctx context.Context, model *models.Student) error {
 	err := s.db.Update(ctx, model)
 	return err
-
 }
 
 func (s *studentRepository) FreezeStudent(ctx context.Context, RollNo string) error {
@@ -81,5 +80,4 @@ func (s *studentRepository) UnFreezeStudent(ctx context.Context, RollNo string) 
 		return s.db.Update(ctx, student)
 	}
 	return err
-
 }

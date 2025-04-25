@@ -14,8 +14,6 @@ func NewMiddleware(services *services.Services) *Middleware {
 
 	studentService := services.StudentService
 	return &Middleware{
-
 		Auth: NewAuthMiddleware(authSvc, studentService),
 	}
-
 }

@@ -14,11 +14,9 @@ func NewAssigner(keto KetoService) *Assigner {
 	return &Assigner{
 		keto: keto,
 	}
-
 }
 
 func (a *Assigner) AssignFacultyToCourse(ctx context.Context, facultyID, courseID string) {
-
 	relations := []string{"faculty", "manage_qr", "view_attendance", "grade_assignments"}
 	for _, relation := range relations {
 		if err := a.keto.CreateRelation(ctx, "courses", courseID, relation, facultyID); err != nil {

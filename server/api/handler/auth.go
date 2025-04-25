@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"eduhub/server/internal/helpers"
-	"eduhub/server/internal/services/auth"
-
 	"fmt"
 	"net/http"
+
+	"eduhub/server/internal/helpers"
+	"eduhub/server/internal/services/auth"
 
 	"github.com/labstack/echo/v4"
 )

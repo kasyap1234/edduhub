@@ -2,9 +2,10 @@ package attendance
 
 import (
 	"context"
+	"fmt"
+
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
-	"fmt"
 )
 
 const (
@@ -39,7 +40,6 @@ func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repo
 		studentRepo:    studentRepo,
 		enrollmentRepo: enrollmentRepo,
 	}
-
 }
 
 func (a *attendanceService) GetAttendanceByLecture(ctx context.Context, collegeID int, courseID int, lectureID int) ([]*models.Attendance, error) {
@@ -60,7 +60,6 @@ func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context,
 }
 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID, lectureID int) (bool, error) {
-
 	ok, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentID, courseID)
 	if !ok {
 		return false, err
@@ -120,7 +119,6 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 		return false, err
 	}
 	return true, nil
-
 }
 
 func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error) {

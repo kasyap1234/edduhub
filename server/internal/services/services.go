@@ -33,5 +33,4 @@ func NewServices(cfg *config.Config) *Services {
 		StudentService: studentService,
 		System:         systemService,
 	}
-
 }

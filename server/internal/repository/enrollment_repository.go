@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"eduhub/server/internal/models"
 )
 
@@ -26,7 +27,6 @@ func (e *enrollmentRepository) CreateEnrollment(ctx context.Context, enrollment 
 }
 
 func (e *enrollmentRepository) IsStudentEnrolled(ctx context.Context, collegeID, studentID, courseID int) (bool, error) {
-
 	exists, err := e.db.Exists(ctx, (*models.Enrollment)(nil), "college_id=? AND student_id=? AND course_id=?", collegeID, studentID, courseID)
 	return exists, err
 }

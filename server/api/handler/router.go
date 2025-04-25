@@ -3,7 +3,6 @@ package handler
 import (
 	"eduhub/server/internal/middleware"
 
-	
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -12,7 +11,6 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 	// Public routes
 	e.GET("/health", a.System.HealthCheck)
 	e.GET("/docs/*", a.System.SwaggerDocs)
-	
 
 	// Register Swagger routes - make sure these are registered correctly
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

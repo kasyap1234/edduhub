@@ -1,18 +1,6 @@
-# version : '3'
-
-# tasks: 
-#   build: 
-#     cmds:
-#       - go build -v -i main.go
-#   run: 
-#     cmds: 
-#     - go run main.go 
-  
-# Taskfile.yml
 version: '3'
 
 vars:
-  # Define variables for paths or commands if needed
   APP_NAME: edduhub
   COVERAGE_UNIT_OUT: coverage-unit.out
   COVERAGE_INTEGRATION_OUT: coverage-integration.out
@@ -31,34 +19,25 @@ tasks:
 
   test:unit:
     desc: Run unit tests
-    # Use -short flag if needed to skip long tests during normal dev
-    # Use -race flag to detect race conditions
     cmds:
       - go test -tags=unit -race -coverprofile={{.COVERAGE_UNIT_OUT}} ./...
-    # Set environment variables if needed for tests
-    # env:
-    #   SOME_VAR: some_value
 
   test:integration:
     desc: Run integration tests (requires Docker running)
     cmds:
-      # Ensure Docker is running before attempting
       - docker info > /dev/null || (echo "Docker is not running. Please start Docker." && exit 1)
-      - go test -tags=integration -race -coverprofile={{.COVERAGE_INTEGRATION_OUT}} -v ./... # -v for verbose output
+      - go test -tags=integration -race -coverprofile={{.COVERAGE_INTEGRATION_OUT}} -v ./...
 
   cover:
     desc: Generate and view code coverage report (run after tests)
-    deps: [cover:merge] # Depends on merging first
+    deps: [cover:merge]
     cmds:
       - go tool cover -html={{.COVERAGE_MERGED_OUT}}
-    silent: true # Don't echo the command
+    silent: true
 
   cover:merge:
     desc: Merge unit and integration test coverage profiles
-    # Requires gocovmerge: go install github.com/wadey/gocovmerge@latest
-    # If only running one type of test, you can simplify the 'cover' task
     cmds:
-      # Check if both files exist before merging
       - |
         if [ -f {{.COVERAGE_UNIT_OUT}} ] && [ -f {{.COVERAGE_INTEGRATION_OUT}} ]; then
           gocovmerge {{.COVERAGE_UNIT_OUT}} {{.COVERAGE_INTEGRATION_OUT}} > {{.COVERAGE_MERGED_OUT}}
@@ -74,7 +53,6 @@ tasks:
 
   lint:
     desc: Run golangci-lint
-    # Requires golangci-lint: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     cmds:
       - golangci-lint run ./...
 
@@ -85,15 +63,8 @@ tasks:
 
   build:
     desc: Build the main application binary
-    # Adjust path to your main.go if different
     cmds:
       - go build -o bin/{{.APP_NAME}} ./server/cmd
-    # sources: # Optional: Only rebuild if source files change
-    #   - ./**/*.go
-    #   - go.mod
-    #   - go.sum
-    # generated:
-    #   - bin/{{.APP_NAME}}
 
   clean:
     desc: Remove coverage files and built binary
@@ -101,3 +72,28 @@ tasks:
       - rm -f {{.COVERAGE_UNIT_OUT}} {{.COVERAGE_INTEGRATION_OUT}} {{.COVERAGE_MERGED_OUT}} {{.COVERAGE_HTML_OUT}}
       - rm -f bin/{{.APP_NAME}}
 
+  mocks:
+    desc: Generate mocks for all interfaces using mockery
+    cmds:
+      - mockery --all --output server/mocks --case=camel
+
+  run:dev:
+    desc: Run server with autoreload (requires air)
+    cmds:
+      - air
+
+  docker:dev:
+    desc: Start development environment with Docker Compose
+    cmds:
+      - docker-compose up --build
+
+  fmt:
+    desc: Format code using gofumpt and goimports
+    cmds:
+      - gofumpt -w .
+      - goimports -w .
+
+  swagger:
+    desc: Generate Swagger OpenAPI docs (requires swag)
+    cmds:
+      - swag init -g server/main.go -o server/docs

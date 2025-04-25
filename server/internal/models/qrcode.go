@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/uptrace/bun"
 	"time"
+
+	"github.com/uptrace/bun"
 )
 
 type QRCode struct {
@@ -13,6 +14,6 @@ type QRCode struct {
 }
 
 type AttendanceRequest struct {
-	StudentID int `json:"student_id"`
-	QRCodeID string `json:"qr_code_id"`
+	StudentID int    `json:"student_id"`
+	QRCodeID  string `json:"qr_code_id"`
 }

@@ -16,9 +16,9 @@ func NewZapLogger() Logger {
 func (l *ZapLogger) Info(msg string, fields ...interface{}) {
 	l.Logger.Info(msg, convertFields(fields...)...)
 }
+
 func (l *ZapLogger) Error(msg string, fields ...interface{}) {
 	l.Logger.Error(msg, convertFields(fields)...)
-
 }
 
 func convertFields(fields ...interface{}) []zap.Field {

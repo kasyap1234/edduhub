@@ -96,11 +96,11 @@ func (d *BaseDatabaseRepository[T]) Exists(ctx context.Context, model *T, query 
 	return exists, err
 }
 
-//Student <-> Course: This is Many-to-Many. You need to create  the enrollments table/model. This is the standard and necessary approach.
-//Course <-> Lecture: This is One-to-Many (One Course, Many Lectures). You correctly have course_id in the lectures table. No join table needed. .Relation() works directly.
-//Student <-> Attendance: One-to-Many. Correctly have student_id in attendance. No join table needed. .Relation() works directly.
-//Course <-> Attendance: One-to-Many. Correctly have course_id in attendance. No join table needed. .Relation() works directly.
-//Lecture <-> Attendance: One-to-Many. Correctly have lecture_id in attendance. No join table needed. .Relation() works directly.
+// Student <-> Course: This is Many-to-Many. You need to create  the enrollments table/model. This is the standard and necessary approach.
+// Course <-> Lecture: This is One-to-Many (One Course, Many Lectures). You correctly have course_id in the lectures table. No join table needed. .Relation() works directly.
+// Student <-> Attendance: One-to-Many. Correctly have student_id in attendance. No join table needed. .Relation() works directly.
+// Course <-> Attendance: One-to-Many. Correctly have course_id in attendance. No join table needed. .Relation() works directly.
+// Lecture <-> Attendance: One-to-Many. Correctly have lecture_id in attendance. No join table needed. .Relation() works directly.
 // Permissions (Keto): Your assignment_helper.go uses Keto for permissions (e.g., Faculty-Course, Student-Course). Keto acts as an external system managing these relationships (relation tuples). You do not need database join tables for these specific permission relationships because Keto handles them.
 
 // only need to create a dedicated join table (like enrollments) when you have a Many-to-Many relationship between two core entities in your database.

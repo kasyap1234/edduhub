@@ -51,6 +51,7 @@ func LoadDatabaseConfig() (*DBConfig, error) {
 		SSLMode:  dbSSLMode,
 	}, nil
 }
+
 func LoadDatabase() *bun.DB {
 	dbconfig, err := LoadDatabaseConfig()
 	if err != nil {
@@ -63,6 +64,7 @@ func LoadDatabase() *bun.DB {
 	db := bun.NewDB(sqldb, pgdialect.New())
 	return db
 }
+
 func buildDSN(config DBConfig) string {
 	return "postgres://" + config.User + ":" + config.Password +
 		"@" + config.Host + ":" + config.Port + "/" +

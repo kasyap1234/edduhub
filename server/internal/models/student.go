@@ -3,8 +3,8 @@ package models
 import "github.com/uptrace/bun"
 
 type Student struct {
-	bun.BaseModel    `bun:"table:students"`
-	StudentID        int      `json:"student_id" bun:",pk,autoincrement"`
+	bun.BaseModel `bun:"table:students"`
+	StudentID     int `json:"student_id" bun:",pk,autoincrement"`
 	// UserID           int      `json:"user_id" bun:",notnull,unique"`
 	KratosIdentityID string   `json:"-" bun:",notnull,unique"`
 	CollegeID        int      `json:"college_id" bun:"college_id,notnull"`

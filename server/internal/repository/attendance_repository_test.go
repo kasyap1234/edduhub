@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
+	"testing"
 
 	"eduhub/server/internal/models"
 	"eduhub/server/mocks"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +18,6 @@ func TestMarkAttendance(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, result)
 	mockRepo.AssertExpectations(t)
-
 }
 
 // TestUpdateAttendance tests the UpdateAttendance method of the AttendanceRepository
@@ -31,7 +30,6 @@ func TestUpdateAttendance(t *testing.T) {
 	err := mockRepo.UpdateAttendance(ctx, 1, 2, 3, 4, "marked")
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
-
 }
 
 func TestGetAttendanceStudentInCourse(t *testing.T) {
@@ -65,7 +63,6 @@ func TestGetAttendanceByLecture(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 	mockRepo.AssertExpectations(t)
-
 }
 
 func TestGetAttendanceByCourse(t *testing.T) {

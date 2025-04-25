@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"eduhub/server/internal/services/system"
 	"net/http"
 	"time"
+
+	"eduhub/server/internal/services/system"
 
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"

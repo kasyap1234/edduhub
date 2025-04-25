@@ -2,6 +2,7 @@ package student
 
 import (
 	"context"
+
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
 )
@@ -23,13 +24,14 @@ type studentService struct {
 	EnrollmentRepo repository.EnrollmentRepository
 }
 
-func NewstudentService(studentRepo repository.StudentRepository,attendance repository.AttendanceRepository,enrollment repository.EnrollmentRepository) StudentService {
+func NewstudentService(studentRepo repository.StudentRepository, attendance repository.AttendanceRepository, enrollment repository.EnrollmentRepository) StudentService {
 	return &studentService{
-		StudentRepo: studentRepo,
+		StudentRepo:    studentRepo,
 		AttendanceRepo: attendance,
 		EnrollmentRepo: enrollment,
 	}
 }
+
 func (s *studentService) CreateStudent(ctx context.Context, student *models.Student) error {
 	return s.StudentRepo.CreateStudent(ctx, student)
 }

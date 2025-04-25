@@ -44,7 +44,6 @@ func (a *attendanceService) GenerateQRCode(ctx context.Context, collegeID int, c
 	}
 	qrBase64 := fmt.Sprintf("data ,%s", qrBytes)
 	return qrBase64, nil
-
 }
 
 // process qr and take values from it to mark attendance(process qr and chaning state)

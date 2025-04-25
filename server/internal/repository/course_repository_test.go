@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
+	"testing"
+
 	"eduhub/server/internal/models"
 	"eduhub/server/mocks"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -28,4 +29,3 @@ func TestCreateCourse(t *testing.T) {
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
 }
-

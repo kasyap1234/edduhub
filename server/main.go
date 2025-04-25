@@ -2,8 +2,10 @@
 package main
 
 import (
+	"log"
+
 	"eduhub/server/api/app"
-	"log" // Use standard log for fatal startup errors before custom logger is ready
+	// Use standard log for fatal startup errors before custom logger is ready
 
 	"github.com/joho/godotenv"
 )

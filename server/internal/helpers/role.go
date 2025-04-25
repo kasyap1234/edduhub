@@ -7,7 +7,6 @@ import (
 )
 
 func GetUserRole(c echo.Context) (string, error) {
-
 	identity, ok := c.Get("identity").(*auth.Identity)
 	if !ok {
 		return "", echo.NewHTTPError(401, "unauthorized")

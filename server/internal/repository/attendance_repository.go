@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"eduhub/server/internal/models"
 )
 
@@ -29,7 +30,6 @@ func NewAttendanceRepository(db DatabaseRepository[models.Attendance]) Attendanc
 // mark attendance
 
 func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error) {
-
 	attendance := &models.Attendance{
 		CollegeID: collegeID,
 		StudentID: studentID,
@@ -51,13 +51,11 @@ func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID i
 	}
 	attendance.Status = status
 	return a.db.Update(ctx, attendance)
-
 }
 
 // to get attendance of student in a course a course is a series of lectures wil give student attendance for the entire course for example student 1 has attendance for lecture 1 and lecture2 of course 1
 
 func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
-
 	attendances, err := a.db.FindWhere(ctx, "college_id=? AND student_id=? AND course_id=?", collegeID, studentID, courseID)
 	if err != nil {
 		return nil, err
@@ -99,9 +97,7 @@ func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID, 
 	}
 	student.Status = "FREEZED"
 	return a.db.Update(ctx, student)
-
 }
-
 
 // func(a*attendanceRepository)ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error){
 // 	attendance := &models.Attendance{

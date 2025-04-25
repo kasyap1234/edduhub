@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"eduhub/server/internal/models"
 )
 
@@ -29,7 +30,6 @@ func (u *userRepository) CreateUser(ctx context.Context, user *models.User) erro
 
 func (u *userRepository) FindByRollNo(ctx context.Context, RollNo string) (*models.User, error) {
 	return u.db.FindOne(ctx, "roll_no=?", RollNo)
-
 }
 
 func (u *userRepository) DeleteUser(ctx context.Context, RollNo string) error {
@@ -38,7 +38,6 @@ func (u *userRepository) DeleteUser(ctx context.Context, RollNo string) error {
 		return err
 	}
 	return u.db.Delete(ctx, user)
-
 }
 
 func (u *userRepository) FreezeUser(ctx context.Context, RollNo string) error {

@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"net/http"
+
 	"eduhub/server/internal/helpers"
 	"eduhub/server/internal/services/attendance"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -84,7 +85,6 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 	}
 
 	courseID, err := helpers.GetIDFromParam(c, "courseID")
-
 	if err != nil {
 		return helpers.Error(c, "Invalid course ID", http.StatusBadRequest)
 	}
@@ -92,10 +92,8 @@ func (a *AttendanceHandler) GetAttendanceByCourse(c echo.Context) error {
 	attendance, err := a.attendanceService.GetAttendanceByCourse(ctx, collegeID, courseID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
-
 	}
 	return helpers.Success(c, attendance, http.StatusOK)
-
 }
 
 // use structs instead of maps while returning c.JSON
@@ -111,7 +109,6 @@ func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	attendance, err := a.attendanceService.GetAttendanceByStudent(ctx, collegeID, studentID)
 	if err != nil {
 		return helpers.Error(c, "unable to get attendance by student", http.StatusInternalServerError)
-
 	}
 	return helpers.Success(c, attendance, http.StatusOK)
 }
@@ -136,7 +133,6 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 	attendance, err := a.attendanceService.GetAttendanceByStudentAndCourse(ctx, collegeID, studentID, courseID)
 	if err != nil {
 		return helpers.Error(c, "unable to get attendance", http.StatusInternalServerError)
-
 	}
 	return helpers.Success(c, attendance, 200)
 }
