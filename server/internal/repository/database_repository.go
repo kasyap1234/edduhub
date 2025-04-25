@@ -85,7 +85,7 @@ func (d *BaseDatabaseRepository[T]) Count(ctx context.Context, query string, arg
 	count, err := d.DB.NewSelect().Model((*T)(nil)).Where(query, args...).Count(ctx)
 	return count, err
 }
-tg
+
 func (d *BaseDatabaseRepository[T]) Delete(ctx context.Context, model *T) error {
 	_, err := d.DB.NewDelete().Model(model).WherePK().Exec(ctx)
 	return err
