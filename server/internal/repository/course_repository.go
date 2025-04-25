@@ -21,5 +21,8 @@ func NewCourseRepository(db DatabaseRepository[models.Course]) CourseRepository 
 
 func (c *courseRepository) CreateCourse(ctx context.Context, course *models.Course) error {
 	return c.db.Create(ctx, course)
+}
 
+func (c *courseRepository) FindCourseByID(ctx context.Context, courseID int) (*models.Course, error) {
+	return c.db.FindByID(ctx, courseID)
 }

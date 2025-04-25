@@ -54,19 +54,6 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, st
 		return errors.New("invalid qr code")
 	}
 
-	// enrolled, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentID, qrData.CourseID)
-
-	// if err != nil {
-	// 	return err
-	// }
-	// if time.Now().After(qrData.ExpiresAt) {
-	// 	return errors.New("qr code has expired")
-
-	// }
-	// if !enrolled {
-	// 	return errors.New("student is not enrolled in the course")
-	// }
-	// mark attendance changing state
 	marked, err := a.repo.MarkAttendance(ctx, collegeID, studentID, qrData.CourseID, qrData.LectureID)
 	if !marked {
 		return errors.New("unable to mark attendance using processqrcode")

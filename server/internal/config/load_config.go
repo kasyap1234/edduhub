@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/uptrace/bun"
@@ -22,7 +21,7 @@ func NewConfig() (*Config, error) {
 	db := LoadDatabase()
 	authConfig, err := LoadAuthConfig()
 	if err != nil {
-		log.Fatal("error loading auth config")
+		return nil, err
 	}
 
 	AppPort := os.Getenv("APP_PORT")

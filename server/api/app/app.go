@@ -44,6 +44,7 @@ func New() *App {
 
 func (a *App) Start() error {
 	// Middleware
+
 	a.e.Use(echomid.Logger())
 	a.e.Use(echomid.Recover())
 	a.e.Use(echomid.CORS())

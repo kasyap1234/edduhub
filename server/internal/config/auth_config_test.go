@@ -2,35 +2,28 @@ package config
 
 import (
 	"os"
-	"reflect"
 	"testing"
 )
 
 func TestLoadAuthConfig(t *testing.T) {
-	// ✅ Set the required environment variables
-	os.Setenv("KRATOS_PUBLIC_URL", "http://localhost:4433")
-	os.Setenv("KRATOS_ADMIN_URL", "http://localhost:4434")
-	os.Setenv("KRATOS_DOMAIN", "example.com")
-	os.Setenv("PORT", "8080")
-
-	// ✅ Ensure environment variables are cleared after the test
-	defer func() {
-		os.Unsetenv("KRATOS_PUBLIC_URL")
-		os.Unsetenv("KRATOS_ADMIN_URL")
-		os.Unsetenv("KRATOS_DOMAIN")
-		os.Unsetenv("PORT")
-	}()
-
 	tests := []struct {
-		name    string
-		want    *AuthConfig
-		wantErr bool
+		name          string
+		envVars       map[string]string
+		expectError   bool
+		expectedValue *AuthConfig
 	}{
 		{
-			name: "Valid Auth Config",
-			want: &AuthConfig{
-				PublicURL: "http://localhost:4433",
-				AdminURL:  "http://localhost:4434",
+			name: "valid configuration",
+			envVars: map[string]string{
+				"KRATOS_PUBLIC_URL": "http://public.example.com",
+				"KRATOS_ADMIN_URL":  "http://admin.example.com",
+				"KRATOS_DOMAIN":     "example.com",
+				"PORT":              "8080",
+			},
+			expectError: false,
+			expectedValue: &AuthConfig{
+				PublicURL: "http://public.example.com",
+				AdminURL:  "http://admin.example.com",
 				Domain:    "example.com",
 				Port:      "8080",
 				College: CollegeConfig{
@@ -38,21 +31,82 @@ func TestLoadAuthConfig(t *testing.T) {
 					AllowedRoles:        []string{"admin", "faculty", "student"},
 				},
 			},
-			wantErr: false,
+		},
+		{
+			name: "missing public URL",
+			envVars: map[string]string{
+				"KRATOS_ADMIN_URL": "http://admin.example.com",
+				"KRATOS_DOMAIN":    "example.com",
+				"PORT":             "8080",
+			},
+			expectError: true,
+		},
+		{
+			name: "missing admin URL",
+			envVars: map[string]string{
+				"KRATOS_PUBLIC_URL": "http://public.example.com",
+				"KRATOS_DOMAIN":     "example.com",
+				"PORT":              "8080",
+			},
+			expectError: true,
+		},
+		{
+			name: "optional fields can be empty",
+			envVars: map[string]string{
+				"KRATOS_PUBLIC_URL": "http://public.example.com",
+				"KRATOS_ADMIN_URL":  "http://admin.example.com",
+			},
+			expectError: false,
+			expectedValue: &AuthConfig{
+				PublicURL: "http://public.example.com",
+				AdminURL:  "http://admin.example.com",
+				College: CollegeConfig{
+					RequireVerification: true,
+					AllowedRoles:        []string{"admin", "faculty", "student"},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := LoadAuthConfig()
+			// Clear environment before each test
+			os.Clearenv()
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("LoadAuthConfig() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			// Set environment variables for test
+			for k, v := range tt.envVars {
+				os.Setenv(k, v)
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LoadAuthConfig() = %+v, want %+v", got, tt.want)
+			config, err := LoadAuthConfig()
+
+			if tt.expectError && err == nil {
+				t.Error("expected error but got none")
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+
+			if !tt.expectError && tt.expectedValue != nil {
+				if config.PublicURL != tt.expectedValue.PublicURL {
+					t.Errorf("expected PublicURL %s, got %s", tt.expectedValue.PublicURL, config.PublicURL)
+				}
+				if config.AdminURL != tt.expectedValue.AdminURL {
+					t.Errorf("expected AdminURL %s, got %s", tt.expectedValue.AdminURL, config.AdminURL)
+				}
+				if config.Domain != tt.expectedValue.Domain {
+					t.Errorf("expected Domain %s, got %s", tt.expectedValue.Domain, config.Domain)
+				}
+				if config.Port != tt.expectedValue.Port {
+					t.Errorf("expected Port %s, got %s", tt.expectedValue.Port, config.Port)
+				}
+				if config.College.RequireVerification != tt.expectedValue.College.RequireVerification {
+					t.Errorf("expected RequireVerification %v, got %v", tt.expectedValue.College.RequireVerification, config.College.RequireVerification)
+				}
+				if len(config.College.AllowedRoles) != len(tt.expectedValue.College.AllowedRoles) {
+					t.Errorf("expected AllowedRoles length %d, got %d", len(tt.expectedValue.College.AllowedRoles), len(config.College.AllowedRoles))
+				}
 			}
 		})
 	}

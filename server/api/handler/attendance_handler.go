@@ -103,7 +103,7 @@ func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	collegeID, err := helpers.ExtractCollegeID(c)
-	studentID, err := helpers.ExtractStudentID(c)
+	studentID, err := helpers.GetIDFromParam(c, "studentID")
 	if err != nil {
 		return helpers.Error(c, "invalid studentID", 400)
 	}
@@ -141,14 +141,14 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 	return helpers.Success(c, attendance, 200)
 }
 
-func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
+// func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
+// return c.JSON()
+// }
 
-}
+// func (a *AttendanceHandler) GetCourseAttendanceReport(c echo.Context) error {
 
-func (a *AttendanceHandler) GetCourseAttendanceReport(c echo.Context) error {
+// }
 
-}
+// func (a *AttendanceHandler) GetStudentAttendanceReport(c echo.Context) error {
 
-func (a *AttendanceHandler) GetStudentAttendanceReport(c echo.Context) error {
-
-}
+// }
