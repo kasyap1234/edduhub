@@ -29,9 +29,13 @@ func TestCreateEnrollment(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestIsStudentEnrolled(t *testing.T){
-	ctx :=context.Background()
+func TestIsStudentEnrolled(t *testing.T) {
+	ctx := context.Background()
 	mockRepo := new(mocks.EnrollmentRepository)
-	mockRepo.On("IsStudentEnrolled",ctx).Return(true,nil)
-	ok := mockRepo.IsStudentEnrolled()
+	mockRepo.On("IsStudentEnrolled", ctx,1,2,3).Return(true, nil)
+	ok, err := mockRepo.IsStudentEnrolled(ctx, 1, 2, 3)
+	assert.NoError(t, err)
+	assert.Equal(t, ok, true)
+	mockRepo.AssertExpectations(t)
+
 }
