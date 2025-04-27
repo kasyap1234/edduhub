@@ -64,4 +64,5 @@ func TestCreateStudent(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-// Add more unit tests for other methods
+// Add more unit tests for other methods like table driven test cases 
+
