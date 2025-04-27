@@ -38,7 +38,7 @@ type Courses struct {
 
 // Subjects represents the courses a student is enrolled in
 type Subjects struct {
-	Current  Courses `json:"current"`  // Currently enrolled courses
+	Current Courses `json:"current"`  // Currently enrolled courses
 	Previous Courses `json:"previous"` // Previously completed courses
 	Optional Courses `json:"optional"` // Optional/elective courses
 }
