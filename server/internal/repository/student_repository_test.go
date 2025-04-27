@@ -4,28 +4,44 @@ import (
 	"context"
 	"eduhub/server/internal/models"
 	"eduhub/server/mocks"
-
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFindByKratosID(t *testing.T) {
+	// Arrange
 	ctx := context.Background()
 	mockRepo := new(mocks.StudentRepository)
 	kratosID := "123"
-	student := &models.Student{}
-	mockRepo.On("FindByKratosID", ctx, kratosID).Return(student, nil)
+	expectedStudent := &models.Student{
+		StudentID:        1,
+		KratosIdentityID: kratosID,
+		CollegeID:        3,
+		RollNo:           "SE20UARI73",
+		Batch:            2020,
+		Year:             5,
+		Sem:              2,
+		IsActive:         true,
+	}
+
+	// Mock the repository method
+	mockRepo.On("FindByKratosID", ctx, kratosID).Return(expectedStudent, nil)
+
+	// Act
 	result, err := mockRepo.FindByKratosID(ctx, kratosID)
-	assert.NoError(t, err)
-	assert.Equal(t, student, result)
+
+	// Assert
+	assert.NoError(t, err, "Expected no error when finding student by Kratos ID")
+	assert.Equal(t, expectedStudent, result, "Expected the returned student to match the mock")
 	mockRepo.AssertExpectations(t)
 }
 
 func TestCreateStudent(t *testing.T) {
+	// Arrange
 	ctx := context.Background()
 	mockRepo := new(mocks.StudentRepository)
-	student := &models.Student{
+	newStudent := &models.Student{
 		StudentID:        1,
 		KratosIdentityID: "identity",
 		CollegeID:        3,
@@ -36,9 +52,15 @@ func TestCreateStudent(t *testing.T) {
 		Subjects:         models.Subjects{Current: models.Courses{Items: []*models.Course{}}},
 		IsActive:         true,
 	}
-	mockRepo.On("CreateStudent", ctx, student).Return(nil)
-	err := mockRepo.CreateStudent(ctx, student)
-	assert.NoError(t, err)
+
+	// Mock the repository method
+	mockRepo.On("CreateStudent", ctx, newStudent).Return(nil)
+
+	// Act
+	err := mockRepo.CreateStudent(ctx, newStudent)
+
+	// Assert
+	assert.NoError(t, err, "Expected no error when creating a new student")
 	mockRepo.AssertExpectations(t)
 }
 
