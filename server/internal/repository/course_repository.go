@@ -29,7 +29,7 @@ func (c *courseRepository) CreateCourse(ctx context.Context, course *models.Cour
 	query := c.DB.SQ.Insert("course").Columns("ID", "Name", "Description", "Credits", "InstructorID").Values(course.ID, course.Name, course.Description, course.Credits, course.InstructorID).Suffix("RETURNING *")
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return fmt.Errorf("Create course query build error: %w", err)
+		return fmt.Errorf("create course query build error: %w", err)
 	}
 
 	var created_course *models.Course
@@ -50,7 +50,7 @@ func (c *courseRepository) FindCourseByID(ctx context.Context, courseID int) (*m
 
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("Find course by id query build error: %w", err)
+		return nil, fmt.Errorf("find course by id query build error: %w", err)
 	}
 
 	// Initialize the struct BEFORE scanning!

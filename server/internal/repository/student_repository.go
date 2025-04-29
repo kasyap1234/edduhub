@@ -89,7 +89,7 @@ func (s *studentRepository) CreateStudent(ctx context.Context, student *models.S
 	}
 
 	// Execute the query and scan the returned ID back into the struct
-	err = s.DB.Pool.QueryRow(ctx, sql, args...).Scan(&student.ID)
+	err = s.DB.Pool.QueryRow(ctx, sql, args...).Scan(&student.StudentID)
 	if err != nil {
 		return fmt.Errorf("CreateStudent: failed to execute query or scan ID: %w", err)
 	}
@@ -171,10 +171,10 @@ func (s *studentRepository) UpdateStudent(ctx context.Context, model *models.Stu
 		Set("college_id", model.CollegeID).
 		Set("kratos_identity_id", model.KratosIdentityID).
 		Set("enrollment_year", model.EnrollmentYear).
-		Set("roll_no", model.RollNo).       // Include new field
-		Set("is_active", model.IsActive).   // Include new field
-		Set("updated_at", model.UpdatedAt). // Update timestamp
-		Where(squirrel.Eq{"id": model.ID})  // Identify the record by ID
+		Set("roll_no", model.RollNo).             // Include new field
+		Set("is_active", model.IsActive).         // Include new field
+		Set("updated_at", model.UpdatedAt).       // Update timestamp
+		Where(squirrel.Eq{"id": model.StudentID}) // Identify the record by ID
 
 	sql, args, err := query.ToSql()
 	if err != nil {
@@ -190,7 +190,7 @@ func (s *studentRepository) UpdateStudent(ctx context.Context, model *models.Stu
 	// Optional: Check if a row was actually updated
 	if commandTag.RowsAffected() == 0 {
 		// You might want to return a specific error here if the ID wasn't found
-		return fmt.Errorf("UpdateStudent: no row updated for ID %d", model.ID)
+		return fmt.Errorf("UpdateStudent: no row updated for ID %d", model.StudentID)
 	}
 
 	return nil // Success

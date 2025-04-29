@@ -3,11 +3,11 @@ package config
 import (
 	"os"
 
-	"github.com/uptrace/bun"
+	"eduhub/server/internal/repository"
 )
 
 type Config struct {
-	DB         *bun.DB
+	DB         *repository.DB
 	DBConfig   *DBConfig
 	AuthConfig *AuthConfig
 	AppPort    string

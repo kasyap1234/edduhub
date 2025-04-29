@@ -12,7 +12,7 @@ type Handlers struct {
 	// fee handler
 	// attendance handler
 	Attendance *AttendanceHandler
-	System     *SystemHandler
+	// System     *SystemHandler
 }
 
 func NewHandlers(services *services.Services) *Handlers {
@@ -20,6 +20,6 @@ func NewHandlers(services *services.Services) *Handlers {
 		Auth:       NewAuthHandler(services.Auth),
 		Attendance: NewAttendanceHandler(services.Attendance),
 		// other handlers
-		System: NewSystemHandler(services.System),
+		// System: NewSystemHandler(services.System),
 	}
 }

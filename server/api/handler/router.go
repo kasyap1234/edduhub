@@ -9,8 +9,8 @@ import (
 
 func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 	// Public routes
-	e.GET("/health", a.System.HealthCheck)
-	e.GET("/docs/*", a.System.SwaggerDocs)
+	// e.GET("/health", a.System.HealthCheck)
+	// e.GET("/docs/*", a.System.SwaggerDocs)
 
 	// Register Swagger routes - make sure these are registered correctly
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

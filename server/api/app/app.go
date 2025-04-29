@@ -4,16 +4,16 @@ import (
 	"eduhub/server/api/handler"
 	"eduhub/server/internal/config"
 	"eduhub/server/internal/middleware"
+	"eduhub/server/internal/repository"
 	"eduhub/server/internal/services"
 
 	"github.com/labstack/echo/v4"
 	echomid "github.com/labstack/echo/v4/middleware"
-	"github.com/uptrace/bun"
 )
 
 type App struct {
 	e          *echo.Echo
-	db         *bun.DB
+	db         *repository.DB
 	config     *config.Config
 	services   *services.Services
 	handlers   *handler.Handlers

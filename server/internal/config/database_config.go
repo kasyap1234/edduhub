@@ -1,14 +1,15 @@
 package config
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"os"
 	"strconv"
 
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
+	"eduhub/server/internal/repository"
+
+	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type DBConfig struct {
@@ -52,21 +53,48 @@ func LoadDatabaseConfig() (*DBConfig, error) {
 	}, nil
 }
 
-func LoadDatabase() *bun.DB {
-	dbconfig, err := LoadDatabaseConfig()
+func LoadDatabase() *repository.DB {
+	dbConfig, err := LoadDatabaseConfig()
 	if err != nil {
-		fmt.Print("unabel to load database")
+		// It's generally better to return an error from LoadDatabase
+		// and handle panics at a higher level (e.g., main), but matching
+		// the original panic behavior.
+		panic(fmt.Errorf("failed to load database config: %w", err))
 	}
-	dsn := buildDSN(*dbconfig)
-	// dsn := "unix://user:pass@dbname/var/run/postgresql/.s.PGSQL.5432"
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 
-	db := bun.NewDB(sqldb, pgdialect.New())
-	return db
+	dsn := buildDSN(*dbConfig)
+
+	// Use a context with timeout for connection attempts in production
+	// For this example, using context.Background() as in original
+	pool, err := pgxpool.Connect(context.Background(), dsn)
+	if err != nil {
+		// Same note about panic vs return error applies
+		panic(fmt.Errorf("failed to connect to database: %w", err))
+	}
+
+	// ping the database to ensure the connection is healthy
+	err = pool.Ping(context.Background())
+	if err != nil {
+		panic(fmt.Errorf("failed to ping database: %w", err))
+	}
+
+	sq := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	// --- Complete the return statement ---
+	return &repository.DB{
+		Pool: pool, // Assign the connected pool to the Pool field
+		SQ:   sq,   // Assign the squirrel builder to the SQ field
+	}
 }
 
 func buildDSN(config DBConfig) string {
-	return "postgres://" + config.User + ":" + config.Password +
-		"@" + config.Host + ":" + config.Port + "/" +
-		config.DBName + "?sslmode=" + config.SSLMode
+	// Using fmt.Sprintf is often cleaner for DSN construction
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		config.User,
+		config.Password,
+		config.Host,
+		config.Port,
+		config.DBName,
+		config.SSLMode,
+	)
 }
