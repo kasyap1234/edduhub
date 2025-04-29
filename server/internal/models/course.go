@@ -4,16 +4,16 @@ import "time"
 
 // Course represents an individual course/subject
 type Course struct {
-	ID          int       `db:"id" json:"id"`
-	Name        string    `db:"name" json:"name"`
-	Description string    `db:"description" json:"description"`
-	Credits     int       `db:"credits" json:"credits"`
-	InstructorID int      `db:"instructor_id" json:"instructor_id"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
-	
+	ID           int       `db:"id" json:"id"`
+	Name         string    `db:"name" json:"name"`
+	Description  string    `db:"description" json:"description"`
+	Credits      int       `db:"credits" json:"credits"`
+	InstructorID int       `db:"instructor_id" json:"instructor_id"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
+
 	// Relations - not stored in DB
-	Instructor  *User     `db:"-" json:"instructor,omitempty"`
+	Instructor  *User         `db:"-" json:"instructor,omitempty"`
 	Enrollments []*Enrollment `db:"-" json:"enrollments,omitempty"`
 }
 

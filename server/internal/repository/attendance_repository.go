@@ -41,12 +41,17 @@ type attendanceRepository struct {
 //     LectureID int       `db:"lecture_id"`
 // }
 
+func NewAttendanceRepository(DB *DB) AttendanceRepository {
+	return &attendanceRepository{
+		DB: DB,
+	}
+}
+
 func (a *attendanceRepository) GetAttendanceByCourse(
 	ctx context.Context,
 	collegeID int,
 	courseID int,
 ) ([]*models.Attendance, error) {
-
 	// Define the table name (assuming it's "attendance")
 	const attendanceTable = "attendance"
 
@@ -79,7 +84,6 @@ func (a *attendanceRepository) GetAttendanceByCourse(
 	attendances := []*models.Attendance{}
 
 	err = pgxscan.Select(ctx, a.DB.Pool, &attendances, sql, args...) // Pass the address of the slice
-
 	if err != nil {
 		// pgxscan.Select returns nil error and an empty slice if no rows are found.
 		// So, an error here typically indicates a problem with query execution or scanning errors during iteration.
@@ -135,7 +139,6 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 	// It's a good check, but often just checking for nil error is sufficient for "success".
 	// Given the bool return, let's return true if at least one row was affected.
 	return commandTag.RowsAffected() > 0, nil
-
 }
 
 func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error {
@@ -155,7 +158,6 @@ func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID i
 	}
 	if commandTag.RowsAffected() == 0 {
 		return fmt.Errorf("did not update attendance")
-
 	}
 	return nil
 }
@@ -183,5 +185,97 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 		return nil, fmt.Errorf("failed to execute getAttendanceStudentINCourse")
 	}
 	return attendances, nil
+}
 
+func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error) {
+	// Build the SELECT query for multiple rows
+	query := a.DB.SQ.Select(
+		"id", "student_id", "course_id", "college_id",
+		"date", "status", "scanned_at", "lecture_id",
+	).
+		From(attendanceTable).
+		Where(squirrel.Eq{
+			"college_id": collegeID,
+			"student_id": studentID,
+		}).
+		OrderBy("date ASC", "course_id ASC", "scanned_at ASC") // Optional: Add ordering
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("GetAttendanceStudent: failed to build query: %w", err)
+	}
+
+	attendances := []*models.Attendance{} // Slice to hold results
+
+	// Use pgxscan.Select for multiple rows
+	err = pgxscan.Select(ctx, a.DB.Pool, &attendances, sql, args...)
+	if err != nil {
+		return nil, fmt.Errorf("GetAttendanceStudent: failed to execute query or scan: %w", err)
+	}
+
+	return attendances, nil // Returns slice (empty if no rows) and nil error on success
+}
+
+// GetAttendanceByLecture retrieves attendance records for a specific lecture.
+func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error) {
+	// Build the SELECT query for multiple rows
+	query := a.DB.SQ.Select(
+		"id", "student_id", "course_id", "college_id",
+		"date", "status", "scanned_at", "lecture_id",
+	).
+		From(attendanceTable).
+		Where(squirrel.Eq{
+			"college_id": collegeID,
+			"lecture_id": lectureID,
+			"course_id":  courseID, // Include courseID as per the interface, even if lectureID might be globally unique
+		}).
+		OrderBy("student_id ASC", "scanned_at ASC") // Optional: Add ordering
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("GetAttendanceByLecture: failed to build query: %w", err)
+	}
+
+	attendances := []*models.Attendance{} // Slice to hold results
+
+	// Use pgxscan.Select for multiple rows
+	err = pgxscan.Select(ctx, a.DB.Pool, &attendances, sql, args...)
+	if err != nil {
+		return nil, fmt.Errorf("GetAttendanceByLecture: failed to execute query or scan: %w", err)
+	}
+
+	return attendances, nil // Returns slice (empty if no rows) and nil error on success
+}
+
+// FreezeAttendance updates the status of all attendance records for a specific student to "Frozen".
+// This is a simple example; actual freezing logic might be more complex (e.g., only for past dates).
+func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID int, studentID int) error {
+	// Build the UPDATE query
+	query := a.DB.SQ.Update(attendanceTable).
+		Set("status", "Frozen"). // Set the status to "Frozen"
+		// Add other potential fields like freeze_date = now() if needed
+		Where(squirrel.Eq{ // Identify the records to freeze
+			"college_id": collegeID,
+			"student_id": studentID,
+		})
+		// Optional: Add a condition to only freeze records that aren't already frozen or finalized
+		// .Where(squirrel.NotEq{"status": "Frozen"})
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return fmt.Errorf("FreezeAttendance: failed to build query: %w", err)
+	}
+
+	// Execute the query
+	commandTag, err := a.DB.Pool.Exec(ctx, sql, args...)
+	if err != nil {
+		return fmt.Errorf("FreezeAttendance: failed to execute query: %w", err)
+	}
+
+	// Optional: Check if any rows were affected. Freezing might affect 0 rows
+	// if the student has no attendance records or they are already frozen.
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("unabel to freeze attendance")
+	}
+	return nil // Success
 }
