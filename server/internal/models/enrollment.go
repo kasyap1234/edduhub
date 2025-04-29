@@ -1,20 +1,19 @@
 package models
 
-import (
-	"time"
-
-	"github.com/uptrace/bun"
-)
+import "time"
 
 type Enrollment struct {
-	bun.BaseModel  `bun:"table:enrollments,alias:e"` // Added alias 'e'
-	ID             int                               `json:"id" bun:",pk,autoincrement"`
-	StudentID      int                               `json:"student_id" bun:"student_id,notnull"` // Foreign Key to students
-	CourseID       int                               `json:"course_id" bun:"course_id,notnull"`   // Foreign Key to courses
-	EnrollmentDate time.Time                         `json:"enrollment_date" bun:",default:current_timestamp"`
-	Status         string                            `json:"status" bun:"status,default:'active'"` // e.g., 'active', 'dropped', 'completed'
+	ID             int       `db:"id" json:"id"`
+	StudentID      int       `db:"student_id" json:"student_id"`
+	CourseID       int       `db:"course_id" json:"course_id"`
+	CollegeID      int       `db:"college_id" json:"course_id"`
+	EnrollmentDate time.Time `db:"enrollment_date" json:"enrollment_date"`
+	Status         string    `db:"status" json:"status"` // Active, Completed, Dropped
+	Grade          string    `db:"grade" json:"grade,omitempty"`
+	CreatedAt      time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt      time.Time `db:"updated_at" json:"updated_at"`
 
-	// --- Relationships ---
-	Student *Student `json:"student,omitempty" bun:"rel:belongs-to,join:student_id=student_id"`
-	Course  *Course  `json:"course,omitempty" bun:"rel:belongs-to,join:course_id=id"`
+	// Relations - not stored in DB
+	Student *Student `db:"-" json:"student,omitempty"`
+	Course  *Course  `db:"-" json:"course,omitempty"`
 }
