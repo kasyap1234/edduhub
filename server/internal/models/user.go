@@ -1,10 +1,18 @@
+// filepath: /home/tgt/Desktop/edduhub/server/internal/models/user.go
 package models
 
-type User struct {
-	ID int `json:"ID" bun:"id,autoincrement"`
+import "time"
 
-	Name     string   `json:"name" bun:"name"`
-	Role     string   `json:"role" bun:"role"`
-	Student  *Student `bun:"rel:has-one,join:id=user_id,nullzero"`
-	IsActive bool     `bun:"is_active"`
+type User struct {
+	ID              int       `db:"id" json:"id"`
+	Name            string    `db:"name" json:"name"`
+	Role            string    `db:"role" json:"role"`
+	Email           string    `db:"email" json:"email"`
+	KratosIdentityID string   `db:"kratos_identity_id" json:"kratos_identity_id"`
+	IsActive        bool      `db:"is_active" json:"is_active"`
+	CreatedAt       time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
+	
+	// Relations - not stored in DB
+	Student         *Student  `db:"-" json:"student,omitempty"`
 }

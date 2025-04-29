@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
+	"eduhub/server/internal/testutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,38 +14,12 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
-func setupTestDB(t *testing.T) *bun.DB {
-	// Connect to the test database
-	dsn := "postgres://user:password@localhost:5432/testdb?sslmode=disable"
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-	db := bun.NewDB(sqldb, pgdialect.New())
 
-	// Create the students table
-	_, err := db.Exec(`
-        CREATE TABLE IF NOT EXISTS students (
-            student_id SERIAL PRIMARY KEY,
-            kratos_identity_id TEXT NOT NULL,
-            college_id INTEGER,
-            roll_no TEXT,
-            batch INTEGER,
-            year INTEGER,
-            sem INTEGER,
-            is_active BOOLEAN
-        )
-    `)
-	assert.NoError(t, err)
-
-	// Truncate the table before each test
-	_, err = db.Exec("TRUNCATE TABLE students RESTART IDENTITY")
-	assert.NoError(t, err)
-
-	return db
-}
 
 func TestFindByKratosID(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
-	db := setupTestDB(t)
+	db := testutil.SetupTestDB(t)
 	defer db.Close()
 
 	studentRepo := repository.NewBaseRepository[models.Student](db)
@@ -109,7 +84,7 @@ func TestFindByKratosID(t *testing.T) {
 func TestCreateStudent(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
-	db := setupTestDB(t)
+	db := testutil.SetupTestDB(t)
 	defer db.Close()
 
 	studentRepo := repository.NewBaseRepository[models.Student](db)

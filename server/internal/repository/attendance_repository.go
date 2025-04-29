@@ -2,8 +2,14 @@ package repository
 
 import (
 	"context"
+	"fmt" // Import fmt for better error wrapping
+	"time"
 
-	"eduhub/server/internal/models"
+	// Assuming models.Attendance uses time.Time
+	"eduhub/server/internal/models" // Your models package
+
+	"github.com/Masterminds/squirrel"
+	"github.com/georgysavva/scany/pgxscan" // Import pgxscan
 )
 
 type AttendanceRepository interface {
@@ -17,98 +23,165 @@ type AttendanceRepository interface {
 	// ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
 }
 
+const attendanceTable = "attendance"
+
 type attendanceRepository struct {
-	db DatabaseRepository[models.Attendance]
+	DB *DB // Assuming DB struct is accessible here
 }
 
-func NewAttendanceRepository(db DatabaseRepository[models.Attendance]) AttendanceRepository {
-	return &attendanceRepository{
-		db: db,
-	}
-}
+// Assuming models.Attendance struct with db tags is defined in models package:
+// type Attendance struct {
+//     ID        int       `db:"id"`
+//     StudentID int       `db:"student_id"`
+//     CourseID  int       `db:"course_id"`
+//     CollegeID int       `db:"college_id"`
+//     Date      time.Time `db:"date"`
+//     Status    string    `db:"status"`
+//     ScannedAt time.Time `db:"scanned_at"`
+//     LectureID int       `db:"lecture_id"`
+// }
 
-// mark attendance
+func (a *attendanceRepository) GetAttendanceByCourse(
+	ctx context.Context,
+	collegeID int,
+	courseID int,
+) ([]*models.Attendance, error) {
 
-func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error) {
-	attendance := &models.Attendance{
-		CollegeID: collegeID,
-		StudentID: studentID,
-		CourseID:  courseID,
-		LectureID: lectureID,
-	}
-	err := a.db.Create(ctx, attendance)
+	// Define the table name (assuming it's "attendance")
+	const attendanceTable = "attendance"
+
+	// Build the SELECT query
+	query := a.DB.SQ.Select(
+		"id", // Use database column names matching struct tags
+		"student_id",
+		"course_id",
+		"college_id",
+		"date",
+		"status",
+		"scanned_at",
+		"lecture_id",
+	).
+		From(attendanceTable). // Specify the table
+		Where(squirrel.Eq{     // Use WHERE to filter
+			// Use database column names matching struct tags
+			"college_id": collegeID,
+			"course_id":  courseID,
+		})
+
+	sql, args, err := query.ToSql()
 	if err != nil {
-		return false, err
+		// Use fmt.Errorf to wrap the original error for better debugging
+		return nil, fmt.Errorf("GetAttendanceByCourse: failed to build query: %w", err)
 	}
-	return true, nil
-}
 
-// to update student attendance for a single lecture in a course
-func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error {
-	attendance, err := a.db.FindOne(ctx, "college_id=? AND student_id = ? AND course_id=? AND lecture_id=?", collegeID, studentID, courseID, lectureID)
+	// Slice to hold the results (pgxscan.Select will append to this)
+	// Initialize as an empty slice
+	attendances := []*models.Attendance{}
+
+	err = pgxscan.Select(ctx, a.DB.Pool, &attendances, sql, args...) // Pass the address of the slice
+
 	if err != nil {
-		return err
+		// pgxscan.Select returns nil error and an empty slice if no rows are found.
+		// So, an error here typically indicates a problem with query execution or scanning errors during iteration.
+		return nil, fmt.Errorf("GetAttendanceByCourse: failed to execute query or scan: %w", err) // Wrap the original error
 	}
-	attendance.Status = status
-	return a.db.Update(ctx, attendance)
-}
 
-// to get attendance of student in a course a course is a series of lectures wil give student attendance for the entire course for example student 1 has attendance for lecture 1 and lecture2 of course 1
-
-func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
-	attendances, err := a.db.FindWhere(ctx, "college_id=? AND student_id=? AND course_id=?", collegeID, studentID, courseID)
-	if err != nil {
-		return nil, err
-	}
+	// If no error occurred, attendances will contain the results (or be an empty slice if no rows matched)
 	return attendances, nil
 }
 
-// to get attendance of student across all courses and lectures
-func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, collegeID, studentID int) ([]*models.Attendance, error) {
-	records, err := a.db.FindWhere(ctx, "student_id = ? AND college_id=?", studentID, collegeID)
+func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID int, lectureID int) (bool, error) {
+	now := time.Now()
+	// Truncate date for the 'date' column if you only store the date part
+	attendanceDate := now.Truncate(24 * time.Hour)
+
+	// This query attempts to insert a record.
+	// If a record for the same student, course, lecture, and date already exists,
+	// it updates the scanned_at timestamp. This is a common "upsert" pattern.
+	query := a.DB.SQ.Insert(attendanceTable).
+		Columns(
+			"student_id",
+			"course_id",
+			"college_id",
+			"lecture_id",
+			"date",
+			"status", // Initial status, e.g., "Present"
+			"scanned_at",
+		).
+		Values(
+			studentID,
+			courseID,
+			collegeID,
+			lectureID,
+			attendanceDate,
+			"Present", // Default status when marked
+			now,
+		).
+		Suffix(`ON CONFLICT (student_id, course_id, lecture_id, date, college_id)
+              DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`) // Update scan time and status on conflict
+
+	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, err
+		return false, fmt.Errorf("MarkAttendance: failed to build query: %w", err)
 	}
-	return records, nil
+
+	// Execute the query (Exec is used for INSERT/UPDATE/DELETE)
+	commandTag, err := a.DB.Pool.Exec(ctx, sql, args...)
+	if err != nil {
+		return false, fmt.Errorf("MarkAttendance: failed to execute query: %w", err)
+	}
+
+	// commandTag.RowsAffected() will be 1 if a row was inserted or updated.
+	// It's a good check, but often just checking for nil error is sufficient for "success".
+	// Given the bool return, let's return true if at least one row was affected.
+	return commandTag.RowsAffected() > 0, nil
+
 }
 
-func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, collegeID, courseID int, lectureID int) ([]*models.Attendance, error) {
-	records, err := a.db.FindWhere(ctx, "course_id=? AND lecture_id=? AND college_id=?", courseID, lectureID, collegeID)
+func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error {
+	query := a.DB.SQ.Update(attendanceTable).From(attendanceTable).Set("status", status).Where(squirrel.Eq{
+		"college_id": collegeID,
+		"student_id": studentID,
+		"course_id":  courseID,
+		"lecture_id": lectureID,
+	})
+	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("failed to build query")
 	}
-	return records, nil
+	commandTag, err := a.DB.Pool.Exec(ctx, sql, args...)
+	if err != nil {
+		return fmt.Errorf("failed to query update attendance")
+	}
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("did not update attendance")
+
+	}
+	return nil
 }
 
-// attendance of all students in a course
-
-func (a *attendanceRepository) GetAttendanceByCourse(ctx context.Context, collegeID, courseID int) ([]*models.Attendance, error) {
-	records, err := a.db.FindWhere(ctx, "college_id=? AND course_id=?", collegeID, courseID)
+func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
+	attendances := []*models.Attendance{}
+	query := a.DB.SQ.Select("id", // Use database column names matching struct tags
+		"student_id",
+		"course_id",
+		"college_id",
+		"date",
+		"status",
+		"scanned_at",
+		"lecture_id").From(attendanceTable).Where(squirrel.Eq{
+		"college_id": collegeID,
+		"student_id": studentID,
+		"course_id":  courseID,
+	}).OrderBy("scanned_at ASC")
+	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unabel to build query ")
 	}
-	return records, nil
-}
-
-func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID, studentID int) error {
-	student, err := a.db.FindOne(ctx, "college_id=? AND student_id=?", collegeID, studentID)
-	if err != nil {
-		return err
+	sqlErr := pgxscan.Select(ctx, a.DB.Pool, &attendances, sql, args...)
+	if sqlErr != nil {
+		return nil, fmt.Errorf("failed to execute getAttendanceStudentINCourse")
 	}
-	student.Status = "FREEZED"
-	return a.db.Update(ctx, student)
-}
+	return attendances, nil
 
-// func(a*attendanceRepository)ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error){
-// 	attendance := &models.Attendance{
-// 		CollegeID: collegeID,
-// 		StudentID: studentID,
-// 		CourseID:  courseID,
-// 		LectureID: lectureID,
-// 	}
-// 	err := a.db.Create(ctx, attendance)
-// 	if err != nil {
-// 		return false, err
-// 	}
-// 	return true, nil
-// }
+}

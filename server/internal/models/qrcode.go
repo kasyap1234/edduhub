@@ -1,19 +1,17 @@
 package models
 
-import (
-	"time"
-
-	"github.com/uptrace/bun"
-)
+import "time"
 
 type QRCode struct {
-	bun.BaseModel `bun:"table:qrcodes"`
-	ID            int       `bun:",pk,autoincrement"`
-	Code          string    `json:"code"`
-	ExpiresAt     time.Time `json:"expires_at"`
-}
+	ID        int       `db:"id" json:"id"`
+	StudentID int       `db:"student_id" json:"student_id"`
+	QRCodeID  string    `db:"qr_code_id" json:"qr_code_id"`
+	IssuedAt  time.Time `db:"issued_at" json:"issued_at"`
+	ExpiresAt time.Time `db:"expires_at" json:"expires_at"`
+	IsActive  bool      `db:"is_active" json:"is_active"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 
-type AttendanceRequest struct {
-	StudentID int    `json:"student_id"`
-	QRCodeID  string `json:"qr_code_id"`
+	// Relations - not stored in DB
+	Student *Student `db:"-" json:"student,omitempty"`
 }
