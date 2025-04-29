@@ -57,7 +57,7 @@ func (a *attendanceRepository) GetAttendanceByCourse(
 
 	// Build the SELECT query
 	query := a.DB.SQ.Select(
-		"id", // Use database column names matching struct tags
+		
 		"student_id",
 		"course_id",
 		"college_id",
@@ -140,9 +140,9 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 	// Given the bool return, let's return true if at least one row was affected.
 	return commandTag.RowsAffected() > 0, nil
 }
-
 func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error {
-	query := a.DB.SQ.Update(attendanceTable).From(attendanceTable).Set("status", status).Where(squirrel.Eq{
+	query := a.DB.SQ.Update(attendanceTable). 
+							Set("status", status).Where(squirrel.Eq{
 		"college_id": collegeID,
 		"student_id": studentID,
 		"course_id":  courseID,
@@ -150,21 +150,21 @@ func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID i
 	})
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return fmt.Errorf("failed to build query")
+		return fmt.Errorf("UpdateAttendance: failed to build query: %w", err) // Wrap error
 	}
 	commandTag, err := a.DB.Pool.Exec(ctx, sql, args...)
 	if err != nil {
-		return fmt.Errorf("failed to query update attendance")
+		return fmt.Errorf("UpdateAttendance: failed to execute query: %w", err) // Wrap error
 	}
 	if commandTag.RowsAffected() == 0 {
-		return fmt.Errorf("did not update attendance")
+		return fmt.Errorf("did not update attendance") // Keep specific error for no rows affected
 	}
 	return nil
 }
 
 func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
 	attendances := []*models.Attendance{}
-	query := a.DB.SQ.Select("id", // Use database column names matching struct tags
+	query := a.DB.SQ.Select(// Use database column names matching struct tags
 		"student_id",
 		"course_id",
 		"college_id",
@@ -178,11 +178,12 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 	}).OrderBy("scanned_at ASC")
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("unabel to build query ")
+		return nil, fmt.Errorf("GetAttendanceStudentInCourse: unable to build query: %w", err) // Wrap error
 	}
 	sqlErr := pgxscan.Select(ctx, a.DB.Pool, &attendances, sql, args...)
 	if sqlErr != nil {
-		return nil, fmt.Errorf("failed to execute getAttendanceStudentINCourse")
+		// Wrap the specific pgxscan error
+		return nil, fmt.Errorf("GetAttendanceStudentInCourse: failed to execute query or scan: %w", sqlErr)
 	}
 	return attendances, nil
 }
@@ -190,7 +191,7 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error) {
 	// Build the SELECT query for multiple rows
 	query := a.DB.SQ.Select(
-		"id", "student_id", "course_id", "college_id",
+		 "student_id", "course_id", "college_id",
 		"date", "status", "scanned_at", "lecture_id",
 	).
 		From(attendanceTable).
@@ -220,7 +221,7 @@ func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, college
 func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error) {
 	// Build the SELECT query for multiple rows
 	query := a.DB.SQ.Select(
-		"id", "student_id", "course_id", "college_id",
+		 "student_id", "course_id", "college_id",
 		"date", "status", "scanned_at", "lecture_id",
 	).
 		From(attendanceTable).

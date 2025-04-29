@@ -1,6 +1,8 @@
 # mockery install 
 brew install mockery 
 go install github.com/vektra/mockery/v3@v3.2.4
+or use v2 if getting error --all 
+
 # mockery update 
 brew upgrade mockery 
 

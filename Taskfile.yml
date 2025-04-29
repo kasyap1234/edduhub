@@ -75,7 +75,7 @@ tasks:
   mocks:
     desc: Generate mocks for all interfaces using mockery
     cmds:
-      - mockery --all --output=server/mocks --case=camel
+      - mockery 
 
   run:dev:
     desc: Run server with autoreload (requires air)
