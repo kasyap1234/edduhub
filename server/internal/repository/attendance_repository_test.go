@@ -41,13 +41,13 @@ func TestGetAttendanceByCourse(t *testing.T) {
 
 	// Define expected rows
 	rows := pgxmock.NewRows([]string{
-		"student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
+		"id", "student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
 	}).
-		AddRow(101, 2, 1, time.Now(), "Present", time.Now(), 201).
-		AddRow(102, 2, 1, time.Now(), "Absent", time.Now(), 201)
+		AddRow(1, 101, 2, 1, time.Now(), "Present", time.Now(), 201).
+		AddRow(2, 102, 2, 1, time.Now(), "Absent", time.Now(), 201)
 
 	// Expect the query with specific arguments
-	mock.ExpectQuery(`SELECT  student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE`).
+	mock.ExpectQuery(`SELECT  id, student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE`).
 		WithArgs(collegeID, courseID).
 		WillReturnRows(rows)
 
@@ -74,7 +74,7 @@ func TestGetAttendanceByCourse_Error(t *testing.T) {
 	courseID := 2
 
 	// Simulate a database error
-	mock.ExpectQuery(`SELECT  student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE`).
+	mock.ExpectQuery(`SELECT  id, student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE`).
 		WithArgs(collegeID, courseID).
 		WillReturnError(errors.New("database error"))
 
@@ -90,6 +90,8 @@ func TestGetAttendanceByCourse_Error(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
+
+
 func TestMarkAttendance(t *testing.T) {
 	mock, _, repo, ctx := setupAttendanceTest(t)
 	defer mock.Close()
@@ -99,9 +101,11 @@ func TestMarkAttendance(t *testing.T) {
 	courseID := 2
 	lectureID := 201
 
-	// Expect the query with specific arguments (using a regex pattern since the exact SQL might vary)
-	mock.ExpectExec(`INSERT INTO attendance`).
-		WithArgs(studentID, courseID, collegeID, lectureID, pgxmock.AnyArg(), "Present", pgxmock.AnyArg()).
+	// Expect the INSERT query for the 7 columns we are providing.
+	// Use regex to match the generated SQL, escaping special characters.
+	// This regex matches the columns, values placeholders, and the ON CONFLICT clause.
+	mock.ExpectExec(`INSERT INTO attendance \(student_id, course_id, college_id, lecture_id, date, status, scanned_at\) VALUES \(\$1, \$2, \$3, \$4, \$5, \$6, \$7\) ON CONFLICT \(student_id, course_id, lecture_id, date, college_id\) DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`).
+		WithArgs(studentID, courseID, collegeID, lectureID, pgxmock.AnyArg(), "Present", pgxmock.AnyArg()). // 7 Args, matching the VALUES
 		WillReturnResult(pgxmock.NewResult("INSERT", 1))
 
 	// Call the method
@@ -124,9 +128,9 @@ func TestMarkAttendance_Error(t *testing.T) {
 	courseID := 2
 	lectureID := 201
 
-	// Simulate a database error
-	mock.ExpectExec(`INSERT INTO attendance`).
-		WithArgs(studentID, courseID, collegeID, lectureID, pgxmock.AnyArg(), "Present", pgxmock.AnyArg()).
+	// Simulate a database error using the same refined regex pattern
+	mock.ExpectExec(`INSERT INTO attendance \(student_id, course_id, college_id, lecture_id, date, status, scanned_at\) VALUES \(\$1, \$2, \$3, \$4, \$5, \$6, \$7\) ON CONFLICT \(student_id, course_id, lecture_id, date, college_id\) DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`).
+		WithArgs(studentID, courseID, collegeID, lectureID, pgxmock.AnyArg(), "Present", pgxmock.AnyArg()). // 7 Args
 		WillReturnError(errors.New("database error"))
 
 	// Call the method
@@ -136,10 +140,11 @@ func TestMarkAttendance_Error(t *testing.T) {
 	assert.Error(t, err)
 	assert.False(t, success)
 	assert.Contains(t, err.Error(), "failed to execute query")
-
+// 
 	// Ensure all expectations were met
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
 
 func TestUpdateAttendance(t *testing.T) {
 	mock, _, repo, ctx := setupAttendanceTest(t)
@@ -205,10 +210,10 @@ func TestGetAttendanceStudentInCourse(t *testing.T) {
 
 	// Define expected rows (without 'id')
 	rows := pgxmock.NewRows([]string{
-		"student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
+		"id", "student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
 	}).
-		AddRow(studentID, courseID, collegeID, time.Now(), "Present", time.Now(), 201).
-		AddRow(studentID, courseID, collegeID, time.Now().Add(24*time.Hour), "Absent", time.Now().Add(24*time.Hour), 202)
+		AddRow(1,studentID, courseID, collegeID, time.Now(), "Present", time.Now(), 201).
+		AddRow(2,studentID, courseID, collegeID, time.Now().Add(24*time.Hour), "Absent", time.Now().Add(24*time.Hour), 202)
 
 	// Expect the query matching the actual WHERE clause order and argument order
 	mock.ExpectQuery(`SELECT student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND student_id = \$3 ORDER BY scanned_at ASC`). // Correct WHERE clause order
@@ -239,7 +244,7 @@ func TestGetAttendanceStudent(t *testing.T) {
 
 	// Define expected rows (without 'id')
 	rows := pgxmock.NewRows([]string{
-		"student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
+		"id", "student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
 	}).
 		AddRow(studentID, 2, collegeID, time.Now(), "Present", time.Now(), 201).
 		AddRow(studentID, 3, collegeID, time.Now(), "Absent", time.Now(), 301)
@@ -271,12 +276,12 @@ func TestGetAttendanceByLecture(t *testing.T) {
 	lectureID := 201
 	courseID := 2
 
-	// Define expected rows (without 'id')
+
 	rows := pgxmock.NewRows([]string{
-		"student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
+		"id", "student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
 	}).
-		AddRow(101, courseID, collegeID, time.Now(), "Present", time.Now(), lectureID).
-		AddRow(102, courseID, collegeID, time.Now(), "Absent", time.Now(), lectureID)
+		AddRow(1,101, courseID, collegeID, time.Now(), "Present", time.Now(), lectureID).
+		AddRow(2,102, courseID, collegeID, time.Now(), "Absent", time.Now(), lectureID)
 
 	// Expect the query matching the actual WHERE clause order and argument order
 	mock.ExpectQuery(`SELECT student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND lecture_id = \$3 ORDER BY student_id ASC, scanned_at ASC`). // Correct WHERE clause order

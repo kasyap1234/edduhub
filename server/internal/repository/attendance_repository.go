@@ -57,7 +57,7 @@ func (a *attendanceRepository) GetAttendanceByCourse(
 
 	// Build the SELECT query
 	query := a.DB.SQ.Select(
-		
+		"id",
 		"student_id",
 		"course_id",
 		"college_id",
@@ -104,6 +104,7 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 	// it updates the scanned_at timestamp. This is a common "upsert" pattern.
 	query := a.DB.SQ.Insert(attendanceTable).
 		Columns(
+
 			"student_id",
 			"course_id",
 			"college_id",
@@ -122,7 +123,7 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 			now,
 		).
 		Suffix(`ON CONFLICT (student_id, course_id, lecture_id, date, college_id)
-              DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`) // Update scan time and status on conflict
+              DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`)
 
 	sql, args, err := query.ToSql()
 	if err != nil {
@@ -141,8 +142,8 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 	return commandTag.RowsAffected() > 0, nil
 }
 func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error {
-	query := a.DB.SQ.Update(attendanceTable). 
-							Set("status", status).Where(squirrel.Eq{
+	query := a.DB.SQ.Update(attendanceTable).
+		Set("status", status).Where(squirrel.Eq{
 		"college_id": collegeID,
 		"student_id": studentID,
 		"course_id":  courseID,
@@ -164,7 +165,7 @@ func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID i
 
 func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
 	attendances := []*models.Attendance{}
-	query := a.DB.SQ.Select(// Use database column names matching struct tags
+	query := a.DB.SQ.Select("id", // Use database column names matching struct tags
 		"student_id",
 		"course_id",
 		"college_id",
@@ -191,7 +192,7 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error) {
 	// Build the SELECT query for multiple rows
 	query := a.DB.SQ.Select(
-		 "student_id", "course_id", "college_id",
+		"id", "student_id", "course_id", "college_id",
 		"date", "status", "scanned_at", "lecture_id",
 	).
 		From(attendanceTable).
@@ -221,7 +222,7 @@ func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, college
 func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error) {
 	// Build the SELECT query for multiple rows
 	query := a.DB.SQ.Select(
-		 "student_id", "course_id", "college_id",
+		"id", "student_id", "course_id", "college_id",
 		"date", "status", "scanned_at", "lecture_id",
 	).
 		From(attendanceTable).

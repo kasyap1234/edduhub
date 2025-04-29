@@ -3,7 +3,6 @@ package models
 import "time"
 
 type QRCode struct {
-	ID        int       `db:"id" json:"id"`
 	StudentID int       `db:"student_id" json:"student_id"`
 	QRCodeID  string    `db:"qr_code_id" json:"qr_code_id"`
 	IssuedAt  time.Time `db:"issued_at" json:"issued_at"`

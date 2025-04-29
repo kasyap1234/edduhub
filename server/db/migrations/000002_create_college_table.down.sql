@@ -1,0 +1,6 @@
+BEGIN;
+
+DROP INDEX IF EXISTS idx_colleges_name;
+DROP TABLE IF EXISTS colleges;
+
+COMMIT;
