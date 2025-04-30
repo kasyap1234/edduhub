@@ -6,6 +6,10 @@ vars:
   COVERAGE_INTEGRATION_OUT: coverage-integration.out
   COVERAGE_MERGED_OUT: coverage-merged.out
   COVERAGE_HTML_OUT: coverage.html
+  MIGRATE_PATH: /home/tgt/Desktop/edduhub/server/db/migrations
+  # Using TEST_DB_URL assuming this is for the test database based on the instructions
+  TEST_DB_URL: postgres://user:password@localhost:5432/testdb?sslmode=disable
+
 
 tasks:
   default:
@@ -97,3 +101,8 @@ tasks:
     desc: Generate Swagger OpenAPI docs (requires swag)
     cmds:
       - swag init -g server/main.go -o server/docs
+
+  migrate:up:
+    desc: "Apply database migrations to the test database"
+    cmds:
+      - migrate -path {{.MIGRATE_PATH}} -database {{.TEST_DB_URL}} up
