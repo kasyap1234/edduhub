@@ -8,6 +8,7 @@ import (
 	"eduhub/server/internal/models"
 
 	"github.com/jackc/pgx"
+	"github.com/georgysavva/scany/pgxscan" // Add pgxscan import
 )
 
 type CourseRepository interface {
@@ -60,13 +61,8 @@ func (c *courseRepository) FindCourseByID(ctx context.Context, courseID int) (*m
 	// Initialize the struct BEFORE scanning!
 	course := &models.Course{}
 
-	err = c.DB.Pool.QueryRow(ctx, sql, args...).Scan(
-		&course.ID,
-		&course.Name,
-		&course.Description,
-		&course.Credits,
-		&course.InstructorID,
-	)
+	// Use pgxscan.Get for consistency
+	err = pgxscan.Get(ctx, c.DB.Pool, course, sql, args...)
 	if err != nil {
 		// It's better to check for specific errors like "no rows"
 		if err == pgx.ErrNoRows { // Make sure you've imported "github.com/jackc/pgx/v4"
