@@ -10,6 +10,7 @@ type User struct {
 	Email            string    `db:"email" json:"email"`
 	KratosIdentityID string    `db:"kratos_identity_id" json:"kratos_identity_id"`
 	IsActive         bool      `db:"is_active" json:"is_active"`
+	// RollNo           string    `db:"roll_no" json:"roll_no"` // Removed from User model
 	CreatedAt        time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt        time.Time `db:"updated_at" json:"updated_at"`
 

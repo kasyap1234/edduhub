@@ -39,8 +39,8 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, user *models.User) error
 
 	UpdateUser(ctx context.Context, user *models.User) error
-	FreezeUser(ctx context.Context, rollNo string) error // Renamed param to match casing
-	DeleteUser(ctx context.Context, rollNo string) error // Renamed param to match casing
+	FreezeUserByID(ctx context.Context, userID int) error // Changed to operate on ID
+	DeleteUserByID(ctx context.Context, userID int) error // Changed to operate on ID
 	// Note: methods like GetUserByID would be useful here too
 }
 
@@ -77,8 +77,7 @@ func (u *userRepository) CreateUser(ctx context.Context, user *models.User) erro
 			"email",
 			"kratos_identity_id",
 			"is_active",
-			"roll_no", // Include the new field
-			"created_at",
+			"created_at", // Removed roll_no
 			"updated_at",
 		).
 		Values(
@@ -87,7 +86,7 @@ func (u *userRepository) CreateUser(ctx context.Context, user *models.User) erro
 			user.Email,
 			user.KratosIdentityID,
 			user.IsActive,
-
+			// user.RollNo, // Removed RollNo value
 			user.CreatedAt,
 			user.UpdatedAt,
 		).
@@ -120,8 +119,7 @@ func (u *userRepository) UpdateUser(ctx context.Context, model *models.User) err
 		Set("email", model.Email).
 		Set("kratos_identity_id", model.KratosIdentityID).
 		Set("is_active", model.IsActive).
-		// Include the roll_no field
-		Set("updated_at", model.UpdatedAt). // Update timestamp
+		Set("updated_at", model.UpdatedAt).       // Update timestamp (Removed roll_no)
 		Where(squirrel.Eq{"id": model.ID})  // Identify the record by ID
 
 	sql, args, err := query.ToSql()
@@ -145,14 +143,14 @@ func (u *userRepository) UpdateUser(ctx context.Context, model *models.User) err
 }
 
 // FreezeUser sets the IsActive status of a user to false based on their roll number.
-// This implementation updates directly by roll_no without fetching first.
-func (u *userRepository) FreezeUser(ctx context.Context, rollNo string) error {
+// This implementation updates directly by ID without fetching first.
+func (u *userRepository) FreezeUserByID(ctx context.Context, userID int) error {
 	// Build the UPDATE query
 	now := time.Now()
 	query := u.DB.SQ.Update(userTable).
 		Set("is_active", false).              // Set status to false
 		Set("updated_at", now).               // Update timestamp
-		Where(squirrel.Eq{"roll_no": rollNo}) // Identify the user by roll_no
+		Where(squirrel.Eq{"id": userID}) // Identify the user by ID
 
 	sql, args, err := query.ToSql()
 	if err != nil {
@@ -169,18 +167,18 @@ func (u *userRepository) FreezeUser(ctx context.Context, rollNo string) error {
 	// If freezing an already frozen user is okay, this check might not be strictly necessary
 	// depending on whether you need to know if a change *actually* happened.
 	if commandTag.RowsAffected() == 0 {
-		return fmt.Errorf("FreezeUser: user with roll number %s not found or already frozen", rollNo)
+		return fmt.Errorf("FreezeUserByID: user with ID %d not found or already frozen", userID)
 	}
 
 	return nil // Success
 }
 
 // DeleteUser deletes a user record based on their roll number.
-// This implementation deletes directly by roll_no without fetching first.
-func (u *userRepository) DeleteUser(ctx context.Context, rollNo string) error {
+// This implementation deletes directly by ID without fetching first.
+func (u *userRepository) DeleteUserByID(ctx context.Context, userID int) error {
 	// Build the DELETE query
 	query := u.DB.SQ.Delete(userTable).
-		Where(squirrel.Eq{"roll_no": rollNo}) // Identify the user by roll_no
+		Where(squirrel.Eq{"id": userID}) // Identify the user by ID
 
 	sql, args, err := query.ToSql()
 	if err != nil {
@@ -196,7 +194,7 @@ func (u *userRepository) DeleteUser(ctx context.Context, rollNo string) error {
 	// Optional: Check if a row was actually deleted
 	if commandTag.RowsAffected() == 0 {
 		// You might want to return an error if the user wasn't found by roll number
-		return fmt.Errorf("DeleteUser: user with roll number %s not found", rollNo)
+		return fmt.Errorf("DeleteUserByID: user with ID %d not found", userID)
 	}
 
 	return nil // Success
