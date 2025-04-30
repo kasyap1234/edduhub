@@ -90,8 +90,6 @@ func TestGetAttendanceByCourse_Error(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-
-
 func TestMarkAttendance(t *testing.T) {
 	mock, _, repo, ctx := setupAttendanceTest(t)
 	defer mock.Close()
@@ -140,11 +138,10 @@ func TestMarkAttendance_Error(t *testing.T) {
 	assert.Error(t, err)
 	assert.False(t, success)
 	assert.Contains(t, err.Error(), "failed to execute query")
-// 
+	//
 	// Ensure all expectations were met
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
-
 
 func TestUpdateAttendance(t *testing.T) {
 	mock, _, repo, ctx := setupAttendanceTest(t)
@@ -212,8 +209,8 @@ func TestGetAttendanceStudentInCourse(t *testing.T) {
 	rows := pgxmock.NewRows([]string{
 		"id", "student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
 	}).
-		AddRow(1,studentID, courseID, collegeID, time.Now(), "Present", time.Now(), 201).
-		AddRow(2,studentID, courseID, collegeID, time.Now().Add(24*time.Hour), "Absent", time.Now().Add(24*time.Hour), 202)
+		AddRow(1, studentID, courseID, collegeID, time.Now(), "Present", time.Now(), 201).
+		AddRow(2, studentID, courseID, collegeID, time.Now().Add(24*time.Hour), "Absent", time.Now().Add(24*time.Hour), 202)
 
 	// Expect the query matching the actual WHERE clause order and argument order
 	mock.ExpectQuery(`SELECT student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND student_id = \$3 ORDER BY scanned_at ASC`). // Correct WHERE clause order
@@ -276,12 +273,11 @@ func TestGetAttendanceByLecture(t *testing.T) {
 	lectureID := 201
 	courseID := 2
 
-
 	rows := pgxmock.NewRows([]string{
 		"id", "student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
 	}).
-		AddRow(1,101, courseID, collegeID, time.Now(), "Present", time.Now(), lectureID).
-		AddRow(2,102, courseID, collegeID, time.Now(), "Absent", time.Now(), lectureID)
+		AddRow(1, 101, courseID, collegeID, time.Now(), "Present", time.Now(), lectureID).
+		AddRow(2, 102, courseID, collegeID, time.Now(), "Absent", time.Now(), lectureID)
 
 	// Expect the query matching the actual WHERE clause order and argument order
 	mock.ExpectQuery(`SELECT student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND lecture_id = \$3 ORDER BY student_id ASC, scanned_at ASC`). // Correct WHERE clause order

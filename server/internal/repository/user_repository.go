@@ -119,7 +119,7 @@ func (u *userRepository) UpdateUser(ctx context.Context, model *models.User) err
 		Set("email", model.Email).
 		Set("kratos_identity_id", model.KratosIdentityID).
 		Set("is_active", model.IsActive).
-		Set("updated_at", model.UpdatedAt).       // Update timestamp (Removed roll_no)
+		Set("updated_at", model.UpdatedAt). // Update timestamp (Removed roll_no)
 		Where(squirrel.Eq{"id": model.ID})  // Identify the record by ID
 
 	sql, args, err := query.ToSql()
@@ -148,8 +148,8 @@ func (u *userRepository) FreezeUserByID(ctx context.Context, userID int) error {
 	// Build the UPDATE query
 	now := time.Now()
 	query := u.DB.SQ.Update(userTable).
-		Set("is_active", false).              // Set status to false
-		Set("updated_at", now).               // Update timestamp
+		Set("is_active", false).         // Set status to false
+		Set("updated_at", now).          // Update timestamp
 		Where(squirrel.Eq{"id": userID}) // Identify the user by ID
 
 	sql, args, err := query.ToSql()

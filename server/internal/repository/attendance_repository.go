@@ -104,7 +104,7 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 	// it updates the scanned_at timestamp. This is a common "upsert" pattern.
 	query := a.DB.SQ.Insert(attendanceTable).
 		Columns(
-			
+
 			"student_id",
 			"course_id",
 			"college_id",
@@ -114,7 +114,7 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 			"scanned_at",
 		).
 		Values(
-		
+
 			studentID,
 			courseID,
 			collegeID,
@@ -142,6 +142,7 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 	// Given the bool return, let's return true if at least one row was affected.
 	return commandTag.RowsAffected() > 0, nil
 }
+
 func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error {
 	query := a.DB.SQ.Update(attendanceTable).
 		Set("status", status).Where(squirrel.Eq{

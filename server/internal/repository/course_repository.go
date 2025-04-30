@@ -49,8 +49,8 @@ func (c *courseRepository) FindCourseByID(ctx context.Context, courseID int) (*m
 	// if they are different and you were using a scanning helper library.
 	// With pgxpool.QueryRow/Scan directly, the order and type must match.
 	query := c.DB.SQ.Select("ID", "Name", "Description", "Credits", "InstructorID"). // Select "ID" column
-		From("course").
-		Where("ID = ?", courseID) // Or use squirrel.Eq{"ID": courseID}
+												From("course").
+												Where("ID = ?", courseID) // Or use squirrel.Eq{"ID": courseID}
 
 	sql, args, err := query.ToSql()
 	if err != nil {
