@@ -26,14 +26,18 @@ func NewCourseRepository(db *DB) CourseRepository {
 }
 
 func (c *courseRepository) CreateCourse(ctx context.Context, course *models.Course) error {
-	query := c.DB.SQ.Insert("course").Columns("ID", "Name", "Description", "Credits", "InstructorID").Values(course.ID, course.Name, course.Description, course.Credits, course.InstructorID).Suffix("RETURNING *")
+	// Remove "ID" from Columns and course.ID from Values
+	// Change Suffix to "RETURNING id" to get only the generated ID
+	query := c.DB.SQ.Insert("course").
+		Columns("Name", "Description", "Credits", "InstructorID").
+		Values(course.Name, course.Description, course.Credits, course.InstructorID).
+		Suffix("RETURNING id")
 	sql, args, err := query.ToSql()
 	if err != nil {
 		return fmt.Errorf("create course query build error: %w", err)
 	}
 
-	var created_course *models.Course
-	err = c.DB.Pool.QueryRow(ctx, sql, args...).Scan(&created_course)
+	err = c.DB.Pool.QueryRow(ctx, sql, args...).Scan(&course.ID) // Scan the returned ID into the original course struct
 	if err != nil {
 		return errors.New("unable to create a course")
 	}
@@ -44,7 +48,7 @@ func (c *courseRepository) FindCourseByID(ctx context.Context, courseID int) (*m
 	// Ensure your model field names match the column names or use aliases
 	// if they are different and you were using a scanning helper library.
 	// With pgxpool.QueryRow/Scan directly, the order and type must match.
-	query := c.DB.SQ.Select("ID", "Name", "Description", "Credits", "InstructorID").
+	query := c.DB.SQ.Select("ID", "Name", "Description", "Credits", "InstructorID"). // Select "ID" column
 		From("course").
 		Where("ID = ?", courseID) // Or use squirrel.Eq{"ID": courseID}
 
