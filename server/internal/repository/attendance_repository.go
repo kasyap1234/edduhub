@@ -104,7 +104,7 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 	// it updates the scanned_at timestamp. This is a common "upsert" pattern.
 	query := a.DB.SQ.Insert(attendanceTable).
 		Columns(
-
+			
 			"student_id",
 			"course_id",
 			"college_id",
@@ -114,6 +114,7 @@ func (a *attendanceRepository) MarkAttendance(ctx context.Context, collegeID int
 			"scanned_at",
 		).
 		Values(
+		
 			studentID,
 			courseID,
 			collegeID,

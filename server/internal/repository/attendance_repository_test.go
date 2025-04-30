@@ -104,7 +104,7 @@ func TestMarkAttendance(t *testing.T) {
 	// Expect the INSERT query for the 7 columns we are providing.
 	// Use regex to match the generated SQL, escaping special characters.
 	// This regex matches the columns, values placeholders, and the ON CONFLICT clause.
-	mock.ExpectExec(`INSERT INTO attendance \(student_id, course_id, college_id, lecture_id, date, status, scanned_at\) VALUES \(\$1, \$2, \$3, \$4, \$5, \$6, \$7\) ON CONFLICT \(student_id, course_id, lecture_id, date, college_id\) DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`).
+	mock.ExpectExec(`INSERT INTO attendance \(student_id,course_id,college_id,lecture_id,date,status,scanned_at\) VALUES \(\$1,\$2,\$3,\$4,\$5,\$6,\$7\) ON CONFLICT \(student_id, course_id, lecture_id, date, college_id\) DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`).
 		WithArgs(studentID, courseID, collegeID, lectureID, pgxmock.AnyArg(), "Present", pgxmock.AnyArg()). // 7 Args, matching the VALUES
 		WillReturnResult(pgxmock.NewResult("INSERT", 1))
 
@@ -129,7 +129,7 @@ func TestMarkAttendance_Error(t *testing.T) {
 	lectureID := 201
 
 	// Simulate a database error using the same refined regex pattern
-	mock.ExpectExec(`INSERT INTO attendance \(student_id, course_id, college_id, lecture_id, date, status, scanned_at\) VALUES \(\$1, \$2, \$3, \$4, \$5, \$6, \$7\) ON CONFLICT \(student_id, course_id, lecture_id, date, college_id\) DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`).
+	mock.ExpectExec(`INSERT INTO attendance \(student_id,course_id,college_id,lecture_id,date,status,scanned_at\) VALUES \(\$1,\$2,\$3,\$4,\$5,\$6,\$7\) ON CONFLICT \(student_id, course_id, lecture_id, date, college_id\) DO UPDATE SET scanned_at = EXCLUDED.scanned_at, status = EXCLUDED.status`).
 		WithArgs(studentID, courseID, collegeID, lectureID, pgxmock.AnyArg(), "Present", pgxmock.AnyArg()). // 7 Args
 		WillReturnError(errors.New("database error"))
 
