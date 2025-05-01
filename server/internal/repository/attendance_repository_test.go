@@ -37,7 +37,8 @@ func TestGetAttendanceByCourse(t *testing.T) {
 	defer mock.Close()
 
 	collegeID := 1
-	courseID := 2
+	courseID := 2 
+// test code 
 
 	// Define expected rows
 	rows := pgxmock.NewRows([]string{
