@@ -37,8 +37,8 @@ func TestGetAttendanceByCourse(t *testing.T) {
 	defer mock.Close()
 
 	collegeID := 1
-	courseID := 2 
-// test code 
+	courseID := 2
+	// test code
 
 	// Define expected rows
 	rows := pgxmock.NewRows([]string{
@@ -214,7 +214,7 @@ func TestGetAttendanceStudentInCourse(t *testing.T) {
 		AddRow(2, studentID, courseID, collegeID, time.Now().Add(24*time.Hour), "Absent", time.Now().Add(24*time.Hour), 202)
 
 	// Expect the query matching the actual WHERE clause order and argument order
-	mock.ExpectQuery(`SELECT student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND student_id = \$3 ORDER BY scanned_at ASC`). // Correct WHERE clause order
+	mock.ExpectQuery(`SELECT id, student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND student_id = \$3 ORDER BY scanned_at ASC`). // Correct WHERE clause order
 																											WithArgs(collegeID, courseID, studentID). // Correct argument order
 																											WillReturnRows(rows)
 
@@ -244,11 +244,11 @@ func TestGetAttendanceStudent(t *testing.T) {
 	rows := pgxmock.NewRows([]string{
 		"id", "student_id", "course_id", "college_id", "date", "status", "scanned_at", "lecture_id",
 	}).
-		AddRow(studentID, 2, collegeID, time.Now(), "Present", time.Now(), 201).
-		AddRow(studentID, 3, collegeID, time.Now(), "Absent", time.Now(), 301)
+		AddRow(1, studentID, 2, collegeID, time.Now(), "Present", time.Now(), 201).
+		AddRow(2, studentID, 3, collegeID, time.Now(), "Absent", time.Now(), 301)
 
 	// Expect the query without 'id' and with ordering
-	mock.ExpectQuery(`SELECT student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND student_id = \$2 ORDER BY date ASC, course_id ASC, scanned_at ASC`).
+	mock.ExpectQuery(`SELECT id, student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND student_id = \$2 ORDER BY date ASC, course_id ASC, scanned_at ASC`).
 		WithArgs(collegeID, studentID).
 		WillReturnRows(rows)
 
@@ -281,9 +281,9 @@ func TestGetAttendanceByLecture(t *testing.T) {
 		AddRow(2, 102, courseID, collegeID, time.Now(), "Absent", time.Now(), lectureID)
 
 	// Expect the query matching the actual WHERE clause order and argument order
-	mock.ExpectQuery(`SELECT student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND lecture_id = \$3 ORDER BY student_id ASC, scanned_at ASC`). // Correct WHERE clause order
-																													WithArgs(collegeID, courseID, lectureID). // Correct argument order
-																													WillReturnRows(rows)
+	mock.ExpectQuery(`SELECT id,  student_id, course_id, college_id, date, status, scanned_at, lecture_id FROM attendance WHERE college_id = \$1 AND course_id = \$2 AND lecture_id = \$3 ORDER BY student_id ASC, scanned_at ASC`). // Correct WHERE clause order
+																														WithArgs(collegeID, courseID, lectureID). // Correct argument order
+																														WillReturnRows(rows)
 
 	// Call the method
 	attendances, err := repo.GetAttendanceByLecture(ctx, collegeID, lectureID, courseID)
