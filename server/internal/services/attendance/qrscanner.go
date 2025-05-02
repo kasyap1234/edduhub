@@ -53,7 +53,7 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, st
 		return errors.New("invalid qr code")
 	}
 
-	marked, err := a.repo.MarkAttendance(ctx, collegeID, studentID, qrData.CourseID, qrData.LectureID)
+	marked, err := a.MarkAttendance(ctx,collegeID,studentID,qrData.CourseID,qrData.LectureID)
 	if !marked {
 		return errors.New("unable to mark attendance using processqrcode")
 	}

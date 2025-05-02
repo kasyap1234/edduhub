@@ -21,7 +21,7 @@ type AttendanceService interface {
 	GetAttendanceByStudent(ctx context.Context, collegeID, studentID int) ([]*models.Attendance, error)
 	GetAttendanceByStudentAndCourse(ctx context.Context, collegeID, studentID int, courseID int) ([]*models.Attendance, error)
 	MarkAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
-	UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error)
+	UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) (bool, error)
 	FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error)
 	VerifyStudentStateAndEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
 	FreezeStudent(ctx context.Context, collegeID int, RollNo string) error
@@ -105,16 +105,28 @@ func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, colleg
 	return nil
 }
 
-func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, currentStatus, updatedStatus string) (bool, error) {
+func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) (bool, error) {
+	attendances, err := a.GetAttendanceByStudent(ctx, collegeID, studentID)
+	if err != nil {
+		return false, err
+	}
+	
+	var currentStatus string
+	var updatedStatus string
+	for _, att := range attendances {
+		if att.LectureID == lectureID {
+			currentStatus = att.Status
+			break
+		}
+	}
+	
 	switch currentStatus {
 	case Present:
 		updatedStatus = Absent
-
 	case Absent:
 		updatedStatus = Present
-
 	}
-	err := a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, updatedStatus)
+	err =a.repo.UpdateAttendance(ctx,collegeID,studentID,courseID,lectureID,updatedStatus)
 	if err != nil {
 		return false, err
 	}

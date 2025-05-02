@@ -13,6 +13,10 @@ type AttendanceHandler struct {
 	attendanceService attendance.AttendanceService
 }
 
+type QRCodeRequest struct {
+	QRCodeData string `json:"qrcode_data"`
+}
+
 func NewAttendanceHandler(attendance attendance.AttendanceService) *AttendanceHandler {
 	return &AttendanceHandler{
 		attendanceService: attendance,
@@ -42,6 +46,23 @@ func (a *AttendanceHandler) GenerateQRCode(c echo.Context) error {
 	return helpers.Success(c, qrCode, 200)
 }
 
+func (a *AttendanceHandler) ProcessAttendance(c echo.Context) error {
+	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return err
+	}
+	studentId, err := helpers.ExtractStudentID(c)
+	if err != nil {
+		return err
+	}
+	var qrcodeData QRCodeRequest
+	if c.Bind(&qrcodeData); err != nil {
+		return helpers.Error(c, "invalid request body", 400)
+	}
+	err = a.attendanceService.ProcessQRCode(ctx, collegeID, studentId, qrcodeData.QRCodeData)
+	return err
+}
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -101,6 +122,9 @@ func (a *AttendanceHandler) GetAttendanceForStudent(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return helpers.Error(c, "invalid collegeID", 400)
+	}
 	studentID, err := helpers.GetIDFromParam(c, "studentID")
 	if err != nil {
 		return helpers.Error(c, "invalid studentID", 400)
@@ -137,14 +161,29 @@ func (a *AttendanceHandler) GetAttendanceByStudentAndCourse(c echo.Context) erro
 	return helpers.Success(c, attendance, 200)
 }
 
-// func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
-// return c.JSON()
-// }
+func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
+	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return helpers.Error(c, "Invalid collegeID", 400)
 
-// func (a *AttendanceHandler) GetCourseAttendanceReport(c echo.Context) error {
+	}
+	studentID, err := helpers.ExtractStudentID(c)
+	if err != nil {
+		return helpers.Error(c, "Invalid studentID", 400)
+	}
+	courseID, err := helpers.GetIDFromParam(c, "courseID")
+	if err != nil {
+		return helpers.Error(c, "invalid courseID ", 400)
+	}
 
-// }
+	ok, err := a.attendanceService.UpdateAttendance(ctx, collegeID, studentID, courseID, studentID)
+	if !ok {
+		return helpers.Error(c, "Unable update attendance", 500)
+	}
+	if err != nil {
+		return helpers.Error(c, "error in update attendance", 502)
+	}
 
-// func (a *AttendanceHandler) GetStudentAttendanceReport(c echo.Context) error {
-
-// }
+	return helpers.Success(c, "Success", 200)
+}
