@@ -1,8 +1,13 @@
 package student
 
-import "eduhub/server/internal/repository"
+import (
+	"context"
+	"eduhub/server/internal/models"
+	"eduhub/server/internal/repository"
+)
 
 type StudentService interface {
+	FindByKratosID(ctx context.Context, kratosID string) (*models.Student, error)
 }
 
 type studentService struct {
@@ -17,4 +22,12 @@ func NewstudentService(studentRepo repository.StudentRepository, attendanceRepo 
 		attendanceRepo: attendanceRepo,
 		enrollmentRepo: enrollmentRepo,
 	}
+}
+
+func (a *studentService) FindByKratosID(ctx context.Context, kratosID string) (*models.Student, error) {
+	student, err := a.studentRepo.FindByKratosID(ctx, kratosID)
+	if err != nil {
+		return nil, err
+	}
+	return student, nil
 }
