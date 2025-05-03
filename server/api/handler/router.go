@@ -90,8 +90,8 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 		m.RequireRole(middleware.RoleStudent),
 		m.LoadStudentProfile,
 		m.VerifyStudentOwnership)
-	// attendance.POST("/mark/bulk/course/:courseID/lecture/:lectureID", a.Attendance.MarkBulkAttendance,
-	// 	m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
+	attendance.POST("/mark/bulk/course/:courseID/lecture/:lectureID", a.Attendance.MarkBulkAttendance,
+		m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 	attendance.GET("/course/:courseID/lecture/:lectureID/qrcode", a.Attendance.GenerateQRCode,
 		m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
 	attendance.GET("/course/:courseID", a.Attendance.GetAttendanceByCourse,
@@ -104,14 +104,9 @@ func SetupRoutes(e *echo.Echo, a *Handlers, m *middleware.AuthMiddleware) {
 		m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent),
 		m.LoadStudentProfile,
 		m.VerifyStudentOwnership)
-	// attendance.PUT("/course/:courseID/lecture/:lectureID/student/:studentID", a.Attendance.UpdateAttendance,
-	// 	m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
-	// attendance.GET("/reports/course/:courseID", a.Attendance.GetCourseAttendanceReport,
-	// 	m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
-	// attendance.GET("/reports/student/:studentID", a.Attendance.GetStudentAttendanceReport,
-	// 	m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty, middleware.RoleStudent),
-	// 	m.LoadStudentProfile,
-	// 	m.VerifyStudentOwnership)
+	attendance.PUT("/course/:courseID/lecture/:lectureID/student/:studentID", a.Attendance.UpdateAttendance,
+		m.RequireRole(middleware.RoleAdmin, middleware.RoleFaculty))
+	attendance.GET("/report/:studentID", a.Attendance.GetAttendanceForStudent, m.RequireRole(middleware.RoleAdmin, middleware.RoleStudent), m.VerifyStudentOwnership)
 
 	// 	// Grades/Assessment management
 	// 	grades := apiGroup.Group("/grades")

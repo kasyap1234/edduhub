@@ -3,7 +3,9 @@ package handler
 import (
 	"net/http"
 
+	"eduhub/server/internal/models" // Import models package
 	"eduhub/server/internal/helpers"
+	// "eduhub/server/internal/middleware" // Assuming validator is setup via middleware or directly
 	"eduhub/server/internal/services/attendance"
 
 	"github.com/labstack/echo/v4"
@@ -11,6 +13,11 @@ import (
 
 type AttendanceHandler struct {
 	attendanceService attendance.AttendanceService
+}
+
+// BulkAttendanceRequest defines the structure for the bulk attendance marking endpoint.
+type BulkAttendanceRequest struct {
+	Attendances []models.StudentAttendanceStatus `json:"attendances" validate:"required,dive"` // Use dive for validating nested structs
 }
 
 type QRCodeRequest struct {
@@ -186,4 +193,40 @@ func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
 	}
 
 	return helpers.Success(c, "Success", 200)
+}
+
+func (a *AttendanceHandler) MarkBulkAttendance(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return helpers.Error(c, "invalid collegeID", http.StatusBadRequest)
+	}
+
+	courseID, err := helpers.GetIDFromParam(c, "courseID")
+	if err != nil {
+		return err // GetIDFromParam already returns formatted error
+	}
+	lectureID, err := helpers.GetIDFromParam(c, "lectureID")
+	if err != nil {
+		return err // GetIDFromParam already returns formatted error
+	}
+
+	var req BulkAttendanceRequest
+	if err := c.Bind(&req); err != nil {
+		return helpers.Error(c, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+	}
+
+	// Optional: Add validation using a validator library if you have one integrated
+	// if err := c.Validate(&req); err != nil {
+	// 	 return helpers.Error(c, "Validation failed: "+err.Error(), http.StatusBadRequest)
+	// }
+
+	err = a.attendanceService.MarkBulkAttendance(ctx, collegeID, courseID, lectureID, req.Attendances)
+	if err != nil {
+		// The service layer now returns a more descriptive error if needed
+		return helpers.Error(c, "Failed to mark bulk attendance: "+err.Error(), http.StatusInternalServerError)
+	}
+
+	return helpers.Success(c, "Bulk attendance marked successfully", http.StatusOK)
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt" // Import fmt for better error wrapping
 	"time"
 
@@ -21,6 +22,7 @@ type AttendanceRepository interface {
 	GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error)
 	FreezeAttendance(ctx context.Context, collegeID int, studentID int) error
 	// ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
+	SetAttendanceStatus(ctx context.Context, collegeID int, studentID, courseID int, lectureID int, status string) error
 }
 
 const attendanceTable = "attendance"
@@ -282,4 +284,33 @@ func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID i
 		return fmt.Errorf("unabel to freeze attendance")
 	}
 	return nil // Success
+}
+
+// type Attendance struct {
+// 	ID        int       `json:"ID"`
+// 	StudentID int       `json:"studentID"`
+// 	CourseID  int       `json:"courseId"`
+// 	CollegeID int       `json:"collegeID"`
+// 	Date      time.Time `json:"date"`
+// 	Status    string    `json:"status"`
+// 	ScannedAt time.Time `json:"scannedAt"`
+// 	LectureID int       `json:"lectureID"`
+// }
+
+func (a *attendanceRepository) SetAttendanceStatus(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error {
+	// Build the UPDATE query
+	query := a.DB.SQ.Insert(attendanceTable).Columns("student_id", "course_id", "college_id", "status", "scanned_at", "lecture_id").Values(studentID, courseID, collegeID, status, time.Now(), lectureID).Suffix(`ON CONFLICT (student_id, course_id, college_id, lecture_id) DO UPDATE SET status = EXCLUDED.status, scanned_at = EXCLUDED.scanned_at`)
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return errors.New("failed to build query")
+	}
+	commandTag, err := a.DB.Pool.Exec(ctx, sql, args...)
+	if err != nil {
+		return errors.New("failed to execute query")
+	}
+	if commandTag.RowsAffected() == 0 {
+		return errors.New("failed to update attendance")
+	}
+	return nil
+
 }
