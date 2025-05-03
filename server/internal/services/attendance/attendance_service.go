@@ -24,8 +24,6 @@ type AttendanceService interface {
 	UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) (bool, error)
 	FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error)
 	VerifyStudentStateAndEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
-	FreezeStudent(ctx context.Context, collegeID int, RollNo string) error
-	UnFreezeStudent(ctx context.Context, collegeID int, RollNo string) error
 	ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error
 }
 type attendanceService struct {
@@ -61,6 +59,7 @@ func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context,
 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID, lectureID int) (bool, error) {
 	ok, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentID, courseID)
+
 	if !ok {
 		return false, err
 	}
@@ -110,7 +109,7 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 	if err != nil {
 		return false, err
 	}
-	
+
 	var currentStatus string
 	var updatedStatus string
 	for _, att := range attendances {
@@ -119,14 +118,14 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 			break
 		}
 	}
-	
+
 	switch currentStatus {
 	case Present:
 		updatedStatus = Absent
 	case Absent:
 		updatedStatus = Present
 	}
-	err =a.repo.UpdateAttendance(ctx,collegeID,studentID,courseID,lectureID,updatedStatus)
+	err = a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, updatedStatus)
 	if err != nil {
 		return false, err
 	}
@@ -140,4 +139,3 @@ func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID, stu
 	}
 	return true, nil
 }
-
