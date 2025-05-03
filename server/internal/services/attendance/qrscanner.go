@@ -2,6 +2,7 @@ package attendance
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -42,8 +43,8 @@ func (a *attendanceService) GenerateQRCode(ctx context.Context, collegeID int, c
 	if err != nil {
 		return "", err
 	}
-	qrBase64 := fmt.Sprintf("data ,%s", qrBytes)
-	return qrBase64, nil
+	qrbase64 := base64.StdEncoding.EncodeToString(qrBytes)
+	return qrbase64, nil
 }
 
 // process qr and take values from it to mark attendance(process qr and chaning state)
