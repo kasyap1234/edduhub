@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupAttendanceServiceTest() (*mocks.AttendanceRepository, *mocks.StudentRepository, *mocks.EnrollmentRepository, AttendanceService, context.Context) {
+func setupAttendanceServiceTest(t *testing.T) (*mocks.AttendanceRepository, *mocks.StudentRepository, *mocks.EnrollmentRepository, AttendanceService, context.Context) {
 	mockAttendanceRepo := new(mocks.AttendanceRepository)
 	mockStudentRepo := new(mocks.StudentRepository)
 	mockEnrollmentRepo := new(mocks.EnrollmentRepository)

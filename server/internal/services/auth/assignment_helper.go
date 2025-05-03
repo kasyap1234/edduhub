@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/uber/jaeger-client-go/crossdock/log"
 )
 
 type Assigner struct {
@@ -20,7 +22,7 @@ func (a *Assigner) AssignFacultyToCourse(ctx context.Context, facultyID, courseI
 	relations := []string{"faculty", "manage_qr", "view_attendance", "grade_assignments"}
 	for _, relation := range relations {
 		if err := a.keto.CreateRelation(ctx, "courses", courseID, relation, facultyID); err != nil {
-			errors.New("failed to assign relation")
+			log.Printf("failed to assign relation")
 			return
 		}
 	}
