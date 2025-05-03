@@ -4,8 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/uber/jaeger-client-go/crossdock/log"
+	"log"
 )
 
 type Assigner struct {
