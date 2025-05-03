@@ -141,12 +141,3 @@ func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID, stu
 	return true, nil
 }
 
-func (a *attendanceService) FreezeStudent(ctx context.Context, collegeID int, RollNo string) error {
-	err := a.studentRepo.FreezeStudent(ctx, RollNo)
-	return err
-}
-
-func (a *attendanceService) UnFreezeStudent(ctx context.Context, collegeID int, RollNo string) error {
-	err := a.studentRepo.UnFreezeStudent(ctx, RollNo)
-	return err
-}

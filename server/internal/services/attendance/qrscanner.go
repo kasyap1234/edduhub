@@ -49,8 +49,14 @@ func (a *attendanceService) GenerateQRCode(ctx context.Context, collegeID int, c
 // process qr and take values from it to mark attendance(process qr and chaning state)
 func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error {
 	var qrData QRCodeData
+
 	if err := json.Unmarshal([]byte(qrCodeContent), &qrData); err != nil {
 		return errors.New("invalid qr code")
+	}
+	timestamp: = qrData.TimeStamp
+
+	if timeStamp <time.Now(){
+		return errros.New("qr expried")
 	}
 
 	marked, err := a.MarkAttendance(ctx,collegeID,studentID,qrData.CourseID,qrData.LectureID)
@@ -62,3 +68,6 @@ func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, st
 	}
 	return nil
 }
+
+/// process qr takes qr input and marks attendance
+// mark attendance verifies student and marks attendance
