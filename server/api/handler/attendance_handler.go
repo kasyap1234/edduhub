@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"eduhub/server/internal/models" // Import models package
 	"eduhub/server/internal/helpers"
+	"eduhub/server/internal/models" // Import models package
+
 	// "eduhub/server/internal/middleware" // Assuming validator is setup via middleware or directly
 	"eduhub/server/internal/services/attendance"
 
@@ -64,7 +65,7 @@ func (a *AttendanceHandler) ProcessAttendance(c echo.Context) error {
 		return err
 	}
 	var qrcodeData QRCodeRequest
-	if c.Bind(&qrcodeData); err != nil {
+	if err := c.Bind(&qrcodeData); err != nil {
 		return helpers.Error(c, "invalid request body", 400)
 	}
 	err = a.attendanceService.ProcessQRCode(ctx, collegeID, studentId, qrcodeData.QRCodeData)
@@ -175,16 +176,20 @@ func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
 		return helpers.Error(c, "Invalid collegeID", 400)
 
 	}
+	lectureID, err := helpers.GetIDFromParam(c, "lectureID")
+	if err != nil {
+		return helpers.Error(c, "invalid lectureID", 400)
+	}
 	studentID, err := helpers.ExtractStudentID(c)
 	if err != nil {
-		return helpers.Error(c, "Invalid studentID", 400)
+		helpers.Error(c, "invalid studentID", 400)
 	}
 	courseID, err := helpers.GetIDFromParam(c, "courseID")
 	if err != nil {
 		return helpers.Error(c, "invalid courseID ", 400)
 	}
 
-	ok, err := a.attendanceService.UpdateAttendance(ctx, collegeID, studentID, courseID, studentID)
+	ok, err := a.attendanceService.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID)
 	if !ok {
 		return helpers.Error(c, "Unable update attendance", 500)
 	}
@@ -194,7 +199,6 @@ func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
 
 	return helpers.Success(c, "Success", 200)
 }
-
 
 func (a *AttendanceHandler) FreezeAttendance(c echo.Context) error {
 	ctx := c.Request().Context()
@@ -248,4 +252,3 @@ func (a *AttendanceHandler) MarkBulkAttendance(c echo.Context) error {
 
 	return helpers.Success(c, "Bulk attendance marked successfully", http.StatusOK)
 }
-

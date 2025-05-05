@@ -58,6 +58,7 @@ func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context,
 	return a.repo.GetAttendanceStudentInCourse(ctx, collegeID, studentID, courseID)
 }
 
+// manually mark attendance for a student 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID, lectureID int) (bool, error) {
 	ok, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentID, courseID)
 
@@ -133,6 +134,8 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 	return true, nil
 }
 
+
+// manually mark attendance of multiple students 
 func (a *attendanceService) MarkBulkAttendance(ctx context.Context, collegeID, courseID, lectureID int, studentStatuses []models.StudentAttendanceStatus) error {
 	var errors []error
 
