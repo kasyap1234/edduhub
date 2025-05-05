@@ -25,6 +25,7 @@ type AttendanceService interface {
 	FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error)
 	VerifyStudentStateAndEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
 	ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error
+	MarkBulkAttendance(ctx context.Context, collegeID, courseID, lectureID int, studentStatuses []models.StudentAttendanceStatus) error
 }
 type attendanceService struct {
 	repo           repository.AttendanceRepository
@@ -59,6 +60,7 @@ func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context,
 
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID, lectureID int) (bool, error) {
 	ok, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentID, courseID)
+
 	if !ok {
 		return false, err
 	}
@@ -108,7 +110,7 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 	if err != nil {
 		return false, err
 	}
-	
+
 	var currentStatus string
 	var updatedStatus string
 	for _, att := range attendances {
@@ -117,18 +119,47 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 			break
 		}
 	}
-	
+
 	switch currentStatus {
 	case Present:
 		updatedStatus = Absent
 	case Absent:
 		updatedStatus = Present
 	}
-	err =a.repo.UpdateAttendance(ctx,collegeID,studentID,courseID,lectureID,updatedStatus)
+	err = a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, updatedStatus)
 	if err != nil {
 		return false, err
 	}
 	return true, nil
+}
+
+func (a *attendanceService) MarkBulkAttendance(ctx context.Context, collegeID, courseID, lectureID int, studentStatuses []models.StudentAttendanceStatus) error {
+	var errors []error
+
+	for _, studentStatus := range studentStatuses {
+		// 1. Verify student state and enrollment *before* attempting to mark
+		ok, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentStatus.StudentID, courseID)
+		if err != nil {
+			errors = append(errors, fmt.Errorf("error verifying student %d: %w", studentStatus.StudentID, err))
+			continue // Skip this student if verification fails
+		}
+		if !ok {
+			errors = append(errors, fmt.Errorf("student %d not active or not enrolled in course %d", studentStatus.StudentID, courseID))
+			continue // Skip this student
+		}
+
+		// 2. Call repository to set the specific status
+		err = a.repo.SetAttendanceStatus(ctx, collegeID, studentStatus.StudentID, courseID, lectureID, studentStatus.Status)
+		if err != nil {
+			errors = append(errors, fmt.Errorf("error setting attendance for student %d: %w", studentStatus.StudentID, err))
+		}
+	}
+	// Combine errors if any occurred, otherwise return nil
+	if len(errors) > 0 {
+		// You might want a more sophisticated error aggregation depending on needs
+		return fmt.Errorf("encountered %d error(s) during bulk attendance marking: %v", len(errors), errors)
+	}
+	return nil
 }
 
 func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error) {

@@ -2,6 +2,7 @@ package attendance
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -42,23 +43,39 @@ func (a *attendanceService) GenerateQRCode(ctx context.Context, collegeID int, c
 	if err != nil {
 		return "", err
 	}
-	qrBase64 := fmt.Sprintf("data ,%s", qrBytes)
-	return qrBase64, nil
+	qrbase64 := base64.StdEncoding.EncodeToString(qrBytes)
+	return qrbase64, nil
 }
 
 // process qr and take values from it to mark attendance(process qr and chaning state)
 func (a *attendanceService) ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error {
 	var qrData QRCodeData
 	if err := json.Unmarshal([]byte(qrCodeContent), &qrData); err != nil {
-		return errors.New("invalid qr code")
+		// Consider logging the actual error here for debugging
+		return errors.New("invalid qr code content")
 	}
 
-	marked, err := a.MarkAttendance(ctx,collegeID,studentID,qrData.CourseID,qrData.LectureID)
-	if !marked {
-		return errors.New("unable to mark attendance using processqrcode")
+	// Check if the QR code has expired
+	if time.Now().After(qrData.ExpiresAt) {
+		return errors.New("qr code expired")
 	}
+
+	// Attempt to mark attendance
+	marked, err := a.MarkAttendance(ctx, collegeID, studentID, qrData.CourseID, qrData.LectureID)
 	if err != nil {
-		return err
+		// Return the specific error from MarkAttendance
+		return fmt.Errorf("failed to mark attendance: %w", err)
 	}
+	if !marked {
+		// This case might indicate a specific condition like already marked,
+		// or student not enrolled, which might be better handled by MarkAttendance returning specific errors.
+		// Returning a generic error might be okay depending on requirements.
+		return errors.New("unable to mark attendance (check enrollment or if already marked)")
+	}
+
+	// Attendance marked successfully
 	return nil
 }
+
+/// process qr takes qr input and marks attendance
+// mark attendance verifies student and marks attendance
