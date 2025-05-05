@@ -24,8 +24,6 @@ type AttendanceService interface {
 	UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) (bool, error)
 	FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error)
 	VerifyStudentStateAndEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
-	FreezeStudent(ctx context.Context, collegeID int, RollNo string) error
-	UnFreezeStudent(ctx context.Context, collegeID int, RollNo string) error
 	ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error
 }
 type attendanceService struct {
@@ -141,12 +139,3 @@ func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID, stu
 	return true, nil
 }
 
-func (a *attendanceService) FreezeStudent(ctx context.Context, collegeID int, RollNo string) error {
-	err := a.studentRepo.FreezeStudent(ctx, RollNo)
-	return err
-}
-
-func (a *attendanceService) UnFreezeStudent(ctx context.Context, collegeID int, RollNo string) error {
-	err := a.studentRepo.UnFreezeStudent(ctx, RollNo)
-	return err
-}

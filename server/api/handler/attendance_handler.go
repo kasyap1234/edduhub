@@ -187,3 +187,20 @@ func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
 
 	return helpers.Success(c, "Success", 200)
 }
+
+func (a *AttendanceHandler) FreezeAttendance(c echo.Context) error {
+	ctx := c.Request().Context()
+	collegeID, err := helpers.ExtractCollegeID(c)
+	if err != nil {
+		return helpers.Error(c, "Invalid collegeID", 400)
+	}
+	studentID, err := helpers.ExtractStudentID(c)
+	if err != nil {
+		return helpers.Error(c, "Invalid student ID", 400)
+	}
+	ok, _ := a.attendanceService.FreezeAttendance(ctx, collegeID, studentID)
+	if !ok {
+		return helpers.Error(c, "unable to freeze attendance", 500)
+	}
+	return helpers.Success(c, "Freezed Attendance", 200)
+}
