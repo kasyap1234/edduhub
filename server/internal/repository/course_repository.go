@@ -14,6 +14,7 @@ import (
 type CourseRepository interface {
 	CreateCourse(ctx context.Context, course *models.Course) error
 	FindCourseByID(ctx context.Context, courseID int) (*models.Course, error)
+	UpdateCourse(ctx context.Context,course *models.Course)
 }
 
 type courseRepository struct {
