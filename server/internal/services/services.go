@@ -14,6 +14,7 @@ type Services struct {
 	// Fee *Fee.FeeService
 	Attendance     attendance.AttendanceService
 	StudentService student.StudentService
+
 	// System         system.SystemService
 }
 

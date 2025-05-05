@@ -7,14 +7,14 @@ import (
 
 	"eduhub/server/internal/models"
 
-	"github.com/jackc/pgx"
 	"github.com/georgysavva/scany/pgxscan" // Add pgxscan import
+	"github.com/jackc/pgx"
 )
 
 type CourseRepository interface {
 	CreateCourse(ctx context.Context, course *models.Course) error
 	FindCourseByID(ctx context.Context, courseID int) (*models.Course, error)
-	UpdateCourse(ctx context.Context,course *models.Course)
+	UpdateCourse(ctx context.Context, course *models.Course) error
 }
 
 type courseRepository struct {
@@ -73,4 +73,8 @@ func (c *courseRepository) FindCourseByID(ctx context.Context, courseID int) (*m
 	}
 
 	return course, nil
+}
+
+func (c *courseRepository) UpdateCourse(ctx context.Context, course *models.Course) error {
+
 }

@@ -2,25 +2,23 @@ package repository
 
 import (
 	"context"
-	"fmt"  // Import fmt for better error wrapping
-	"time" // Assuming models.Enrollment uses time.Time
+	"fmt"  
+	"time" 
 
-	"eduhub/server/internal/models" // Your models package
-	// Removed "errors" if only using fmt.Errorf
+	"eduhub/server/internal/models" 
+
 	"github.com/Masterminds/squirrel"
 	"github.com/georgysavva/scany/pgxscan"
-	"github.com/jackc/pgx/v4" // For pgx.ErrNoRows
-	// Assuming pgxpool is imported elsewhere in your repository package
-	// "github.com/jackc/pgx/v4/pgxpool"
-	// Note: pgxscan is not strictly needed for Create and Exists if
-	// you are scanning only the ID or a single value (like '1' for Exists),
-	// but you'd use it for Get/Find/Select methods on Enrollment if you add them.
+	"github.com/jackc/pgx/v4" 
 )
 
 type EnrollmentRepository interface {
 	CreateEnrollment(ctx context.Context, enrollment *models.Enrollment) error
 	IsStudentEnrolled(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
-	// Add other specific enrollment methods here (e.g., GetByID, FindByStudent, UpdateStatus)
+	UpdateEnrollment(ctx context.Context, enrollment *models.Enrollment) error
+	UpdateEnrollmentStatus(ctx context.Context, id int, status string) error
+	DeleteEnrollment(ctx context.Context, collegeID int, enrollmentID int) error
+	FindEnrollmentsByStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Enrollment, error)
 }
 
 // enrollmentRepository now holds a direct reference to *DB
@@ -210,4 +208,11 @@ func (e *enrollmentRepository) UpdateEnrollmentStatus(ctx context.Context, id in
 	}
 
 	return nil // Success
+}
+
+func (e *enrollmentRepository) DeleteEnrollment(ctx context.Context, collegeID, enrollmentID int) error {
+query := e.DB.SQ.Delete()
+}
+func (e *enrollmentRepository) UpdateEnrollment(ctx context.Context, enrollment *models.Enrollment) error {
+
 }
