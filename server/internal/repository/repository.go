@@ -5,6 +5,8 @@ type Repository struct {
 	StudentRepository    StudentRepository
 	UserRepository       UserRepository
 	EnrollmentRepository EnrollmentRepository
+	PlacementRepository  PlacementRepository // Added Placement
+	QuizRepository       QuizRepository      // Added Quiz
 }
 
 // NewRepository creates a new repository with all required sub-repositories
@@ -15,10 +17,14 @@ func NewRepository(DB *DB) *Repository {
 	studentRepo := NewStudentRepository(DB)
 	userRepo := NewUserRepository(DB)
 	enrollmentRepo := NewEnrollmentRepository(DB)
+	placementRepo := NewPlacementRepository(DB) // Instantiate Placement
+	quizRepo := NewQuizRepository(DB)           // Instantiate Quiz
 	return &Repository{
 		AttendanceRepository: attendanceRepo,
 		StudentRepository:    studentRepo,
 		UserRepository:       userRepo,
 		EnrollmentRepository: enrollmentRepo,
+		PlacementRepository:  placementRepo,
+		QuizRepository:       quizRepo,
 	}
 }

@@ -14,13 +14,19 @@ import (
 )
 
 type AttendanceRepository interface {
-	GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int) ([]*models.Attendance, error)
 	MarkAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
 	UpdateAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int, status string) error
-	GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error)
-	GetAttendanceStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error)
-	GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error)
+	SetAttendanceStatus(ctx context.Context, collegeID int, studentID, courseID int, lectureID int, status string) error
 	FreezeAttendance(ctx context.Context, collegeID int, studentID int) error
+	UnFreezeAttendance(ctx context.Context, collegeID int, studentID int) error
+
+	// Get methods with pagination
+	GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int, limit, offset uint64) ([]*models.Attendance, error)
+	GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int, limit, offset uint64) ([]*models.Attendance, error)
+	GetAttendanceStudent(ctx context.Context, collegeID int, studentID int, limit, offset uint64) ([]*models.Attendance, error)
+	GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int, limit, offset uint64) ([]*models.Attendance, error)
+
+	// Count methods (add corresponding count methods if needed)
 	// ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
 	SetAttendanceStatus(ctx context.Context, collegeID int, studentID, courseID int, lectureID int, status string) error
 }
@@ -53,6 +59,7 @@ func (a *attendanceRepository) GetAttendanceByCourse(
 	ctx context.Context,
 	collegeID int,
 	courseID int,
+	limit, offset uint64, // Added pagination params
 ) ([]*models.Attendance, error) {
 	// Define the table name (assuming it's "attendance")
 	const attendanceTable = "attendance"
@@ -73,7 +80,9 @@ func (a *attendanceRepository) GetAttendanceByCourse(
 			// Use database column names matching struct tags
 			"college_id": collegeID,
 			"course_id":  courseID,
-		})
+		}).
+		OrderBy("date DESC", "student_id ASC"). // Example ordering
+		Limit(limit).Offset(offset)             // Apply pagination
 
 	sql, args, err := query.ToSql()
 	if err != nil {
@@ -167,7 +176,14 @@ func (a *attendanceRepository) UpdateAttendance(ctx context.Context, collegeID i
 	return nil
 }
 
-func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
+func (a *attendanceRepository) GetAttendanceStudentInCourse(
+	ctx context.Context,
+	collegeID int,
+	studentID int,
+	courseID int,
+	limit, offset uint64, // Added pagination params
+) ([]*models.Attendance, error) {
+
 	attendances := []*models.Attendance{}
 	query := a.DB.SQ.Select("id", // Use database column names matching struct tags
 		"student_id",
@@ -180,7 +196,9 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 		"college_id": collegeID,
 		"student_id": studentID,
 		"course_id":  courseID,
-	}).OrderBy("scanned_at ASC")
+	}).
+		OrderBy("date DESC", "scanned_at DESC"). // Order by date then scan time
+		Limit(limit).Offset(offset)              // Apply pagination
 	sql, args, err := query.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("GetAttendanceStudentInCourse: unable to build query: %w", err) // Wrap error
@@ -193,7 +211,12 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(ctx context.Context,
 	return attendances, nil
 }
 
-func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error) {
+func (a *attendanceRepository) GetAttendanceStudent(
+	ctx context.Context,
+	collegeID int,
+	studentID int,
+	limit, offset uint64, // Added pagination params
+) ([]*models.Attendance, error) {
 	// Build the SELECT query for multiple rows
 	query := a.DB.SQ.Select(
 		"id", "student_id", "course_id", "college_id",
@@ -204,7 +227,8 @@ func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, college
 			"college_id": collegeID,
 			"student_id": studentID,
 		}).
-		OrderBy("date ASC", "course_id ASC", "scanned_at ASC") // Optional: Add ordering
+		OrderBy("date DESC", "course_id ASC", "scanned_at DESC"). // Order by date, course, scan time
+		Limit(limit).Offset(offset)                               // Apply pagination
 
 	sql, args, err := query.ToSql()
 	if err != nil {
@@ -223,7 +247,13 @@ func (a *attendanceRepository) GetAttendanceStudent(ctx context.Context, college
 }
 
 // GetAttendanceByLecture retrieves attendance records for a specific lecture.
-func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, collegeID int, lectureID int, courseID int) ([]*models.Attendance, error) {
+func (a *attendanceRepository) GetAttendanceByLecture(
+	ctx context.Context,
+	collegeID int,
+	lectureID int,
+	courseID int,
+	limit, offset uint64, // Added pagination params
+) ([]*models.Attendance, error) {
 	// Build the SELECT query for multiple rows
 	query := a.DB.SQ.Select(
 		"id", "student_id", "course_id", "college_id",
@@ -235,7 +265,8 @@ func (a *attendanceRepository) GetAttendanceByLecture(ctx context.Context, colle
 			"lecture_id": lectureID,
 			"course_id":  courseID, // Include courseID as per the interface, even if lectureID might be globally unique
 		}).
-		OrderBy("student_id ASC", "scanned_at ASC") // Optional: Add ordering
+		OrderBy("student_id ASC", "scanned_at ASC"). // Order by student then scan time
+		Limit(limit).Offset(offset)                  // Apply pagination
 
 	sql, args, err := query.ToSql()
 	if err != nil {
@@ -283,6 +314,34 @@ func (a *attendanceRepository) FreezeAttendance(ctx context.Context, collegeID i
 	if commandTag.RowsAffected() == 0 {
 		return fmt.Errorf("unabel to freeze attendance")
 	}
+	return nil // Success
+}
+
+// UnFreezeAttendance updates the status of "Frozen" attendance records for a student back to a default (e.g., "Absent").
+func (a *attendanceRepository) UnFreezeAttendance(ctx context.Context, collegeID int, studentID int) error {
+	// Determine the status to revert to. "Absent" might be a safe default if the original status isn't stored.
+	revertStatus := "Absent" // Or fetch original status if stored elsewhere
+
+	query := a.DB.SQ.Update(attendanceTable).
+		Set("status", revertStatus).
+		// Add other potential fields like unfreeze_date = now() if needed
+		Where(squirrel.Eq{
+			"college_id": collegeID,
+			"student_id": studentID,
+			"status":     "Frozen", // Only unfreeze records that are currently frozen
+		})
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return fmt.Errorf("UnFreezeAttendance: failed to build query: %w", err)
+	}
+
+	_, err = a.DB.Pool.Exec(ctx, sql, args...) // CommandTag not strictly needed here unless checking RowsAffected
+	if err != nil {
+		return fmt.Errorf("UnFreezeAttendance: failed to execute query: %w", err)
+	}
+
+	// Note: 0 rows affected is not necessarily an error here (student might have no frozen records).
 	return nil // Success
 }
 

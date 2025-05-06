@@ -41,24 +41,24 @@ func NewAttendanceService(repo repository.AttendanceRepository, studentRepo repo
 	}
 }
 
-func (a *attendanceService) GetAttendanceByLecture(ctx context.Context, collegeID int, courseID int, lectureID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByLecture(ctx, collegeID, courseID, lectureID)
+func (a *attendanceService) GetAttendanceByLecture(ctx context.Context, collegeID int, courseID int, lectureID int, limit, offset uint64) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceByLecture(ctx, collegeID, courseID, lectureID, limit, offset)
 }
 
 // to get attendance of all students in a course
-func (a *attendanceService) GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByCourse(ctx, collegeID, courseID)
+func (a *attendanceService) GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int, limit, offset uint64) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceByCourse(ctx, collegeID, courseID, limit, offset)
 }
 
-func (a *attendanceService) GetAttendanceByStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceStudent(ctx, collegeID, studentID)
+func (a *attendanceService) GetAttendanceByStudent(ctx context.Context, collegeID int, studentID int, limit uint64, offset uint64) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceStudent(ctx, collegeID, studentID, limit, offset)
 }
 
-func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context, collegeID int, studentID int, courseID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceStudentInCourse(ctx, collegeID, studentID, courseID)
+func (a *attendanceService) GetAttendanceByStudentAndCourse(ctx context.Context, collegeID int, studentID int, courseID int, limit uint64, offset uint64) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceStudentInCourse(ctx, collegeID, studentID, courseID, limit, offset)
 }
 
-// manually mark attendance for a student 
+// manually mark attendance for a student
 func (a *attendanceService) MarkAttendance(ctx context.Context, collegeID int, studentID, courseID, lectureID int) (bool, error) {
 	ok, err := a.VerifyStudentStateAndEnrollment(ctx, collegeID, studentID, courseID)
 
@@ -106,8 +106,8 @@ func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, colleg
 	return nil
 }
 
-func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) (bool, error) {
-	attendances, err := a.GetAttendanceByStudent(ctx, collegeID, studentID)
+func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, limit, offset uint64) (bool, error) {
+	attendances, err := a.GetAttendanceByStudent(ctx, collegeID, studentID, limit, offset)
 	if err != nil {
 		return false, err
 	}
@@ -134,8 +134,7 @@ func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, stu
 	return true, nil
 }
 
-
-// manually mark attendance of multiple students 
+// manually mark attendance of multiple students
 func (a *attendanceService) MarkBulkAttendance(ctx context.Context, collegeID, courseID, lectureID int, studentStatuses []models.StudentAttendanceStatus) error {
 	var errors []error
 
@@ -172,4 +171,3 @@ func (a *attendanceService) FreezeAttendance(ctx context.Context, collegeID, stu
 	}
 	return true, nil
 }
-

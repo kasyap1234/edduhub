@@ -29,6 +29,11 @@ type StudentRepository interface {
 	FreezeStudent(ctx context.Context, rollNo string) error   // Renamed param to match casing
 	UnFreezeStudent(ctx context.Context, rollNo string) error // Renamed param to match casing
 	FindByKratosID(ctx context.Context, kratosID string) (*models.Student, error)
+	DeleteStudent(ctx context.Context, collegeID int, studentID int) error
+
+	// Find methods with pagination
+	FindAllStudentsByCollege(ctx context.Context, collegeID int, limit, offset uint64) ([]*models.Student, error)
+	CountStudentsByCollege(ctx context.Context, collegeID int) (int, error)
 	// Note: GetStudentByID signature is a bit unusual if ID is the primary key;
 	// typically you only need the ID. Assuming you intend to filter by both ID and CollegeID.
 }
@@ -126,6 +131,76 @@ func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo strin
 	}
 
 	return student, nil // Success
+}
+
+// DeleteStudent removes a student record by its ID, scoped by collegeID.
+func (s *studentRepository) DeleteStudent(ctx context.Context, collegeID int, studentID int) error {
+	query := s.DB.SQ.Delete(studentTable).
+		Where(squirrel.Eq{
+			"id":         studentID,
+			"college_id": collegeID, // Scope deletion
+		})
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return fmt.Errorf("DeleteStudent: failed to build query: %w", err)
+	}
+
+	commandTag, err := s.DB.Pool.Exec(ctx, sql, args...)
+	if err != nil {
+		// Consider foreign key constraint errors (e.g., if student has enrollments)
+		return fmt.Errorf("DeleteStudent: failed to execute query: %w", err)
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("DeleteStudent: no student found with ID %d for college ID %d, or already deleted", studentID, collegeID)
+	}
+
+	return nil
+}
+
+// FindAllStudentsByCollege retrieves a paginated list of students for a specific college.
+func (s *studentRepository) FindAllStudentsByCollege(ctx context.Context, collegeID int, limit, offset uint64) ([]*models.Student, error) {
+	query := s.DB.SQ.Select(
+		"id", "user_id", "college_id", "kratos_identity_id",
+		"enrollment_year", "roll_no", "is_active", "created_at", "updated_at",
+	).
+		From(studentTable).
+		Where(squirrel.Eq{"college_id": collegeID}).
+		OrderBy("roll_no ASC"). // Example ordering
+		Limit(limit).
+		Offset(offset)
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("FindAllStudentsByCollege: failed to build query: %w", err)
+	}
+
+	students := []*models.Student{}
+	err = pgxscan.Select(ctx, s.DB.Pool, &students, sql, args...)
+	if err != nil {
+		return nil, fmt.Errorf("FindAllStudentsByCollege: failed to execute query or scan: %w", err)
+	}
+
+	return students, nil
+}
+
+// CountStudentsByCollege counts the total number of students within a specific college.
+func (s *studentRepository) CountStudentsByCollege(ctx context.Context, collegeID int) (int, error) {
+	query := s.DB.SQ.Select("COUNT(*)").From(studentTable).Where(squirrel.Eq{"college_id": collegeID})
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return 0, fmt.Errorf("CountStudentsByCollege: failed to build query: %w", err)
+	}
+
+	var count int
+	err = s.DB.Pool.QueryRow(ctx, sql, args...).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("CountStudentsByCollege: failed to execute query or scan: %w", err)
+	}
+
+	return count, nil
 }
 
 // GetStudentByID retrieves a student by their ID, filtered by college ID.
