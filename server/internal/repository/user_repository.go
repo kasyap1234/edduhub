@@ -3,40 +3,13 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"  // Import fmt for better error wrapping
-	"time" // Needed for time.Now() and time.Time fields
-
-	"eduhub/server/internal/models" // Your models package
-
+	"fmt"  
+	"time" 
+	"eduhub/server/internal/models" 
 	"github.com/Masterminds/squirrel"
-	"github.com/georgysavva/scany/pgxscan" // Using pgxscan for GET
-	"github.com/jackc/pgx/v4"              // For pgx.ErrNoRows, CommandTag
-	// Using pgxscan for GET
-	// For pgx.ErrNoRows, CommandTag
-	// Assuming DB struct uses this
+	"github.com/georgysavva/scany/pgxscan" 
+	"github.com/jackc/pgx/v4"              
 )
-
-// Ensure DB struct is defined elsewhere in this package
-// type DB struct {
-// 	Pool *pgxpool.Pool
-// 	SQ   squirrel.StatementBuilderType
-// }
-
-// --- Updated models.User struct (assuming RollNo field exists in your DB) ---
-// type User struct {
-//  ID               int       `db:"id" json:"id"`
-//  Name             string    `db:"name" json:"name"`
-//  Role             string    `db:"role" json:"role"`
-//  Email            string    `db:"email" json:"email"`
-//  KratosIdentityID string    `db:"kratos_identity_id" json:"kratos_identity_id"`
-//  IsActive         bool      `db:"is_active" json:"is_active"`
-//  RollNo           string    `db:"roll_no" json:"roll_no"` // Added this field
-//  CreatedAt        time.Time `db:"created_at" json:"created_at"`
-//  UpdatedAt        time.Time `db:"updated_at" json:"updated_at"`
-
-//  // Relations - not stored in DB (add db:"-" tag)
-//  // Student *Student `db:"-" json:"student,omitempty"`
-// }
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *models.User) error
@@ -64,7 +37,7 @@ func NewUserRepository(db *DB) UserRepository {
 	}
 }
 
-const userTable = "users" // Define your table name
+const userTable = "users" 
 
 // CreateUser inserts a new user record into the database.
 func (u *userRepository) CreateUser(ctx context.Context, user *models.User) error {

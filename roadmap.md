@@ -53,3 +53,67 @@ XI. Testing & Documentation
 Unit Tests: Write unit tests for handlers and services.
 Integration Tests: Write tests for API endpoints.
 API Documentation: Ensure Swagger/OpenAPI documentation is complete and accurate.
+
+
+
+Based on the existing structure and common features in educational platforms, here are some areas you could focus on next:
+
+Lecture Management:
+
+Why: Attendance is linked to lectureID, but there's no dedicated way to manage lecture details (topic, schedule, associated materials, etc.).
+Implementation:
+Create /home/tgt/Desktop/edduhub/server/internal/models/lecture.go (refining the basic struct you have).
+Create /home/tgt/Desktop/edduhub/server/internal/repository/lecture_repository.go with CRUD operations, finding lectures by course/date, etc.
+Create /home/tgt/Desktop/edduhub/server/internal/services/lecture/lecture_service.go to handle business logic (scheduling, linking resources).
+Assignment Management:
+
+Why: Your Keto permissions mention assignments (manage_assignments, submit_assignments, grade_assignments), but the backend logic isn't there yet.
+Implementation:
+Create /home/tgt/Desktop/edduhub/server/internal/models/assignment.go (defining assignment details, due dates, submissions, grades).
+Create /home/tgt/Desktop/edduhub/server/internal/repository/assignment_repository.go for CRUD on assignments and submissions.
+Create /home/tgt/Desktop/edduhub/server/internal/services/assignment/assignment_service.go for logic like creating assignments, handling student submissions, and grading.
+College Management:
+
+Why: Many repositories are scoped by college_id, implying multi-tenancy, but there's no way to manage the colleges themselves.
+Implementation:
+Ensure /home/tgt/Desktop/edduhub/server/internal/models/college.go is complete.
+Create /home/tgt/Desktop/edduhub/server/internal/repository/college_repository.go for CRUD operations on colleges.
+Create /home/tgt/Desktop/edduhub/server/internal/services/college/college_service.go.
+Department Management:
+
+Why: Keto permissions suggest department-level roles and actions (head, manage_courses).
+Implementation:
+Create /home/tgt/Desktop/edduhub/server/internal/models/department.go.
+Create /home/tgt/Desktop/edduhub/server/internal/repository/department_repository.go.
+Create /home/tgt/Desktop/edduhub/server/internal/services/department/department_service.go.
+Resource/File Management:
+
+Why: Courses often have associated materials (slides, documents, videos). Keto permissions also hint at this (uploader, downloader).
+Implementation:
+Create /home/tgt/Desktop/edduhub/server/internal/models/resource.go.
+Create /home/tgt/Desktop/edduhub/server/internal/repository/resource_repository.go.
+Create /home/tgt/Desktop/edduhub/server/internal/services/resource/resource_service.go (this might involve integrating with file storage like S3 or local storage).
+Announcement Management:
+
+Why: A common feature for broadcasting information within a course or college. Keto permissions exist (publisher, viewer).
+Implementation:
+Create /home/tgt/Desktop/edduhub/server/internal/models/announcement.go.
+Create /home/tgt/Desktop/edduhub/server/internal/repository/announcement_repository.go.
+Create /home/tgt/Desktop/edduhub/server/internal/services/announcement/announcement_service.go.
+API Layer (Handlers/Controllers):
+
+Why: Your services and repositories define what can be done, but you need an API layer (e.g., using net/http, Gin, Echo) to expose these functions over HTTP so a frontend or other clients can interact with them.
+Implementation: Create handler functions in an /internal/handlers or /internal/api directory that call your service methods based on incoming HTTP requests.
+Database Migrations:
+
+Why: You need a way to create and update your database schema based on your models.
+Implementation: Use a migration tool (like golang-migrate, sql-migrate, GORM's auto-migrate if using GORM) to define SQL scripts for creating tables (users, students, courses, enrollments, attendance, quizzes, questions, etc.).
+Configuration:
+
+Why: Manage database connection strings, Kratos/Keto URLs, and other settings cleanly.
+Implementation: Use environment variables or a configuration library (like Viper) loaded in your main.go or a dedicated config package.
+Enhanced Testing:
+
+Why: While you have repository tests, adding service-level tests and potentially integration tests will improve robustness.
+Implementation: Write tests for your service methods, mocking the repository layer.
+I'd suggest tackling the API layer and database migrations next, as they are crucial for making the existing backend functional. Then, you can progressively add the missing feature modules like Lecture Management, Assignment Management, etc.
