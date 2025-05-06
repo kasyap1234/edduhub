@@ -6,6 +6,7 @@ import "time"
 type Course struct {
 	ID           int       `db:"id" json:"id"`
 	Name         string    `db:"name" json:"name"`
+	CollegeID    int       `db:"college_id" json:"college_id"`
 	Description  string    `db:"description" json:"description"`
 	Credits      int       `db:"credits" json:"credits"`
 	InstructorID int       `db:"instructor_id" json:"instructor_id"`
