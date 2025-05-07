@@ -291,7 +291,6 @@ func (r *quizRepository) DeleteAnswerOption(ctx context.Context, optionID int) e
 	return nil
 }
 
-// --- QuizAttempt Methods --- (Simplified Get/Update/Find/Count - add similarly) ---
 
 func (r *quizRepository) CreateQuizAttempt(ctx context.Context, attempt *models.QuizAttempt) error {
 	now := time.Now()

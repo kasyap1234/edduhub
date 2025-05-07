@@ -28,7 +28,7 @@ type AttendanceRepository interface {
 
 	// Count methods (add corresponding count methods if needed)
 	// ProcessQRCode(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
-	SetAttendanceStatus(ctx context.Context, collegeID int, studentID, courseID int, lectureID int, status string) error
+	// SetAttendanceStatus(ctx context.Context, collegeID int, studentID, courseID int, lectureID int, status string) error
 }
 
 const attendanceTable = "attendance"
