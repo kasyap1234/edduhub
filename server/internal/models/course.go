@@ -21,10 +21,16 @@ type Course struct {
 // Lecture represents an individual class session
 
 type Lecture struct {
-	ID        int `json:"id"`
-	CollegeID int `json:"college_id"`
-	CourseID  int `json:"course_id"`
-	QRCodeID  int `json:"qr_code_id"`
+	ID          int       `db:"id" json:"id"`                               // Primary Key
+	CourseID    int       `db:"course_id" json:"course_id"`                 // Foreign key to courses table
+	CollegeID   int       `db:"college_id" json:"college_id"`               // Denormalized, Foreign key to colleges table
+	Title       string    `db:"title" json:"title"`                         // Title of the lecture
+	Description string    `db:"description" json:"description,omitempty"`   // Optional description
+	StartTime   time.Time `db:"start_time" json:"start_time"`               // Start time of the lecture
+	EndTime     time.Time `db:"end_time" json:"end_time"`                   // End time of the lecture
+	MeetingLink string    `db:"meeting_link" json:"meeting_link,omitempty"` // For online lectures
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`               // Timestamp of creation
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`               // Timestamp of last update
 }
 
 // QRCode represents a unique QR code for each lecture
