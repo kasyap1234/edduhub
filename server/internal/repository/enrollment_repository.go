@@ -292,9 +292,9 @@ func (e *enrollmentRepository) UpdateEnrollmentStatus(ctx context.Context, colle
 
 	// Build the UPDATE query
 	query := e.DB.SQ.Update(enrollmentTable).
-		Set("status", status).       // Set the new status
-		Set("updated_at", now).      // Update the updated_at timestamp
-		Where(squirrel.Eq{ // Identify the record by ID and CollegeID
+		Set("status", status).  // Set the new status
+		Set("updated_at", now). // Update the updated_at timestamp
+		Where(squirrel.Eq{      // Identify the record by ID and CollegeID
 			"id":         enrollmentID,
 			"college_id": collegeID,
 		})
@@ -350,7 +350,7 @@ func (e *enrollmentRepository) UpdateEnrollment(ctx context.Context, enrollment 
 		Set("enrollment_date", enrollment.EnrollmentDate).
 		Set("status", enrollment.Status).
 		Set("grade", enrollment.Grade).
-		Set("updated_at", enrollment.UpdatedAt). // Corrected typo: updated_at
+		Set("updated_at", enrollment.UpdatedAt).                                    // Corrected typo: updated_at
 		Where(squirrel.Eq{"id": enrollment.ID, "college_id": enrollment.CollegeID}) // Ensure update is scoped
 
 	sql, args, err := query.ToSql()

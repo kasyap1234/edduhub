@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
-	"eduhub/server/internal/models"
 	"errors"
 	"time"
+
+	"eduhub/server/internal/models"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/georgysavva/scany/pgxscan"
@@ -47,7 +48,6 @@ func NewCollegeRepository(DB *DB) CollegeRepository {
 // }
 
 func (c *collegeRepository) CreateCollege(ctx context.Context, college *models.College) error {
-
 	now := time.Now()
 	college.CreatedAt = now
 	college.UpdatedAt = now
@@ -56,7 +56,6 @@ func (c *collegeRepository) CreateCollege(ctx context.Context, college *models.C
 	sql, args, err := query.ToSql()
 	if err != nil {
 		return errors.New("create college: failed  to build query")
-
 	}
 	err = c.DB.Pool.QueryRow(ctx, sql, args...).Scan(&college.ID)
 	if err != nil {
@@ -134,11 +133,9 @@ func (c *collegeRepository) UpdateCollege(ctx context.Context, college *models.C
 	}
 	if commandTag.RowsAffected() == 0 {
 		return errors.New("update college: no college found with the requested id")
-
 	}
 
 	return nil
-
 }
 
 func (c *collegeRepository) DeleteCollege(ctx context.Context, id int) error {
@@ -160,7 +157,6 @@ func (c *collegeRepository) DeleteCollege(ctx context.Context, id int) error {
 }
 
 func (c *collegeRepository) ListColleges(ctx context.Context, limit, offset uint64) ([]*models.College, error) {
-
 	query := c.DB.SQ.Select("id", "name", "address", "city", "state", "country", "created_at", "updated_at").From(collegeTable)
 	sql, args, err := query.ToSql()
 	if err != nil {

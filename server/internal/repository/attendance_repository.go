@@ -183,7 +183,6 @@ func (a *attendanceRepository) GetAttendanceStudentInCourse(
 	courseID int,
 	limit, offset uint64, // Added pagination params
 ) ([]*models.Attendance, error) {
-
 	attendances := []*models.Attendance{}
 	query := a.DB.SQ.Select("id", // Use database column names matching struct tags
 		"student_id",
@@ -371,5 +370,4 @@ func (a *attendanceRepository) SetAttendanceStatus(ctx context.Context, collegeI
 		return errors.New("failed to update attendance")
 	}
 	return nil
-
 }

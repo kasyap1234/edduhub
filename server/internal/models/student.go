@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Student struct {
-	StudentID        int       `db:"student_id" json:"student_id"`
+	StudentID        int       `db:"id" json:"student_id"`
 	UserID           int       `db:"user_id" json:"user_id"`
 	CollegeID        int       `db:"college_id" json:"college_id"`
 	KratosIdentityID string    `db:"kratos_identity_id" json:"kratos_identity_id"`

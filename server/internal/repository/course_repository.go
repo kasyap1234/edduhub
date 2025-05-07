@@ -10,7 +10,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/georgysavva/scany/pgxscan" // Add pgxscan import
-	"github.com/jackc/pgx/v4"             // Use v4 for pgx.ErrNoRows
+	"github.com/jackc/pgx/v4"              // Use v4 for pgx.ErrNoRows
 )
 
 type CourseRepository interface {

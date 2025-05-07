@@ -5,8 +5,8 @@ type Repository struct {
 	StudentRepository    StudentRepository
 	UserRepository       UserRepository
 	EnrollmentRepository EnrollmentRepository
-	PlacementRepository  PlacementRepository // Added Placement
-	QuizRepository       QuizRepository      // Added Quiz
+	PlacementRepository  PlacementRepository  // Added Placement
+	QuizRepository       QuizRepository       // Added Quiz
 	DepartmentRepository DepartmentRepository // Added Department
 }
 
@@ -18,8 +18,8 @@ func NewRepository(DB *DB) *Repository {
 	studentRepo := NewStudentRepository(DB)
 	userRepo := NewUserRepository(DB)
 	enrollmentRepo := NewEnrollmentRepository(DB)
-	placementRepo := NewPlacementRepository(DB) // Instantiate Placement
-	quizRepo := NewQuizRepository(DB)           // Instantiate Quiz
+	placementRepo := NewPlacementRepository(DB)   // Instantiate Placement
+	quizRepo := NewQuizRepository(DB)             // Instantiate Quiz
 	departmentRepo := NewDepartmentRepository(DB) // Instantiate Department
 	return &Repository{
 		AttendanceRepository: attendanceRepo,

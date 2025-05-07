@@ -23,7 +23,7 @@ import (
 
 type StudentRepository interface {
 	CreateStudent(ctx context.Context, student *models.Student) error
-	GetStudentByRollNo(ctx context.Context, rollNo string) (*models.Student, error)
+	GetStudentByRollNo(ctx context.Context, collegeID int, rollNo string) (*models.Student, error)
 	GetStudentByID(ctx context.Context, collegeID int, studentID int) (*models.Student, error) // Note: studentID is the primary key 'id' here
 	UpdateStudent(ctx context.Context, model *models.Student) error
 	FreezeStudent(ctx context.Context, rollNo string) error   // Renamed param to match casing
@@ -103,18 +103,18 @@ func (s *studentRepository) CreateStudent(ctx context.Context, student *models.S
 }
 
 // GetStudentByRollNo retrieves a student by their roll number.
-func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo string) (*models.Student, error) {
+func (s *studentRepository) GetStudentByRollNo(ctx context.Context, collegeID int, rollNo string) (*models.Student, error) {
 	// Build the SELECT query for a single row
 	query := s.DB.SQ.Select(
 		"id", "user_id", "college_id", "kratos_identity_id",
 		"enrollment_year", "roll_no", "is_active", "created_at", "updated_at",
 	).
 		From(studentTable).
-		Where(squirrel.Eq{"roll_no": rollNo}) // Filter by roll_no
+		Where(squirrel.Eq{"roll_no": rollNo, "college_id": collegeID}) // Filter by roll_no and college_id
 
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("GetStudentByRollNo: failed to build query: %w", err)
+		return nil, fmt.Errorf("GetStudentByRollNo: failed to build query for college %d, rollNo %s: %w", collegeID, rollNo, err)
 	}
 
 	student := &models.Student{} // Initialize the struct
@@ -123,11 +123,11 @@ func (s *studentRepository) GetStudentByRollNo(ctx context.Context, rollNo strin
 	err = pgxscan.Get(ctx, s.DB.Pool, student, sql, args...)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			// Return nil, nil for not found, consistent with your original FindByKratosID
-			return nil, nil
+			// Return a specific error or nil, nil as per your error handling strategy
+			return nil, fmt.Errorf("GetStudentByRollNo: student with rollNo %s not found in college %d", rollNo, collegeID)
 		}
 		// Any other error during execution or scanning
-		return nil, fmt.Errorf("GetStudentByRollNo: failed to execute query or scan: %w", err)
+		return nil, fmt.Errorf("GetStudentByRollNo: failed to execute query or scan for college %d, rollNo %s: %w", collegeID, rollNo, err)
 	}
 
 	return student, nil // Success

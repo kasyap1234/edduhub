@@ -2,15 +2,14 @@ package middleware
 
 import (
 	"context"
-	"eduhub/server/internal/helpers"
-	"eduhub/server/internal/models"
-	"eduhub/server/internal/services/auth"
-	"eduhub/server/internal/services/student"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
+
+	"eduhub/server/internal/models"
+	"eduhub/server/internal/services/auth"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"

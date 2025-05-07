@@ -3,12 +3,14 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"  
-	"time" 
-	"eduhub/server/internal/models" 
+	"fmt"
+	"time"
+
+	"eduhub/server/internal/models"
+
 	"github.com/Masterminds/squirrel"
-	"github.com/georgysavva/scany/pgxscan" 
-	"github.com/jackc/pgx/v4"              
+	"github.com/georgysavva/scany/pgxscan"
+	"github.com/jackc/pgx/v4"
 )
 
 type UserRepository interface {
@@ -37,7 +39,7 @@ func NewUserRepository(db *DB) UserRepository {
 	}
 }
 
-const userTable = "users" 
+const userTable = "users"
 
 // CreateUser inserts a new user record into the database.
 func (u *userRepository) CreateUser(ctx context.Context, user *models.User) error {

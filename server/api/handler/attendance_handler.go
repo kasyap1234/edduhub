@@ -71,6 +71,7 @@ func (a *AttendanceHandler) ProcessAttendance(c echo.Context) error {
 	err = a.attendanceService.ProcessQRCode(ctx, collegeID, studentId, qrcodeData.QRCodeData)
 	return err
 }
+
 func (a *AttendanceHandler) MarkAttendance(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -174,7 +175,6 @@ func (a *AttendanceHandler) UpdateAttendance(c echo.Context) error {
 	collegeID, err := helpers.ExtractCollegeID(c)
 	if err != nil {
 		return helpers.Error(c, "Invalid collegeID", 400)
-
 	}
 	lectureID, err := helpers.GetIDFromParam(c, "lectureID")
 	if err != nil {
