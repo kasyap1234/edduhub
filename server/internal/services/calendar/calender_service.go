@@ -1,10 +1,5 @@
 package calendar
 
-type CalendarService interface {
+type CalendarService interface{}
 
-}
-
-
-type calendarService struct {
-	
-}
+type calendarService struct{}

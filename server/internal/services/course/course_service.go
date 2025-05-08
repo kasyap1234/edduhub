@@ -2,9 +2,10 @@ package course
 
 import (
 	"context"
+	"fmt"
+
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
-	"fmt"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -44,9 +45,9 @@ func (c *courseService) CreateCourse(ctx context.Context, course *models.Course)
 }
 
 func (c *courseService) FindCourseByID(ctx context.Context, collegeID int, courseID int) (*models.Course, error) {
-
 	return c.courseRepo.FindCourseByID(ctx, collegeID, courseID)
 }
+
 func (c *courseService) UpdateCourse(ctx context.Context, courseID int, course *models.Course) error {
 	if course.ID != courseID {
 		return fmt.Errorf("courseID not matching")
@@ -58,15 +59,16 @@ func (c *courseService) UpdateCourse(ctx context.Context, courseID int, course *
 
 	return c.courseRepo.UpdateCourse(ctx, course)
 }
+
 func (c *courseService) DeleteCourse(ctx context.Context, collegeID int, courseID int) error {
 	return c.courseRepo.DeleteCourse(ctx, collegeID, courseID)
-
 }
 
 // Find methods with pagination
 func (c *courseService) FindAllCourses(ctx context.Context, collegeID int, limit, offset uint64) ([]*models.Course, error) {
 	return c.courseRepo.FindAllCourses(ctx, collegeID, limit, offset)
 }
+
 func (c *courseService) FindCoursesByInstructor(ctx context.Context, collegeID int, instructorID int, limit, offset uint64) ([]*models.Course, error) {
 	return c.courseRepo.FindCoursesByInstructor(ctx, collegeID, instructorID, limit, offset)
 }
@@ -75,6 +77,7 @@ func (c *courseService) FindCoursesByInstructor(ctx context.Context, collegeID i
 func (c *courseService) CountCoursesByCollege(ctx context.Context, collegeID int) (int, error) {
 	return c.courseRepo.CountCoursesByCollege(ctx, collegeID)
 }
+
 func (c *courseService) CountCoursesByInstructor(ctx context.Context, collegeID int, instructorID int) (int, error) {
 	return c.courseRepo.CountCoursesByInstructor(ctx, collegeID, instructorID)
 }

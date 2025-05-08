@@ -2,10 +2,11 @@ package repository
 
 import (
 	"context"
-	"eduhub/server/internal/models"
 	"errors"
 	"fmt"
 	"time"
+
+	"eduhub/server/internal/models"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/georgysavva/scany/pgxscan"

@@ -30,7 +30,6 @@ func NewEnrollmentService(enrollmentRepo repository.EnrollmentRepository) Enroll
 		enrollmentRepo: enrollmentRepo,
 		validate:       validator.New(),
 	}
-
 }
 
 func (e *enrollmentService) CreateEnrollment(ctx context.Context, enrollment *models.Enrollment) error {
@@ -38,11 +37,9 @@ func (e *enrollmentService) CreateEnrollment(ctx context.Context, enrollment *mo
 		return fmt.Errorf("struct validaton failed %w", err)
 	}
 	return e.enrollmentRepo.CreateEnrollment(ctx, enrollment)
-
 }
 
 func (e *enrollmentService) IsStudentEnrolled(ctx context.Context, collegeID, studentID, courseID int) (bool, error) {
-
 	return e.enrollmentRepo.IsStudentEnrolled(ctx, collegeID, studentID, courseID)
 }
 
@@ -53,17 +50,18 @@ func (e *enrollmentService) UpdateEnrollment(ctx context.Context, enrollment *mo
 
 	return e.enrollmentRepo.UpdateEnrollment(ctx, enrollment)
 }
+
 func (e *enrollmentService) UpdateEnrollmentStatus(ctx context.Context, collegeID int, enrollmentID int, NewStatus string) error {
 	if NewStatus != models.Active && NewStatus != models.Inactive && NewStatus != models.Completed {
 		return fmt.Errorf("cannot change to %s status", NewStatus)
 	}
 	return e.enrollmentRepo.UpdateEnrollmentStatus(ctx, collegeID, enrollmentID, NewStatus)
-
 }
-func (e *enrollmentService) DeleteEnrollment(ctx context.Context, collegeID int, enrollmentID int) error {
 
+func (e *enrollmentService) DeleteEnrollment(ctx context.Context, collegeID int, enrollmentID int) error {
 	return e.enrollmentRepo.DeleteEnrollment(ctx, collegeID, enrollmentID)
 }
+
 func (e *enrollmentService) FindEnrollmentsByStudent(ctx context.Context, collegeID int, studentID int, limit, offset uint64) ([]*models.Enrollment, error) {
 	return e.enrollmentRepo.FindEnrollmentsByStudent(ctx, collegeID, studentID, limit, offset)
 }

@@ -8,7 +8,7 @@ import (
 type Handlers struct {
 	Auth *AuthHandler
 	// other handlers
-	
+
 	// Quiz *QuizHandler
 	// fee handler
 	// attendance handler

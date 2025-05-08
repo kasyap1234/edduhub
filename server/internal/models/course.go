@@ -23,16 +23,17 @@ type Course struct {
 // Lecture represents an individual class session
 type Lecture struct {
 	ID          int       `db:"id" json:"id" validate:"omitempty,gte=0"`                               // Primary Key
-	CourseID    int       `db:"course_id" json:"course_id" validate:"required,gte=1"`                 // Foreign key to courses table
-	CollegeID   int       `db:"college_id" json:"college_id" validate:"required,gte=1"`               // Denormalized, Foreign key to colleges table
-	Title       string    `db:"title" json:"title" validate:"required,min=3,max=100"`                         // Title of the lecture
-	Description string    `db:"description" json:"description,omitempty" validate:"omitempty,max=200"`   // Optional description
-	StartTime   time.Time `db:"start_time" json:"start_time" validate:"required,before_end_time"`               // Start time of the lecture
-	EndTime     time.Time `db:"end_time" json:"end_time" validate:"required,after_start_time"`                   // End time of the lecture
-	MeetingLink string    `db:"meeting_link" json:"meeting_link,omitempty" validate:"omitempty,url"` // For online lectures
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`                                           // Timestamp of creation
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`                                           // Timestamp of last update
+	CourseID    int       `db:"course_id" json:"course_id" validate:"required,gte=1"`                  // Foreign key to courses table
+	CollegeID   int       `db:"college_id" json:"college_id" validate:"required,gte=1"`                // Denormalized, Foreign key to colleges table
+	Title       string    `db:"title" json:"title" validate:"required,min=3,max=100"`                  // Title of the lecture
+	Description string    `db:"description" json:"description,omitempty" validate:"omitempty,max=200"` // Optional description
+	StartTime   time.Time `db:"start_time" json:"start_time" validate:"required,before_end_time"`      // Start time of the lecture
+	EndTime     time.Time `db:"end_time" json:"end_time" validate:"required,after_start_time"`         // End time of the lecture
+	MeetingLink string    `db:"meeting_link" json:"meeting_link,omitempty" validate:"omitempty,url"`   // For online lectures
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`                                          // Timestamp of creation
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`                                          // Timestamp of last update
 }
+
 // QRCode represents a unique QR code for each lecture
 
 // Courses represents a collection of courses

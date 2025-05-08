@@ -37,6 +37,7 @@ func (a *Assigner) AssignStudentToCourse(ctx context.Context, studentID, courseI
 	}
 	return nil
 }
+
 func (a *Assigner) AssignDepartmentHead(ctx context.Context, facultyID, deparmentID string) {
 	relations := []string{"head", "manage_courses", "view_analytics"}
 	for _, relation := range relations {
@@ -44,14 +45,12 @@ func (a *Assigner) AssignDepartmentHead(ctx context.Context, facultyID, deparmen
 			errors.New("failed to assign department head")
 		}
 	}
-
 }
 
 func (a *Assigner) AssignResourcePermissions(ctx context.Context, userID, resourceID string, permissions []string) error {
 	for _, permission := range permissions {
 		if err := a.keto.CreateRelation(ctx, "resources", resourceID, permission, userID); err != nil {
 			return fmt.Errorf("failed to assign resource permission %s: %w", permission, err)
-
 		}
 	}
 	return nil
