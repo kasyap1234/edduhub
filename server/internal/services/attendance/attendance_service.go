@@ -46,8 +46,8 @@ func (a *attendanceService) GetAttendanceByLecture(ctx context.Context, collegeI
 }
 
 // to get attendance of all students in a course
-func (a *attendanceService) GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int, limit, offset uint64) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByCourse(ctx, collegeID, courseID, limit, offset)
+func (a *attendanceService) GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceByCourse(ctx, collegeID, courseID, 0, 0)
 }
 
 func (a *attendanceService) GetAttendanceByStudent(ctx context.Context, collegeID int, studentID int, limit uint64, offset uint64) ([]*models.Attendance, error) {

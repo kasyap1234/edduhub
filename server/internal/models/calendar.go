@@ -19,4 +19,19 @@ type CalendarBlock struct {
 	Description string            `db:"description" json:"description"`
 	EventType   CalendarEventType `db:"event_type" json:"event_type"`
 	Date        time.Time         `db:"date" json:"date"`
+	// Optional: For multi-day events or events with specific times
+	// StartTime   *time.Time        `db:"start_time" json:"start_time,omitempty"`
+	// EndTime     *time.Time        `db:"end_time" json:"end_time,omitempty"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+}
+
+// CalendarBlockFilter can be used for querying lists of calendar blocks
+type CalendarBlockFilter struct {
+	CollegeID *int               `json:"college_id"` // Mandatory for most queries
+	EventType *CalendarEventType `json:"event_type,omitempty"`
+	StartDate *time.Time         `json:"start_date,omitempty"` // Inclusive
+	EndDate   *time.Time         `json:"end_date,omitempty"`   // Inclusive
+	Limit     uint64             `json:"limit,omitempty"`
+	Offset    uint64             `json:"offset,omitempty"`
 }
