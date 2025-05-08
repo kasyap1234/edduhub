@@ -50,6 +50,7 @@ func (e *enrollmentService) UpdateEnrollment(ctx context.Context, enrollment *mo
 	if err := e.validate.Struct(enrollment); err != nil {
 		return fmt.Errorf("validation failed Error :%w", err)
 	}
+
 	return e.enrollmentRepo.UpdateEnrollment(ctx, enrollment)
 }
 func (e *enrollmentService) UpdateEnrollmentStatus(ctx context.Context, collegeID int, enrollmentID int, NewStatus string) error {
