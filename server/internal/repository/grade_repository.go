@@ -168,8 +168,8 @@ func (r *gradeRepository) GetGrades(ctx context.Context, filter models.GradeFilt
 	if filter.AcademicYear != nil {
 		query = query.Where(squirrel.Eq{"academic_year": *filter.AcademicYear})
 	}
-	if filter.ExamType != nil {
-		query = query.Where(squirrel.Eq{"exam_type": *filter.ExamType})
+	if filter.ExamType != "" {
+		query = query.Where(squirrel.Eq{"exam_type": filter.ExamType})
 	}
 
 	// For progress tracking, you might want to order by academic_year, semester, graded_at

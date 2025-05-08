@@ -3,6 +3,15 @@ package models
 
 import "time"
 
+type ExamType = string
+
+const (
+	Midterm1    ExamType = "midterm-1"
+	Midterm2    ExamType = "midterm-2"
+	Final       ExamType = "final"
+	Assignments ExamType = "assignment"
+)
+
 type Grade struct {
 	ID            int       `db:"id" json:"id"`
 	StudentID     string    `db:"student_id" json:"student_id"` // Kratos ID or internal student identifier
@@ -13,7 +22,7 @@ type Grade struct {
 	GradeLetter   *string   `db:"grade_letter" json:"grade_letter,omitempty"`
 	Semester      int       `db:"semester" json:"semester"`
 	AcademicYear  string    `db:"academic_year" json:"academic_year"` // e.g., "2023-2024"
-	ExamType      string    `db:"exam_type" json:"exam_type"`         // e.g., "Midterm", "Final", "Assignment"
+	ExamType      ExamType  `db:"exam_type" json:"exam_type"`         // e.g., "Midterm", "Final", "Assignment"
 	GradedAt      time.Time `db:"graded_at" json:"graded_at"`         // When the grade was officially given
 	Comments      *string   `db:"comments" json:"comments,omitempty"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
@@ -22,12 +31,12 @@ type Grade struct {
 
 // GradeFilter can be used for querying lists of grades with specific criteria
 type GradeFilter struct {
-	StudentID    *string `json:"student_id,omitempty"`
-	CourseID     *int    `json:"course_id,omitempty"`
-	CollegeID    *int    `json:"college_id,omitempty"` // Essential for multi-tenancy
-	Semester     *int    `json:"semester,omitempty"`
-	AcademicYear *string `json:"academic_year,omitempty"`
-	ExamType     *string `json:"exam_type,omitempty"`
+	StudentID    *string  `json:"student_id,omitempty"`
+	CourseID     *int     `json:"course_id,omitempty"`
+	CollegeID    *int     `json:"college_id,omitempty"` // Essential for multi-tenancy
+	Semester     *int     `json:"semester,omitempty"`
+	AcademicYear *string  `json:"academic_year,omitempty"`
+	ExamType     ExamType `json:"exam_type,omitempty"`
 	// Add pagination fields if needed
 	Limit  uint64 `json:"limit,omitempty"`
 	Offset uint64 `json:"offset,omitempty"`
