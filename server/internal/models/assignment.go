@@ -1,18 +1,20 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 // Assignment represents an assignment given in a course.
 type Assignment struct {
-	ID          int       `db:"id" json:"id"`                             // Primary Key
-	CourseID    int       `db:"course_id" json:"course_id"`               // Foreign key to courses table
-	CollegeID   int       `db:"college_id" json:"college_id"`             // Denormalized, Foreign key to colleges table
-	Title       string    `db:"title" json:"title"`                       // Title of the assignment
-	Description string    `db:"description" json:"description,omitempty"` // Detailed description
-	DueDate     time.Time `db:"due_date" json:"due_date"`                 // Due date for the assignment
-	MaxPoints   int       `db:"max_points" json:"max_points"`             // Maximum points for the assignment
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`             // Timestamp of creation
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`             // Timestamp of last update
+	ID          int       `db:"id" json:"id" validate:"required"`                  // Primary Key
+	CourseID    int       `db:"course_id" json:"course_id" validate:"required"`    // Foreign key to courses table
+	CollegeID   int       `db:"college_id" json:"college_id" validate: "required"` // Denormalized, Foreign key to colleges table
+	Title       string    `db:"title" json:"title"`                                // Title of the assignment
+	Description string    `db:"description" json:"description,omitempty"`          // Detailed description
+	DueDate     time.Time `db:"due_date" json:"due_date"`                          // Due date for the assignment
+	MaxPoints   int       `db:"max_points" json:"max_points"`                      // Maximum points for the assignment
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`                      // Timestamp of creation
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`                      // Timestamp of last update
 }
 
 // AssignmentSubmission represents a student's submission for an assignment.

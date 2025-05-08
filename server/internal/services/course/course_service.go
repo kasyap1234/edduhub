@@ -4,12 +4,15 @@ import (
 	"context"
 	"eduhub/server/internal/models"
 	"eduhub/server/internal/repository"
+	"fmt"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type CourseService interface {
 	CreateCourse(ctx context.Context, course *models.Course) error
 	FindCourseByID(ctx context.Context, collegeID int, courseID int) (*models.Course, error) // Added collegeID
-	UpdateCourse(ctx context.Context, course *models.Course) error
+	UpdateCourse(ctx context.Context, courseID int, course *models.Course) error
 	DeleteCourse(ctx context.Context, collegeID int, courseID int) error
 
 	// Find methods with pagination
@@ -23,15 +26,20 @@ type CourseService interface {
 
 type courseService struct {
 	courseRepo repository.CourseRepository
+	validate   *validator.Validate
 }
 
 func NewCourseService(courseRepo repository.CourseRepository) CourseService {
 	return &courseService{
 		courseRepo: courseRepo,
+		validate:   validator.New(),
 	}
 }
 
 func (c *courseService) CreateCourse(ctx context.Context, course *models.Course) error {
+	if err := c.validate.Struct(course); err != nil {
+		return fmt.Errorf("validation error %w", err)
+	}
 	return c.courseRepo.CreateCourse(ctx, course)
 }
 
@@ -39,7 +47,15 @@ func (c *courseService) FindCourseByID(ctx context.Context, collegeID int, cours
 
 	return c.courseRepo.FindCourseByID(ctx, collegeID, courseID)
 }
-func (c *courseService) UpdateCourse(ctx context.Context, course *models.Course) error {
+func (c *courseService) UpdateCourse(ctx context.Context, courseID int, course *models.Course) error {
+	if course.ID != courseID {
+		return fmt.Errorf("courseID not matching")
+	}
+
+	if err := c.validate.Struct(course); err != nil {
+		return fmt.Errorf("validation error %w", err)
+	}
+
 	return c.courseRepo.UpdateCourse(ctx, course)
 }
 func (c *courseService) DeleteCourse(ctx context.Context, collegeID int, courseID int) error {
@@ -62,4 +78,3 @@ func (c *courseService) CountCoursesByCollege(ctx context.Context, collegeID int
 func (c *courseService) CountCoursesByInstructor(ctx context.Context, collegeID int, instructorID int) (int, error) {
 	return c.courseRepo.CountCoursesByInstructor(ctx, collegeID, instructorID)
 }
-
