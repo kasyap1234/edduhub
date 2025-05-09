@@ -64,7 +64,6 @@ func (g *gradeServices) DeleteGrade(ctx context.Context, gradeID int, collegeID 
 
 func (g *gradeServices) GetGrades(ctx context.Context, filters models.GradeFilter) ([]*models.Grade, error) {
 	return g.gradeRepo.GetGrades(ctx, filters)
-
 }
 
 

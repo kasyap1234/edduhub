@@ -55,8 +55,8 @@ type QuizService interface {
 type quizService struct {
 	quizRepo repository.QuizRepository
 	// For more complex business logic, you might inject other repositories or services:
-	// courseRepo     repository.CourseRepository
-	// enrollmentRepo repository.EnrollmentRepository
+	courseRepo     repository.CourseRepository
+	enrollmentRepo repository.EnrollmentRepository
 	validate *validator.Validate
 }
 
@@ -219,12 +219,15 @@ func (s *quizService) StartQuizAttempt(ctx context.Context, attempt *models.Quiz
 	}
 
 	// Further business logic: check student enrollment, existing attempts, etc.
-
-	attempt.StartTime = time.Now()
+	ok,err :=s.enrollmentRepo.IsStudentEnrolled(ctx,attempt.CollegeID,attempt.Course)
+	if ok{
+		
+		attempt.StartTime = time.Now()
 	attempt.Status = models.QuizAttemptStatusInProgress
 	return s.quizRepo.CreateQuizAttempt(ctx, attempt)
 }
 
+}
 func (s *quizService) GetQuizAttemptByID(ctx context.Context, collegeID int, attemptID int) (*models.QuizAttempt, error) {
 	return s.quizRepo.GetQuizAttemptByID(ctx, collegeID, attemptID)
 }
