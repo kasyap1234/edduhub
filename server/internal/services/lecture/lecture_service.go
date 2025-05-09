@@ -36,7 +36,12 @@ func (l *lectureService) CreateLecture(ctx context.Context, lecture *models.Lect
 	if err := l.validate.Struct(lecture); err != nil {
 		return fmt.Errorf("validation failed %w", err)
 	}
-	return l.CreateLecture(ctx, lecture)
+	// Business logic: Validate StartTime is before EndTime
+	if !lecture.StartTime.Before(lecture.EndTime) {
+		return fmt.Errorf("lecture start time must be before end time")
+	}
+
+	return l.lectureRepo.CreateLecture(ctx, lecture)
 }
 
 func (l *lectureService) GetLectureByID(ctx context.Context, collegeID int, lectureID int) (*models.Lecture, error) {
@@ -47,6 +52,11 @@ func (l *lectureService) UpdateLecture(ctx context.Context, lecture *models.Lect
 	if err := l.validate.Struct(lecture); err != nil {
 		return fmt.Errorf("validation failed %w", err)
 	}
+	// Business logic: Validate StartTime is before EndTime
+	if !lecture.StartTime.Before(lecture.EndTime) {
+		return fmt.Errorf("lecture start time must be before end time")
+	}
+
 	return l.lectureRepo.UpdateLecture(ctx, lecture)
 }
 

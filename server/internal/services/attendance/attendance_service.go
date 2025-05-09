@@ -16,12 +16,12 @@ const (
 
 type AttendanceService interface {
 	GenerateQRCode(ctx context.Context, collegeID, courseID int, lectureID int) (string, error)
-	GetAttendanceByLecture(ctx context.Context, collegeID, courseID int, lectureID int) ([]*models.Attendance, error)
-	GetAttendanceByCourse(ctx context.Context, collegeID, courseID int) ([]*models.Attendance, error)
-	GetAttendanceByStudent(ctx context.Context, collegeID, studentID int) ([]*models.Attendance, error)
-	GetAttendanceByStudentAndCourse(ctx context.Context, collegeID, studentID int, courseID int) ([]*models.Attendance, error)
+	GetAttendanceByLecture(ctx context.Context, collegeID, courseID int, lectureID int, limit, offset uint64) ([]*models.Attendance, error)
+	GetAttendanceByCourse(ctx context.Context, collegeID, courseID int, limit, offset uint64) ([]*models.Attendance, error)
+	GetAttendanceByStudent(ctx context.Context, collegeID, studentID int, limit, offset uint64) ([]*models.Attendance, error)
+	GetAttendanceByStudentAndCourse(ctx context.Context, collegeID, studentID int, courseID int, limit, offset uint64) ([]*models.Attendance, error)
 	MarkAttendance(ctx context.Context, collegeID int, studentID int, courseID int, lectureID int) (bool, error)
-	UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int) (bool, error)
+	UpdateAttendanceStatus(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, newStatus string) (bool, error)
 	FreezeAttendance(ctx context.Context, collegeID, studentID int) (bool, error)
 	VerifyStudentStateAndEnrollment(ctx context.Context, collegeID, studentID, courseID int) (bool, error)
 	ProcessQRCode(ctx context.Context, collegeID int, studentID int, qrCodeContent string) error
@@ -46,8 +46,8 @@ func (a *attendanceService) GetAttendanceByLecture(ctx context.Context, collegeI
 }
 
 // to get attendance of all students in a course
-func (a *attendanceService) GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int) ([]*models.Attendance, error) {
-	return a.repo.GetAttendanceByCourse(ctx, collegeID, courseID, 0, 0)
+func (a *attendanceService) GetAttendanceByCourse(ctx context.Context, collegeID int, courseID int, limit, offset uint64) ([]*models.Attendance, error) {
+	return a.repo.GetAttendanceByCourse(ctx, collegeID, courseID, limit, offset)
 }
 
 func (a *attendanceService) GetAttendanceByStudent(ctx context.Context, collegeID int, studentID int, limit uint64, offset uint64) ([]*models.Attendance, error) {
@@ -106,30 +106,17 @@ func (a *attendanceService) GenerateAndProcessQRCode(ctx context.Context, colleg
 	return nil
 }
 
-func (a *attendanceService) UpdateAttendance(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, limit, offset uint64) (bool, error) {
-	attendances, err := a.GetAttendanceByStudent(ctx, collegeID, studentID, limit, offset)
-	if err != nil {
-		return false, err
+func (a *attendanceService) UpdateAttendanceStatus(ctx context.Context, collegeID, studentID int, courseID int, lectureID int, newStatus string) (bool, error) {
+	// Validate newStatus if necessary (e.g., ensure it's one of "Present", "Absent", "Late", etc.)
+	validStatuses := map[string]bool{Present: true, Absent: true, Freezed: true, "Late": true, "Excused": true}
+	if !validStatuses[newStatus] {
+		return false, fmt.Errorf("invalid attendance status: %s", newStatus)
 	}
 
-	var currentStatus string
-	var updatedStatus string
-	for _, att := range attendances {
-		if att.LectureID == lectureID {
-			currentStatus = att.Status
-			break
-		}
-	}
-
-	switch currentStatus {
-	case Present:
-		updatedStatus = Absent
-	case Absent:
-		updatedStatus = Present
-	}
-	err = a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, updatedStatus)
+	// Directly update the specific attendance record
+	err := a.repo.UpdateAttendance(ctx, collegeID, studentID, courseID, lectureID, newStatus)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to update attendance status: %w", err)
 	}
 	return true, nil
 }

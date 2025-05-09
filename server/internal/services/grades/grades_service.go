@@ -15,8 +15,8 @@ type GradeServices interface {
 	UpdateGrade(ctx context.Context, grade *models.Grade) error
 	DeleteGrade(ctx context.Context, gradeID int, collegeID int) error
 	GetGrades(ctx context.Context, filter models.GradeFilter) ([]*models.Grade, error)
-	CalculateAndStoreStudentGPA(ctx context.Context,collegeID int,RollNo string)error 
-	
+	// CalculateAndStoreStudentGPA(ctx context.Context,collegeID int,RollNo string)error 
+
 }
 
 type gradeServices struct {

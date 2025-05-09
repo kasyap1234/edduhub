@@ -9,6 +9,10 @@ type Repository struct {
 	QuizRepository       QuizRepository       // Added Quiz
 	DepartmentRepository DepartmentRepository // Added Department
 	ProfileRepository    ProfileRepository    // Added Profile
+	CourseRepository     CourseRepository
+	LectureRepository    LectureRepository
+	CollegeRepository    CollegeRepository
+	GradeRepository      GradeRepository
 }
 
 // NewRepository creates a new repository with all required sub-repositories
@@ -23,6 +27,10 @@ func NewRepository(DB *DB) *Repository {
 	quizRepo := NewQuizRepository(DB)             // Instantiate Quiz
 	departmentRepo := NewDepartmentRepository(DB) // Instantiate Department
 	profileRepo := NewProfileRepository(DB)       // Instantiate Profile
+	courseRepo := NewCourseRepository(DB)
+	lectureRepo := NewLectureRepository(DB)
+	collegeRepo := NewCollegeRepository(DB)
+	gradeRepo := NewGradeRepository(DB)
 	return &Repository{
 		AttendanceRepository: attendanceRepo,
 		StudentRepository:    studentRepo,
@@ -32,5 +40,9 @@ func NewRepository(DB *DB) *Repository {
 		QuizRepository:       quizRepo,
 		DepartmentRepository: departmentRepo,
 		ProfileRepository:    profileRepo,
+		CourseRepository:     courseRepo,
+		LectureRepository:    lectureRepo,
+		CollegeRepository:    collegeRepo,
+		GradeRepository:      gradeRepo,
 	}
 }

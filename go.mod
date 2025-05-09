@@ -17,6 +17,7 @@ require (
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.4
 	go.uber.org/zap v1.27.0
+	golang.org/x/sync v0.13.0
 )
 
 require (
