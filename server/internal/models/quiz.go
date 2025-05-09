@@ -33,6 +33,14 @@ type Question struct {
 	Options []*AnswerOption `db:"-" json:"options,omitempty"` // For MultipleChoice/TrueFalse
 }
 
+// QuizAttemptStatus defines the possible statuses for a quiz attempt.
+type QuizAttemptStatus string
+
+const (
+	QuizAttemptStatusInProgress QuizAttemptStatus = "InProgress"
+	QuizAttemptStatusCompleted  QuizAttemptStatus = "Completed"
+	QuizAttemptStatusGraded     QuizAttemptStatus = "Graded"
+)
 // AnswerOption represents a possible answer for a multiple-choice or true/false question.
 type AnswerOption struct {
 	ID         int       `db:"id" json:"id"`
@@ -52,7 +60,7 @@ type QuizAttempt struct {
 	StartTime time.Time `db:"start_time" json:"start_time"`
 	EndTime   time.Time `db:"end_time" json:"end_time"` // Nullable until finished
 	Score     *int      `db:"score" json:"score"`       // Nullable until graded
-	Status    string    `db:"status" json:"status"`     // e.g., InProgress, Completed, Graded
+	Status    QuizAttemptStatus    `db:"status" json:"status"`     // e.g., InProgress, Completed, Graded
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 

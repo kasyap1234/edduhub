@@ -9,6 +9,7 @@ import (
 	"eduhub/server/internal/services/lecture"
 	"eduhub/server/internal/services/attendance"
 	"eduhub/server/internal/services/auth"
+	"eduhub/server/internal/services/quiz" // Added Quiz service import
 	"eduhub/server/internal/services/student"
 )
 
@@ -20,9 +21,8 @@ type Services struct {
 	CourseService  course.CourseService
 	GradeService   grades.GradeServices
 	LectureService lecture.LectureService
+	QuizService    quiz.QuizService // Added QuizService field
 
-	// System         system.SystemService
-	// Quiz *Quiz.QuizService
 	// Fee *Fee.FeeService
 }
 
@@ -45,6 +45,7 @@ func NewServices(cfg *config.Config) *Services {
 	courseService := course.NewCourseService(repo.CourseRepository)
 	gradeService := grades.NewGradeServices(repo.GradeRepository, repo.StudentRepository, repo.EnrollmentRepository, repo.CourseRepository)
 	lectureService := lecture.NewLectureService(repo.LectureRepository)
+	quizService := quiz.NewQuizService(repo.QuizRepository) // Initialize QuizService
 
 	return &Services{
 		Auth:           authService,
@@ -54,6 +55,6 @@ func NewServices(cfg *config.Config) *Services {
 		CourseService:  courseService,
 		GradeService:   gradeService,
 		LectureService: lectureService,
-		// System:         systemService,
+		QuizService:    quizService, // Add QuizService to the struct
 	}
 }
