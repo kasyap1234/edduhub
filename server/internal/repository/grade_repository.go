@@ -30,6 +30,7 @@ type GradeRepository interface {
 	// GetStudentProgress and GenerateStudentReport might be higher-level service methods
 	// or more complex queries. For now, GetGrades with filters can serve many needs.
 	GetGradesByCourse(ctx context.Context, collegeID int, courseID int) ([]*models.Grade, error)
+	GetGradesByStudent(ctx context.Context, collegeID int, studentID int) ([]*models.Grade, error)
 }
 
 type gradeRepository struct {
@@ -208,5 +209,10 @@ func (r *gradeRepository) GetGradesByStudent(ctx context.Context, collegeID int,
 }
 
 func (r *gradeRepository) GetGradesByCourse(ctx context.Context, collegeID int, courseID int) ([]*models.Grade, error) {
-
+	// courseIDStr := string(courseID)
+	filter := models.GradeFilter{
+		CourseID:  &courseID,
+		CollegeID: &collegeID,
+	}
+	return r.GetGrades(ctx, filter)
 }
